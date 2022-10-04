@@ -1,0 +1,13 @@
+# dotenv environment variables file
+*.env
+# IDE / Editor
+.idea
+# macOS
+.DS_Store
+# Python virtual environment
+venv
+# Python built modules
+__pycache__
+
+key.json
+.vscode

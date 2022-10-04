@@ -1,0 +1,14 @@
+.gcloudignore
+
+.git
+.gitignore
+
+# Python pycache:
+__pycache__/
+venv/
+.env
+# Ignored by the build system
+/setup.cfg
+.vscode
+.DS_Store
+key.json

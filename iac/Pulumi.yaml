@@ -1,0 +1,6 @@
+name: personal-blog
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Personal blog deployment on DigitalOcean

@@ -1,0 +1,66 @@
+baseURL: 'https://elmouatassim.louhaidia.info/'
+author: Elmouatassim
+copyright: 'Copyright 2022, Elmouatassim Louhaidia ; all rights reserved.'
+paginate: 10
+languageCode: en
+DefaultContentLanguage: en
+enableInlineShortcodes: true
+disableHugoGeneratorInject: true
+enableRobotsTXT: true
+
+disableKinds: ["RSS"]
+
+ignoreErrors:
+  - error-remote-getjson
+
+title: Elmouatassim.
+
+params:
+  github: mota-lhd
+  instagram: mota.hills
+  subtitle: 'Experimentations, adventures, stories.'
+  disableHLJS: true
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: false
+
+menu:
+  main:
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 10
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 20
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 30
+    - identifier: series
+      name: Series
+      url: /series/
+      weight: 40
+
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
+privacy:
+  instagram:
+    disabled: false
+    simple: true
+
+  googleAnalytics:
+    anonymizeIP: true
+    disable: true
+    respectDoNotTrack: true
+    useSessionStorage: true
+
+services:
+  instagram:
+    disableInlineCSS: true
