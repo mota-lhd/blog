@@ -1,7 +1,0 @@
-indexes:
-- kind: Comment
-  ancestor: yes
-  properties:
-    - name: visible
-    - name: ts
-      direction: desc
