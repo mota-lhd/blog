@@ -1,4 +1,5 @@
 [![Better Uptime Badge](https://betteruptime.com/status-badges/v1/monitor/diai.svg)](https://betteruptime.com/?utm_source=status_badge)
+<img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
 
 # Personal blog
 

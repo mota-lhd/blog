@@ -7,7 +7,7 @@ variable "project_id" {
 variable "location" {
   type        = string
   description = "Location of resources"
-  default     = "europe-west3"
+  default     = "europe-west1"
 }
 
 variable "main_domain" {

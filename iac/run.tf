@@ -19,7 +19,7 @@ resource "google_cloud_run_service" "backend" {
       timeout_seconds = 60 * 60
 
       containers {
-        image = "europe-west3-docker.pkg.dev/${var.project_id}/docker-repo/web/back:latest"
+        image = "${var.location}-docker.pkg.dev/${var.project_id}/docker-repo/web/back:latest"
         resources {
           requests = {
             cpu    = "1000m" # 1 vCPU
@@ -67,12 +67,22 @@ resource "google_cloud_run_service" "backend" {
   }
   metadata {
     annotations = {
-      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
     }
   }
   traffic {
     percent         = 100
     latest_revision = true
+  }
+}
+
+resource "google_cloud_run_domain_mapping" "backend" {
+  name     = "backend.${var.main_domain}"
+  location = google_cloud_run_service.backend.location
+  metadata {
+    namespace = var.project_id
+  }
+  spec {
+    route_name = google_cloud_run_service.backend.name
   }
 }
 
@@ -85,7 +95,7 @@ resource "google_cloud_run_service" "elmouatassim" {
       timeout_seconds = 60 * 60
 
       containers {
-        image = "europe-west3-docker.pkg.dev/${var.project_id}/docker-repo/web/front:latest"
+        image = "${var.location}-docker.pkg.dev/${var.project_id}/docker-repo/web/front:latest"
         resources {
           requests = {
             cpu    = "1000m" # 1 vCPU
@@ -112,12 +122,22 @@ resource "google_cloud_run_service" "elmouatassim" {
   }
   metadata {
     annotations = {
-      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
     }
   }
   traffic {
     percent         = 100
     latest_revision = true
+  }
+}
+
+resource "google_cloud_run_domain_mapping" "elmouatassim" {
+  name     = "elmouatassim.${var.main_domain}"
+  location = google_cloud_run_service.elmouatassim.location
+  metadata {
+    namespace = var.project_id
+  }
+  spec {
+    route_name = google_cloud_run_service.elmouatassim.name
   }
 }
 

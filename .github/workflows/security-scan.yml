@@ -1,0 +1,57 @@
+name: Scan for security issues
+
+on:
+  pull_request:
+    branches-ignore:
+      - "main"
+
+jobs:
+  gitleaks-scan:
+    name: Run gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: true
+          GITLEAKS_ENABLE_SUMMARY: true
+
+  trivy-scan:
+    name: Docker related checks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Scan backend Dockerfile
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        security-checks: 'config'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        scan-ref: './back/Dockerfile'
+        ignore-unfixed: true
+        format: 'table'
+        exit-code: 3
+
+    - name: Scan frontend Dockerfile
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        security-checks: 'config'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        scan-ref: './front/Dockerfile'
+        ignore-unfixed: true
+        format: 'table'
+        exit-code: 3
+
+    - name: Scan HCL code
+      uses: aquasecurity/tfsec-action@v1.0.2
+      with:
+        working_directory: '.'
+        soft-fail: false
+        additional_args: "--concise-output --minimum-severity='MEDIUM'"

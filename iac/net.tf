@@ -11,80 +11,62 @@ resource "google_dns_managed_zone" "zone" {
   }
 }
 
-resource "google_dns_record_set" "backend" {
+# https://www.google.com/webmasters/verification/home
+resource "google_dns_record_set" "backend_verif" {
   project = var.project_id
   name    = "backend.${var.main_domain}."
-  type    = "A"
+  type    = "TXT"
   ttl     = 300
 
   managed_zone = google_dns_managed_zone.zone.name
 
-  rrdatas = [module.lb-http.external_ip]
+  rrdatas = ["google-site-verification=TlJejL41u3Cu1Ea3ymLZp2QU8IaaPURi6xkr05SM6RU"]
 }
 
-resource "google_dns_record_set" "elmouatassim" {
+# https://www.google.com/webmasters/verification/home
+resource "google_dns_record_set" "elmouatassim_verif" {
   project = var.project_id
   name    = "elmouatassim.${var.main_domain}."
-  type    = "A"
+  type    = "TXT"
   ttl     = 300
 
   managed_zone = google_dns_managed_zone.zone.name
 
-  rrdatas = [module.lb-http.external_ip]
+  rrdatas = ["google-site-verification=IiMvco0FcO1xwnBej8eD3kVzFYLAZeswBUfJaK293LY"]
 }
 
-resource "google_compute_region_network_endpoint_group" "run_neg" {
-  name        = "http-neg"
-  description = "Serverless network endpoint group"
-
-  network_endpoint_type = "SERVERLESS"
-  region                = var.location
-  project               = var.project_id
-
-  cloud_run {
-    url_mask = "<service>.${var.main_domain}"
+resource "google_dns_record_set" "elmouatassim_mappings" {
+  for_each = {
+    for record in google_cloud_run_domain_mapping.elmouatassim.status[0].resource_records:
+    record.type => record.rrdata...
   }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-module "lb-http" {
-  source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
-  version = "~> 6.3"
-  name    = "http-lb"
   project = var.project_id
+  name    = "elmouatassim.${var.main_domain}."
+  type    = each.key
+  ttl     = 300
 
-  ssl                             = true
-  managed_ssl_certificate_domains = [
-    "backend.${var.main_domain}",
-    "elmouatassim.${var.main_domain}"
+  managed_zone = google_dns_managed_zone.zone.name
+
+  rrdatas = each.value
+  depends_on = [
+    google_cloud_run_domain_mapping.elmouatassim
   ]
-  https_redirect                  = true
-  labels                          = {}
+}
 
-  backends = {
-    default = {
-      description = null
-      groups = [
-        {
-          group = google_compute_region_network_endpoint_group.run_neg.id
-        }
-      ]
-      enable_cdn              = false
-      security_policy         = null
-      custom_request_headers  = null
-      custom_response_headers = null
-
-      iap_config = {
-        enable               = false
-        oauth2_client_id     = ""
-        oauth2_client_secret = ""
-      }
-      log_config = {
-        enable      = false
-        sample_rate = null
-      }
-    }
+resource "google_dns_record_set" "backend_mappings" {
+  for_each = {
+    for record in google_cloud_run_domain_mapping.backend.status[0].resource_records:
+    record.type => record.rrdata...
   }
+  project = var.project_id
+  name    = "backend.${var.main_domain}."
+  type    = each.key
+  ttl     = 300
+
+  managed_zone = google_dns_managed_zone.zone.name
+
+  rrdatas = each.value
+  depends_on = [
+    google_cloud_run_domain_mapping.backend
+  ]
 }

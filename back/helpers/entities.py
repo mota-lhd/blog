@@ -15,6 +15,7 @@ post_titles: List[str] = [
     u'pokhara-2020-01',
     u'rollwaling-2019-01',
     u'rollwaling-2019-02',
+    u'tech-blog-01'
 ]
 source_credentials, project_id = default()
 project_id: str = "personal-blog-364911"
@@ -38,4 +39,4 @@ for post in post_titles:
 
         entity["title"] = post
         storage.put(entity)
-        print(f"+ added {post} ...")
+        print(f"+ added {post} with id={entity.id} ...")
