@@ -2,18 +2,8 @@
 
 # Personal blog
 
-## Hugo
+Done using Hugo. For detailed explanation on how things work, check out the [documentation](https://gohugo.io/documentation/).
 
-```zsh
-# install dependencies
-$ brew install hugo wget
-
-# create a hugo project
-$ hugo new site personal-blog -f yml
-```
-
-For detailed explanation on how things work, check out the [documentation](https://gohugo.io/documentation/).
-
-## Paper theme
+## Theme
 
 We are using a trimmed version of [Paper theme](https://github.com/nanxiaobei/hugo-paper).
