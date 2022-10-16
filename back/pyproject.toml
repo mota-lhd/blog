@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "back"
+version = "0.1.0"
+description = ""
+authors = ["Elmouatassim <mota.lhd@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.85.0"
+uvicorn = "^0.18.3"
+google-cloud-datastore = "^2.8.2"
+requests = "^2.28.1"
+pydantic = {extras = ["email"], version = "^1.10.2"}
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^1.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
