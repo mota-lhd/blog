@@ -8,9 +8,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.85.0"
+fastapi = "^0.85.1"
 uvicorn = "^0.18.3"
-google-cloud-datastore = "^2.8.2"
+google-cloud-datastore = "^2.8.3"
 requests = "^2.28.1"
 pydantic = {extras = ["email"], version = "^1.10.2"}
 
