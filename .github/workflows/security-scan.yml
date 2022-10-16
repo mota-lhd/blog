@@ -1,9 +1,7 @@
 name: Scan for security issues
 
 on:
-  pull_request:
-    branches-ignore:
-      - "main"
+  pull_request
 
 jobs:
   gitleaks-scan:
