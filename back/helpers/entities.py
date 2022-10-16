@@ -1,3 +1,5 @@
+import os
+
 from typing import List, Iterator
 from google.cloud.datastore import (Client as StorageClient, Entity, Query, Key)
 
@@ -18,10 +20,11 @@ post_titles: List[str] = [
     u'tech-blog-01'
 ]
 source_credentials, project_id = default()
-project_id: str = "personal-blog-364911"
+project_id: str = os.environ['PROJECT_ID']
+main_sa: str = os.environ['MAIN_SA']
 creds: Credentials = impersonated_credentials.Credentials(
     source_credentials=source_credentials,
-    target_principal=(f"main-service-account@{project_id}.iam.gserviceaccount.com"),
+    target_principal=(f"{main_sa}@{project_id}.iam.gserviceaccount.com"),
     target_scopes=["https://www.googleapis.com/auth/cloud-platform"],
 )
 storage: StorageClient = StorageClient(

@@ -1,0 +1,140 @@
+name: Deploy infra + apps
+
+on:
+  push:
+    branches:    
+      - main
+
+jobs:
+  gcp-oidc-auth:
+    name: Authenticates to GCP using OIDC
+    runs-on: ubuntu-latest
+    outputs:
+      access_token: ${{ steps.get_access_token.outputs.GOOGLE_OAUTH_ACCESS_TOKEN }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Auth
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/oidc-pool/providers/ci-cd-jwt'
+        audience: ${{ secrets.OIDC_AUDIENCE }}
+        service_account: ${{ secrets.CI_CD_SA_MAIL }}
+
+    - name: Set up Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: Impersonate main-service-account
+      id: get_access_token
+      run: echo "GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})" >> $GITHUB_OUTPUT
+
+  terraform-apply:
+    name: Terraform plan execution
+    runs-on: ubuntu-latest
+    needs: gcp-oidc-auth
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.3.2
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    - name: Auth remote terraform to GCP
+      run: |
+        cat << EOF > /tmp/tf-var-set-update.json
+        {
+          "data": {
+            "type": "vars",
+            "attributes": {
+              "key": "GOOGLE_OAUTH_ACCESS_TOKEN",
+              "value": "${{ needs.gcp-oidc-auth.outputs.access_token }}",
+              "description": "Access token for main service account ; valid for 1 hour max.",
+              "sensitive": true,
+              "category": "env",
+              "hcl": false
+            }
+          }
+        }
+        EOF
+
+        curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data @/tmp/tf-var-set-update.json \
+          https://app.terraform.io/api/v2/${{ secrets.TF_API_VAR_PATH }}
+
+    - name: Terraform apply
+      run: terraform apply -auto-approve -input=false
+
+  build-push:
+    name: Apply latest IAC ; Build docker images ; Push them ; Updates Run services
+    runs-on: ubuntu-latest
+    needs: [gcp-oidc-auth, terraform-apply]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Auth to docker artifact registry
+      run: echo ${{ needs.gcp-oidc-auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://europe-west1-docker.pkg.dev
+
+    - name: Build & push backend image
+      uses: docker/build-push-action@v3
+      with:
+        context: ./back/
+        push: true
+        tags: europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/back:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build & push frontend image
+      uses: docker/build-push-action@v3
+      with:
+        context: ./front/
+        push: true
+        tags: europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/front:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  update:
+    name: Update Cloud Run services
+    needs: build-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Auth
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/oidc-pool/providers/ci-cd-jwt'
+        audience: ${{ secrets.OIDC_AUDIENCE }}
+        service_account: ${{ secrets.CI_CD_SA_MAIL }}
+
+    - name: Set up Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: Update services (front and back)
+      run: |
+        gcloud run services update --quiet "elmouatassim" \
+          --project "${{ secrets.PROJECT_NAME}}" \
+          --region "europe-west1" \
+          --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/front:latest" \
+          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
+
+        gcloud run services update --quiet "backend" \
+          --project "${{ secrets.PROJECT_NAME}}" \
+          --region "europe-west1" \
+          --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/back:latest" \
+          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}

@@ -4,8 +4,8 @@ on:
   pull_request
 
 jobs:
-  gitleaks-scan:
-    name: Run gitleaks
+  secrets-scan:
+    name: Detect secrets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,18 +18,19 @@ jobs:
           GITLEAKS_ENABLE_COMMENTS: true
           GITLEAKS_ENABLE_SUMMARY: true
 
-  trivy-scan:
-    name: Docker related checks
+  dockerfile-scan:
+    name: Dockerfile related checks
     runs-on: ubuntu-latest
+    needs: secrets-scan
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Scan backend Dockerfile
-      uses: aquasecurity/trivy-action@@0.7.1
+      uses: aquasecurity/trivy-action@0.7.1
       with:
         scan-type: 'config'
-        security-checks: 'config'
         severity: 'MEDIUM,HIGH,CRITICAL'
         scan-ref: './back/Dockerfile'
         ignore-unfixed: true
@@ -37,19 +38,184 @@ jobs:
         exit-code: 3
 
     - name: Scan frontend Dockerfile
-      uses: aquasecurity/trivy-action@@0.7.1
+      uses: aquasecurity/trivy-action@0.7.1
       with:
         scan-type: 'config'
-        security-checks: 'config'
         severity: 'MEDIUM,HIGH,CRITICAL'
         scan-ref: './front/Dockerfile'
         ignore-unfixed: true
         format: 'table'
         exit-code: 3
 
-    - name: Scan HCL code
+  docker-build:
+    name: Build docker images
+    runs-on: ubuntu-latest
+    needs: dockerfile-scan
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build backend image from Dockerfile
+      uses: docker/build-push-action@v3
+      with:
+        context: ./back/
+        push: false
+        tags: local/web:back
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker,dest=/tmp/back.tar
+
+    - name: Build frontend image from Dockerfile
+      uses: docker/build-push-action@v3
+      with:
+        context: ./front/
+        push: false
+        tags: local/web:front
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker,dest=/tmp/front.tar
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-images
+        path: |
+          /tmp/front.tar
+          /tmp/back.tar
+        retention-days: 1
+
+  docker-image-scan:
+    name: Scan Docker images for vulnerabilities
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: docker-images
+        path: /tmp
+
+    - name: Load docker images
+      run: |
+        docker load --input /tmp/front.tar
+        docker load --input /tmp/back.tar
+        docker image ls -a
+
+    - name: Scan frontend image for vulnerabilities
+      uses: aquasecurity/trivy-action@0.7.1
+      with:
+        scan-type: 'image'
+        image-ref: 'local/web:front'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        format: 'table'
+        security-checks: 'vuln'
+        exit-code: 3
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+
+    - name: Scan backend image for vulnerabilities
+      uses: aquasecurity/trivy-action@0.7.1
+      with:
+        scan-type: 'image'
+        image-ref: 'local/web:back'
+        security-checks: 'vuln'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        format: 'table'
+        exit-code: 3
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+
+  iac-scan:
+    name: Terraform related checks
+    runs-on: ubuntu-latest
+    needs: secrets-scan
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Scan terraform code
       uses: aquasecurity/tfsec-action@v1.0.2
       with:
         working_directory: '.'
-        soft-fail: false
-        additional_args: "--concise-output --minimum-severity='MEDIUM'"
+        soft_fail: false
+        additional_args: "--concise-output --minimum-severity=MEDIUM"
+
+  terraform-plan:
+    name: Terraform plan execution
+    runs-on: ubuntu-latest
+    needs: [iac-scan, docker-image-scan]
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - id: 'gcp_oidc_auth'
+      name: Authenticate to Google Cloud using OIDC
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/oidc-pool/providers/ci-cd-jwt'
+        audience: ${{ secrets.OIDC_AUDIENCE }}
+        service_account: ${{ secrets.CI_CD_SA_MAIL }}
+
+    - name: Set up Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.3.2
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    - name: Auth remote terraform to GCP
+      run: |
+        export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
+
+        cat << EOF > /tmp/tf-var-set-update.json
+        {
+          "data": {
+            "type": "vars",
+            "attributes": {
+              "key": "GOOGLE_OAUTH_ACCESS_TOKEN",
+              "value": "${GOOGLE_OAUTH_ACCESS_TOKEN}",
+              "description": "Access token for main service account ; valid for 1 hour max.",
+              "sensitive": true,
+              "category": "env",
+              "hcl": false
+            }
+          }
+        }
+        EOF
+
+        curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data @/tmp/tf-var-set-update.json \
+          https://app.terraform.io/api/v2/${{ secrets.TF_API_VAR_PATH }}
+
+    - name: Terraform Format
+      id: fmt
+      run: terraform -chdir=./iac fmt -check
+
+    - name: Terraform Init
+      id: init
+      run: terraform -chdir=./iac init
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform -chdir=./iac validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      if: github.event_name == 'pull_request'
+      run: terraform -chdir=./iac plan -no-color -input=false

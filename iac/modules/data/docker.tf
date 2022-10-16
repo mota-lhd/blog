@@ -1,7 +1,7 @@
-resource "google_artifact_registry_repository" "docker-repo" {
+resource "google_artifact_registry_repository" "docker" {
   project       = var.project_id
   location      = var.location
-  repository_id = "docker-repo"
+  repository_id = "docker"
   description   = "Docker images"
   format        = "DOCKER"
 }

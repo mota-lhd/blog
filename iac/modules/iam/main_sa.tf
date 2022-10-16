@@ -8,7 +8,7 @@ resource "google_project_iam_custom_role" "main_custom" {
   project     = var.project_id
   role_id     = "main_custom_role"
   title       = "Main Custom Role"
-  permissions = var.main_sa_custom_permissions
+  permissions = var.main_custom_role_perms
 }
 
 resource "google_project_iam_member" "main_custom" {
@@ -28,5 +28,5 @@ resource "google_project_iam_member" "main_sa_roles" {
 resource "google_service_account_iam_member" "main_impersonate" {
   service_account_id = google_service_account.main.name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = var.main_impersonate_account
+  member             = "user:${var.main_impersonate_account}"
 }
