@@ -1,16 +1,15 @@
 resource "google_app_engine_application" "app" {
-  project     = var.project_id
-  location_id = "europe-west3"
+  project       = var.project_id
+  location_id   = trim(var.location, "1")
   database_type = "CLOUD_DATASTORE_COMPATIBILITY"
 }
 
 resource "google_datastore_index" "blog_post_comment" {
   kind     = "Comment"
   ancestor = "ALL_ANCESTORS"
-  project = var.project_id
 
   properties {
-    name = "visible"
+    name      = "visible"
     direction = "DESCENDING"
   }
   properties {
