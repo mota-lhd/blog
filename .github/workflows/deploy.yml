@@ -71,7 +71,7 @@ jobs:
           https://app.terraform.io/api/v2/${{ secrets.TF_API_VAR_PATH }}
 
     - name: Terraform apply
-      run: terraform apply -auto-approve -input=false
+      run: terraform -chdir=./iac apply -auto-approve -input=false
 
   build-push:
     name: Apply latest IAC ; Build docker images ; Push them ; Updates Run services
