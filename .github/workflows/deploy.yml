@@ -37,10 +37,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3.1.0
 
     - name: Setup terraform
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v2.0.2
       with:
         terraform_version: 1.3.2
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3.1.0
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -91,7 +91,7 @@ jobs:
       run: echo ${{ needs.gcp-oidc-auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://europe-west1-docker.pkg.dev
 
     - name: Build & push backend image
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v3.2.0
       with:
         context: ./back/
         push: true
@@ -100,7 +100,7 @@ jobs:
         cache-to: type=gha,mode=max
 
     - name: Build & push frontend image
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v3.2.0
       with:
         context: ./front/
         push: true

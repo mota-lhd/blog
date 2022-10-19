@@ -64,7 +64,8 @@ resource "google_cloud_run_service" "backend" {
   lifecycle {
     ignore_changes = [
       template[0].spec[0].containers[0].ports[0].protocol,
-      metadata[0].annotations
+      metadata[0].annotations,
+      template[0].metadata[0]
     ]
   }
 }
