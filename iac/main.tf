@@ -7,7 +7,7 @@ terraform {
   }
 
   cloud {
-    organization = "kraggin"
+    organization = "mota-lhd"
 
     workspaces {
       name = "personal-blog"
