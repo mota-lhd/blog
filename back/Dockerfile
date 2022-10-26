@@ -1,30 +1,30 @@
-FROM python:3.10.6-alpine as build
+FROM python:3.10 as requirements-step
 
-RUN apk add --no-cache \
-        curl gcc libressl-dev build-base musl-dev libffi-dev
+WORKDIR /tmp
 
-RUN /usr/local/bin/python -m pip install --upgrade pip
-RUN /usr/local/bin/python -m pip install --no-cache-dir poetry==1.2.1
+RUN pip install --no-cache-dir poetry
+COPY poetry.lock pyproject.toml /tmp/
 
-WORKDIR /
-COPY poetry.lock pyproject.toml /
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root --without dev
-RUN /usr/local/bin/python -m pip uninstall --yes poetry
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM python:3.10.6-alpine as prod
+FROM python:3.10-alpine as prod
+
+LABEL org.opencontainers.image.authors="elmouatassim.louhaidia@pm.me"
+
+HEALTHCHECK --interval=5m --timeout=3s \
+    CMD curl -f http://localhost/ || exit 1
 
 RUN addgroup web
 RUN adduser --disabled-password --ingroup web back
 
+WORKDIR /web
+COPY --from=requirements-step /tmp/requirements.txt /web/requirements.txt
+COPY --chown=back:web ./src/ /web/
+
 RUN apk -U upgrade
-RUN apk add --no-cache jq git
+RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 EXPOSE 80
-
-WORKDIR /web
-COPY --from=build /usr/local /usr/local
-COPY --chown=back:web ./src/ /web/
 
 USER back
 
