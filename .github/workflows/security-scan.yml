@@ -179,6 +179,8 @@ jobs:
       run: |
         export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
 
+        echo "::add-mask::$GOOGLE_OAUTH_ACCESS_TOKEN"
+
         cat << EOF > /tmp/tf-var-set-update.json
         {
           "data": {
