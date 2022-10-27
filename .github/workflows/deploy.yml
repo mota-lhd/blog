@@ -14,6 +14,15 @@ jobs:
       id-token: 'write'
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.1.0
+
+    - name: Setup terraform
+      uses: hashicorp/setup-terraform@v2.0.2
+      with:
+        terraform_version: 1.3.2
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
     - name: OIDC authentication
       uses: 'google-github-actions/auth@v0'
       with:
@@ -27,23 +36,9 @@ jobs:
     - name: Impersonate main service account
       id: get_access_token
       run: |
-        export APP_TOKEN=$(gcloud auth application-default print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
         export TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
-
-        echo "::add-mask::$APP_TOKEN"
         echo "::add-mask::$TOKEN"
-
         echo "GOOGLE_OAUTH_ACCESS_TOKEN=$TOKEN" >> $GITHUB_ENV
-        echo "GOOGLE_APP_DEFAULT_TOKEN=$APP_TOKEN" >> $GITHUB_ENV
-
-    - name: Checkout code
-      uses: actions/checkout@v3.1.0
-
-    - name: Setup terraform
-      uses: hashicorp/setup-terraform@v2.0.2
-      with:
-        terraform_version: 1.3.2
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
     - name: Remote authentication from terraform to GCP
       run: |
@@ -101,17 +96,14 @@ jobs:
 
     - name: Update services (front and back)
       run: |
-        export ACCESS_TOKEN_FILE=/tmp/gcp_oauth_access_token
-        echo {{ env.GOOGLE_APP_DEFAULT_TOKEN }} > $ACCESS_TOKEN_FILE
-
         gcloud run services update --quiet "elmouatassim" \
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
           --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/front:latest" \
-          --access-token-file=$ACCESS_TOKEN_FILE
+          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
 
         gcloud run services update --quiet "backend" \
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
           --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/back:latest" \
-          --access-token-file=$ACCESS_TOKEN_FILE
+          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
