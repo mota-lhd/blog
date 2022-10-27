@@ -96,14 +96,17 @@ jobs:
 
     - name: Update services (front and back)
       run: |
+        export ACCESS_TOKEN_FILE=/tmp/gcp_oauth_access_token
+        echo {{ env.GOOGLE_OAUTH_ACCESS_TOKEN }} > $ACCESS_TOKEN_FILE
+
         gcloud run services update --quiet "elmouatassim" \
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
           --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/front:latest" \
-          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
+          --access-token-file=$ACCESS_TOKEN_FILE
 
         gcloud run services update --quiet "backend" \
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
           --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/back:latest" \
-          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
+          --access-token-file=$ACCESS_TOKEN_FILE
