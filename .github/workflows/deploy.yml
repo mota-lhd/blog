@@ -96,6 +96,8 @@ jobs:
 
     - name: Update services (front and back)
       run: |
+        export GOOGLE_OAUTH_ACCESS_TOKEN={{ env.GOOGLE_OAUTH_ACCESS_TOKEN }}
+
         gcloud run services update --quiet "elmouatassim" \
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
