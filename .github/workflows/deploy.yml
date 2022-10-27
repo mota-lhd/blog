@@ -27,9 +27,14 @@ jobs:
     - name: Impersonate main service account
       id: get_access_token
       run: |
+        export APP_TOKEN=$(gcloud auth application-default print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
         export TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
+
+        echo "::add-mask::$APP_TOKEN"
         echo "::add-mask::$TOKEN"
+
         echo "GOOGLE_OAUTH_ACCESS_TOKEN=$TOKEN" >> $GITHUB_ENV
+        echo "GOOGLE_APP_DEFAULT_TOKEN=$APP_TOKEN" >> $GITHUB_ENV
 
     - name: Checkout code
       uses: actions/checkout@v3.1.0
@@ -97,7 +102,7 @@ jobs:
     - name: Update services (front and back)
       run: |
         export ACCESS_TOKEN_FILE=/tmp/gcp_oauth_access_token
-        echo {{ env.GOOGLE_OAUTH_ACCESS_TOKEN }} > $ACCESS_TOKEN_FILE
+        echo {{ env.GOOGLE_APP_DEFAULT_TOKEN }} > $ACCESS_TOKEN_FILE
 
         gcloud run services update --quiet "elmouatassim" \
           --project "${{ secrets.PROJECT_NAME}}" \
