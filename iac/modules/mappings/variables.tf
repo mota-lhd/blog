@@ -26,6 +26,11 @@ variable "backend_cloud_run_name" {
   description = "Name of backend cloud-run"
 }
 
+variable "umami_cloud_run_name" {
+  type        = string
+  description = "Name of umami cloud-run"
+}
+
 variable "managed_zone_name" {
   type        = string
   description = "Managed zone name"

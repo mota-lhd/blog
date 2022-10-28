@@ -22,3 +22,8 @@ variable "front_records" {
   type        = list(any)
   description = "Mappings A and AAAA records for frontend"
 }
+
+variable "umami_records" {
+  type        = list(any)
+  description = "Mappings A and AAAA records for umami"
+}
