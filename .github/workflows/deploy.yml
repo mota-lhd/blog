@@ -71,7 +71,6 @@ jobs:
 
         terraform -chdir=./iac apply -auto-approve -input=false \
                   -target=google_project_service.default_services \
-                  -target=module.iam \
                   -target=module.dns \
                   -target=module.backend-data \
                   -target=module.backend \
