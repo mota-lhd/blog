@@ -72,20 +72,20 @@ jobs:
         terraform -chdir=./iac plan \
                   -out=./first-stage.plan \
                   -input=false \
-                  -target=default_services \
-                  -target=iam \
-                  -target=dns \
-                  -target=backend-data \
-                  -target=backend \
-                  -target=frontend \
-                  -target=umami \
-                  -target=run-mappings
+                  -target=google_project_service.default_services \
+                  -target=module.iam \
+                  -target=module.dns \
+                  -target=module.backend-data \
+                  -target=module.backend \
+                  -target=module.frontend \
+                  -target=module.umami \
+                  -target=module.run-mappings
         terraform -chdir=./iac apply "./first-stage.plan" -auto-approve -input=false
 
         terraform -chdir=./iac plan \
                   -out=./second-stage.plan \
                   -input=false \
-                  -target=dns-records \
+                  -target=module.dns-records \
         terraform -chdir=./iac apply "./second-stage.plan" -auto-approve -input=false
 
     - name: Set up Docker Buildx
