@@ -13,7 +13,7 @@ resource "google_cloud_run_service" "umami" {
       timeout_seconds = 60 * 60
 
       containers {
-        image = "docker.umami.is/umami-software/umami:postgresql-latest"
+        image = "europe-west1-docker.pkg.dev/${var.project_id}/docker/umami:latest"
         resources {
           requests = {
             cpu    = "1000m" # 1 vCPU
