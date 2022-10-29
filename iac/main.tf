@@ -66,6 +66,12 @@ module "frontend" {
   location   = var.location
 }
 
+module "umami" {
+  source     = "./modules/umami"
+  project_id = var.project_id
+  location   = var.location
+}
+
 module "run-mappings" {
   source                 = "./modules/mappings"
   project_id             = var.project_id
@@ -73,6 +79,7 @@ module "run-mappings" {
   main_domain            = var.main_domain
   front_cloud_run_name   = module.frontend.cloud_run_name
   backend_cloud_run_name = module.backend.cloud_run_name
+  umami_cloud_run_name   = module.umami.cloud_run_name
   managed_zone_name      = module.dns.managed_zone_name
 }
 
@@ -83,4 +90,5 @@ module "dns-records" {
   main_domain       = var.main_domain
   back_records      = module.run-mappings.backend_records
   front_records     = module.run-mappings.front_records
+  umami_records     = module.run-mappings.umami_records
 }
