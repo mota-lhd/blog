@@ -69,9 +69,7 @@ jobs:
       run: |
         terraform -chdir=./iac init
 
-        terraform -chdir=./iac plan \
-                  -out=./first-stage.plan \
-                  -input=false \
+        terraform -chdir=./iac apply -auto-approve -input=false \
                   -target=google_project_service.default_services \
                   -target=module.iam \
                   -target=module.dns \
@@ -80,13 +78,9 @@ jobs:
                   -target=module.frontend \
                   -target=module.umami \
                   -target=module.run-mappings
-        terraform -chdir=./iac apply "./first-stage.plan" -auto-approve -input=false
 
-        terraform -chdir=./iac plan \
-                  -out=./second-stage.plan \
-                  -input=false \
+        terraform -chdir=./iac apply -auto-approve -input=false \
                   -target=module.dns-records \
-        terraform -chdir=./iac apply "./second-stage.plan" -auto-approve -input=false
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
