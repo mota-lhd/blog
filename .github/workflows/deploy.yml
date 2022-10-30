@@ -77,11 +77,6 @@ jobs:
           --data @/tmp/tf-var-set-update.json \
           https://app.terraform.io/api/v2/${{ secrets.TF_API_VAR_PATH }}
 
-    - name: Terraform apply
-      run: |
-        terraform -chdir=./iac init
-        terraform -chdir=./iac apply -auto-approve -input=false
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
@@ -102,6 +97,11 @@ jobs:
         tags: europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME }}/docker/front:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - name: Terraform apply
+      run: |
+        terraform -chdir=./iac init
+        terraform -chdir=./iac apply -auto-approve -input=false
 
     - name: Update services (front and back)
       run: |
