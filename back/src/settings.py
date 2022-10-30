@@ -3,8 +3,8 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     SERVICE_NAME: str
     PROJECT_ID: str
-    GOOGLE_CAPTCHA_SERVER_KEY: str
-    GOOGLE_CAPTCHA_API_URL: str
+    CAPTCHA_SERVER_KEY: str
+    CAPTCHA_API_URL: str
     DEBUG: bool = False
     REQUEST_TIMEOUT: int = 30
 

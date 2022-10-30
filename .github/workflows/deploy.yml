@@ -80,18 +80,7 @@ jobs:
     - name: Terraform apply
       run: |
         terraform -chdir=./iac init
-
-        terraform -chdir=./iac apply -auto-approve -input=false \
-                  -target=google_project_service.default_services \
-                  -target=module.dns \
-                  -target=module.backend-data \
-                  -target=module.backend \
-                  -target=module.frontend \
-                  -target=module.umami \
-                  -target=module.run-mappings
-
-        terraform -chdir=./iac apply -auto-approve -input=false \
-                  -target=module.dns-records \
+        terraform -chdir=./iac apply -auto-approve -input=false
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -126,4 +115,10 @@ jobs:
           --project "${{ secrets.PROJECT_NAME}}" \
           --region "europe-west1" \
           --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/back:latest" \
+          --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}
+
+        gcloud run services update --quiet "umami" \
+          --project "${{ secrets.PROJECT_NAME}}" \
+          --region "europe-west1" \
+          --image "europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME}}/docker/umami:latest" \
           --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }}

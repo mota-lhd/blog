@@ -153,3 +153,6 @@ jobs:
 
     - name: Terraform Validate
       run: terraform -chdir=./iac validate -no-color
+
+    - name: Terraform plan
+      run: terraform -chdir=./iac plan

@@ -49,7 +49,7 @@ class Comment(BaseModel):
 
 
 class CommentIn(Comment):
-    captcha: str = Field(alias="g-recaptcha-response")
+    captcha: str
 
 
 class Article(BaseModel):
@@ -63,8 +63,6 @@ class Article(BaseModel):
 origins: list = [
     # PROD
     "https://elmouatassim.louhaidia.info",
-    # DEV
-    "http://localhost:1313",
 ]
 router: APIRouter = APIRouter()
 
@@ -84,13 +82,13 @@ async def get_db():
 # Helper methods
 
 
-def check_g_captcha(token: str) -> bool:
+def check_captcha(token: str) -> bool:
     payload: dict = {
-        "secret": settings.GOOGLE_CAPTCHA_SERVER_KEY,
+        "secret": settings.CAPTCHA_SERVER_KEY,
         "response": token,
     }
 
-    res = post(settings.GOOGLE_CAPTCHA_API_URL, data=payload)
+    res = post(settings.CAPTCHA_API_URL, data=payload)
     res = res.json()
 
     if not res["success"]:
@@ -111,11 +109,11 @@ def raise_g_captcha_error(error_code: str):
     elif error_code == "invalid-input-response":
         msg = msg + "Captcha is not formed correctly !!"
     elif error_code == "bad-request":
-        msg = msg + "The request to Google is not formed correctly ..."
+        msg = msg + "The request is not formed correctly ..."
     elif error_code == "timeout-or-duplicate":
-        msg = msg + "Request to Google timed out !"
+        msg = msg + "Request timed out !"
     else:
-        msg = msg + "Unknown error to Google Captcha !"
+        msg = msg + "Internal error!"
 
     raise UnauthorizedException(msg)
 
@@ -154,7 +152,7 @@ async def add_comment_to_article(
     comment: CommentIn,
     storage: StorageClient = Depends(get_db),
 ):
-    if check_g_captcha(comment.captcha):
+    if check_captcha(comment.captcha):
         with storage.transaction():
             article: Article = storage.get(
                 storage.key(Entities.ARTICLE.value, article_id)
