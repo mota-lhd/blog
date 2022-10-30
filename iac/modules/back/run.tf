@@ -28,15 +28,15 @@ resource "google_cloud_run_service" "backend" {
           value = "Personal Blog API"
         }
         env {
-          name  = "GOOGLE_CAPTCHA_API_URL"
-          value = "https://www.google.com/recaptcha/api/siteverify"
+          name  = "CAPTCHA_API_URL"
+          value = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
         }
         env {
-          name = "GOOGLE_CAPTCHA_SERVER_KEY"
+          name = "CAPTCHA_SERVER_KEY"
           value_from {
             secret_key_ref {
               key  = "latest"
-              name = "google-captcha-server-key"
+              name = "captcha-server-key"
             }
           }
         }

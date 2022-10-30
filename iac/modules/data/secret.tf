@@ -1,6 +1,6 @@
 resource "google_secret_manager_secret" "captcha_server_key" {
   project   = var.project_id
-  secret_id = "google-captcha-server-key"
+  secret_id = "captcha-server-key"
   replication {
     automatic = true
   }

@@ -1,4 +1,4 @@
-<script src="https://www.google.com/recaptcha/api.js?hl=en" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <script lang="javascript" async defer>
   const targetBackend = "https://backend.louhaidia.info/api/article/{{ .articleID }}"
@@ -60,13 +60,13 @@
     <input required data-tooltip="Mandatory field" type="email" id="comment_who" name="who" tabindex="1" placeholder="Your mail address" class="tooltip-top">
     <textarea required id="comment_content" name="content" tabindex="2" placeholder="Tell me everything :)" ></textarea>
 
-    <div id="g_recaptcha_response"
-         class="g-recaptcha g-captcha"
-         style="margin-left: 1em;"
-         data-sitekey="6LeQI3AfAAAAABP6SNP_lD54_UW1GlKTD4iIWZTJ"
-         data-theme="light"
-         data-size="compact"
-         data-tabindex="3"></div>
+    <div class="cf-turnstile"
+         data-sitekey="0x4AAAAAAABCp0ljCLkn6iFC"
+         data-theme="auto"
+         data-response-field-name="captcha"
+         data-size="compact">
+    </div>
+
     <footer>
       <button type="submit">Submit!</button>
     </footer>      

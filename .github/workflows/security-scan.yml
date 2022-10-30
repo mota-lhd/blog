@@ -4,28 +4,27 @@ on:
   pull_request
 
 jobs:
-  secrets-scan:
-    name: Detect secrets
+  pre-checks:
+    name: Pre security scans
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3.1.0
-        with:
-          fetch-depth: 0
 
-      - uses: gitleaks/gitleaks-action@v2.3.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_ENABLE_COMMENTS: true
-          GITLEAKS_ENABLE_SUMMARY: true
-
-  dockerfile-scan:
-    name: Dockerfile related checks
-    runs-on: ubuntu-latest
-    needs: secrets-scan
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      pull-requests: 'read'
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3.1.0
+      with:
+        fetch-depth: 0
+
+    - name: Detect secrets
+      uses: gitleaks/gitleaks-action@v2.3.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_ENABLE_COMMENTS: true
+        GITLEAKS_ENABLE_SUMMARY: true
 
     - name: Scan backend Dockerfile
       uses: aquasecurity/trivy-action@0.7.1
@@ -47,14 +46,12 @@ jobs:
         format: 'table'
         exit-code: 3
 
-  docker-build:
-    name: Build docker images
-    runs-on: ubuntu-latest
-    needs: dockerfile-scan
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3.1.0
+    - name: Scan terraform code
+      uses: aquasecurity/tfsec-action@v1.0.2
+      with:
+        working_directory: '.'
+        soft_fail: false
+        additional_args: "--concise-output --minimum-severity=MEDIUM"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -67,56 +64,7 @@ jobs:
         tags: local/web:back
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        outputs: type=docker,dest=/tmp/back.tar
-
-    - name: Build frontend image from Dockerfile
-      uses: docker/build-push-action@v3.2.0
-      with:
-        context: ./front/
-        push: false
-        tags: local/web:front
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        outputs: type=docker,dest=/tmp/front.tar
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: docker-images
-        path: |
-          /tmp/front.tar
-          /tmp/back.tar
-        retention-days: 1
-
-  docker-image-scan:
-    name: Scan Docker images for vulnerabilities
-    runs-on: ubuntu-latest
-    needs: docker-build
-
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: docker-images
-        path: /tmp
-
-    - name: Load docker images
-      run: |
-        docker load --input /tmp/front.tar
-        docker load --input /tmp/back.tar
-        docker image ls -a
-
-    - name: Scan frontend image for vulnerabilities
-      uses: aquasecurity/trivy-action@0.7.1
-      with:
-        scan-type: 'image'
-        image-ref: 'local/web:front'
-        severity: 'MEDIUM,HIGH,CRITICAL'
-        format: 'table'
-        security-checks: 'vuln'
-        exit-code: 3
-        ignore-unfixed: true
-        vuln-type: 'os,library'
+        outputs: type=docker
 
     - name: Scan backend image for vulnerabilities
       uses: aquasecurity/trivy-action@0.7.1
@@ -130,34 +78,27 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
 
-  iac-scan:
-    name: Terraform related checks
-    runs-on: ubuntu-latest
-    needs: secrets-scan
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3.1.0
-
-    - name: Scan terraform code
-      uses: aquasecurity/tfsec-action@v1.0.2
+    - name: Build frontend image from Dockerfile
+      uses: docker/build-push-action@v3.2.0
       with:
-        working_directory: '.'
-        soft_fail: false
-        additional_args: "--concise-output --minimum-severity=MEDIUM"
+        context: ./front/
+        push: false
+        tags: local/web:front
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker
 
-  terraform-plan:
-    name: Terraform plan
-    runs-on: ubuntu-latest
-    needs: [iac-scan, docker-image-scan]
-
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3.1.0
+    - name: Scan frontend image for vulnerabilities
+      uses: aquasecurity/trivy-action@0.7.1
+      with:
+        scan-type: 'image'
+        image-ref: 'local/web:front'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        format: 'table'
+        security-checks: 'vuln'
+        exit-code: 3
+        ignore-unfixed: true
+        vuln-type: 'os,library'
 
     - name: Authenticate to Google Cloud using OIDC
       uses: 'google-github-actions/auth@v0'
@@ -212,3 +153,6 @@ jobs:
 
     - name: Terraform Validate
       run: terraform -chdir=./iac validate -no-color
+
+    - name: Terraform plan
+      run: terraform -chdir=./iac plan
