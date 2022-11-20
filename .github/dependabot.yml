@@ -6,7 +6,7 @@ updates:
     directory: "/back/" # Location of package manifests
     schedule:
       interval: "daily"
-      time: "11:30"
+      time: "14:00"
       timezone: "Europe/Paris"
     labels:
       - "poetry"
@@ -24,7 +24,7 @@ updates:
     directory: "/front/"
     schedule:
       interval: "daily"
-      time: "11:30"
+      time: "14:00"
       timezone: "Europe/Paris"
     labels:
       - "docker"
@@ -41,7 +41,7 @@ updates:
     directory: "/back/"
     schedule:
       interval: "daily"
-      time: "11:30"
+      time: "14:00"
       timezone: "Europe/Paris"
     labels:
       - "docker"
