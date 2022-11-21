@@ -15,6 +15,7 @@ variable "main_domain" {
 
 variable "main_impersonate_account" {
   type        = string
+  sensitive   = true
   description = "Account granted impersonation on main service account of the blog"
 }
 

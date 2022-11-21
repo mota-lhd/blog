@@ -1,7 +1,8 @@
 baseURL: 'https://elmouatassim.louhaidia.info/'
 author: Elmouatassim
 copyright: 'Copyright 2022, Elmouatassim Louhaidia ; all rights reserved.'
-paginate: 10
+
+paginate: 6
 languageCode: en
 DefaultContentLanguage: en
 enableInlineShortcodes: true
@@ -16,10 +17,15 @@ ignoreErrors:
 title: Elmouatassim.
 
 params:
+  color: 'linen'
   github: mota-lhd
   instagram: mota.hills
   subtitle: 'Experimentations, adventures, stories.'
   disableHLJS: true
+
+  # avatar: "https://domain.name/path/"
+  # name: "Elmouatassim"
+  # bio: "Discover fresh content"
 
 markup:
   goldmark:

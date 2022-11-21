@@ -4,8 +4,7 @@
 
 .fig-caption {
     flex-shrink: 0;
-    font-size: 2rem;
-    color: var(--air);
+    font-size: 1rem;
 }
 
 /*
@@ -112,13 +111,6 @@ button[disabled] {
   background: #aaa;
 }
 
-/*
-  G-Captcha
-*/
-
-.g-captcha {
-  max-width: 50%;
-}
 
 /*
     Inputs
