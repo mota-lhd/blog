@@ -34,3 +34,8 @@ Pulumi.prod.yaml
 # Terraform
 **/.terraform*
 **/terraform.tfstate*
+
+# hugo generated files
+public/
+node_modules/
+*lock*

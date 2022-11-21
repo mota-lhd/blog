@@ -27,5 +27,6 @@ variable "main_custom_role_perms" {
 }
 
 variable "main_impersonate_account" {
-  type = string
+  type      = string
+  sensitive = true
 }

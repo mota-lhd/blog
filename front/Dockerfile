@@ -1,7 +1,7 @@
-FROM alpine:3.16 as build
+FROM node:gallium-alpine as build
 
-ENV HUGO_VERSION="0.105.0"
-ENV HUGO_CHECKSUM="f5d76d69c4dbe56dae506ebadf03acca414f8b2905bce089a1de298515324daa"
+ENV HUGO_VERSION="0.106.0"
+ENV HUGO_CHECKSUM="8b4363201031d2cce13ea44c6436fd3e4518e4192500b6ab998ad877b3093c58"
 
 RUN apk add --no-cache curl
 
@@ -11,6 +11,9 @@ RUN tar xf /tmp/hugo.tar.gz hugo -C /tmp/ && cp /tmp/hugo /usr/bin
 
 WORKDIR /web
 COPY ./src/ /web/
+
+RUN npm install
+RUN npm run css
 RUN hugo --minify --gc --destination public --source .
 
 FROM nginx:stable-alpine as prod
