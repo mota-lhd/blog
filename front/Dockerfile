@@ -1,7 +1,7 @@
 FROM node:gallium-alpine as build
 
-ENV HUGO_VERSION="0.106.0"
-ENV HUGO_CHECKSUM="8b4363201031d2cce13ea44c6436fd3e4518e4192500b6ab998ad877b3093c58"
+ENV HUGO_VERSION="0.107.0"
+ENV HUGO_CHECKSUM="042c9b4d0ddff26bd700757b8f939b8d495da4e6fa49a8e8c9d31a5b3c9935bf"
 
 RUN apk add --no-cache curl
 
@@ -18,6 +18,9 @@ RUN hugo --minify --gc --destination public --source .
 
 FROM nginx:stable-alpine as prod
 
+ARG USER=front
+ARG GROUP=web
+
 LABEL org.opencontainers.image.authors="elmouatassim.louhaidia@pm.me"
 
 HEALTHCHECK --interval=5m --timeout=3s \
@@ -29,7 +32,7 @@ WORKDIR /web
 COPY --from=build /web/public/ /web
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
-RUN addgroup web
-RUN adduser --disabled-password --no-create-home --ingroup web front
+RUN addgroup ${GROUP}
+RUN adduser --disabled-password --no-create-home --ingroup ${GROUP} ${USER}
 
-USER front
+USER ${USER}
