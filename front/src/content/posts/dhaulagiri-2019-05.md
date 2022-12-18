@@ -22,7 +22,7 @@ series: ["Trek autour du Dhaulagiri et des Annapurnas"]
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/05/01.webp "")
 
-Après Danfe et dans la montée, le Manaslu entre en scène au dessus des nuages, on a l'impression que ses falaises sont roses. La neige aussi fait son apparition et commence alors une montée en lacets dans une neige dure est compacte. Pas besoin de crampons ici si on prend bien ses appuis. Quelques minutes plus tard, on est au col et le spectacle est époustouflant. 
+Après Danfe et dans la montée, le Manaslu entre en scène au dessus des nuages, on a l'impression que ses falaises sont roses. La neige aussi fait son apparition et commence alors une montée en lacets dans une neige dure est compacte. Pas besoin de crampons ici si on prend bien ses appuis. Quelques minutes plus tard, on est au col et le spectacle est époustouflant.
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/05/02.webp "")
 ![](https://res.cloudinary.com/elmouatassim/image/upload/05/03.webp "La vue de Namun-La pass. Un moment magique.")
@@ -41,7 +41,7 @@ Après une dizaine de bergeries et quelques moments de doute sur la direction pr
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/05/05.webp "")
 
-J'ai commencé alors la descente vers le village en pensant à tout ce que je pourrai y manger le soir. Le sentier est aménagé en escaliers ici, très peu emprunté parce qu'il y avait beaucoup de végétation entre les pierres. Il débouche sur une rivière puissante mais pas profonde, qu'il faut traverser à pieds. J'ai enlevé mes chaussures pour la traversée et je me suis reposé un peu avant d'aller au village. J'étais bien ici. 
+J'ai commencé alors la descente vers le village en pensant à tout ce que je pourrai y manger le soir. Le sentier est aménagé en escaliers ici, très peu emprunté parce qu'il y avait beaucoup de végétation entre les pierres. Il débouche sur une rivière puissante mais pas profonde, qu'il faut traverser à pieds. J'ai enlevé mes chaussures pour la traversée et je me suis reposé un peu avant d'aller au village. J'étais bien ici.
 
 En arrivant au village j'étais surpris d'apprendre que je n'étais pas à Syange. J'avais pris un chemin qui ne figure pas sur la carte et j'étais donc dans un village à 30 minutes de l'objectif initial. Ici il y a un seul lodge au décor kitsch. On ne peut pas le rater parce qu'il est peint en rose, sur trois étages et décoré avec des guirlandes pour la fête hindou Tihar. La famille qui le tient est très sympathique. J'ai mangé avec eux et écouté leurs échanges interminables auxquels je ne comprenais rien. Je suis allé dormir ensuite dans un lit sans matelas.
 

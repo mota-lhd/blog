@@ -1,7 +1,6 @@
 name: Scan for security issues
 
-on:
-  pull_request
+on: pull_request
 
 jobs:
   pre-checks:

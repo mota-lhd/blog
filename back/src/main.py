@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from google.cloud.datastore import Client as StorageClient
 from google.cloud.datastore import Key, Entity, Query
 
-from pydantic import BaseModel, constr, Field, EmailStr
+from pydantic import BaseModel, constr, EmailStr
 
 from settings import settings
 
@@ -133,7 +133,7 @@ async def get_articles(storage: StorageClient = Depends(get_db)):
 
 @router.get("/article/{article_id}/comments", response_model=List[Comment])
 async def get_article_comments(
-    article_id: int, storage: StorageClient = Depends(get_db)
+    article_id: int, storage: StorageClient = Depends(get_db),
 ):
     ancestor: Key = storage.key(Entities.ARTICLE.value, article_id)
     query: Query = storage.query(kind=Entities.COMMENT.value, ancestor=ancestor)
@@ -155,7 +155,7 @@ async def add_comment_to_article(
     if check_captcha(comment.captcha):
         with storage.transaction():
             article: Article = storage.get(
-                storage.key(Entities.ARTICLE.value, article_id)
+                storage.key(Entities.ARTICLE.value, article_id),
             )
 
             if article:
@@ -164,7 +164,7 @@ async def add_comment_to_article(
                         Entities.ARTICLE.value,
                         article_id,
                         Entities.COMMENT.value,
-                    )
+                    ),
                 )
 
                 comment_ent.update(
@@ -172,19 +172,19 @@ async def add_comment_to_article(
                         "who": comment.who,
                         "content": comment.content,
                         "ts": comment.ts,
-                        "visible": False
-                    }
+                        "visible": False,
+                    },
                 )
 
                 storage.put_multi(
                     [
                         comment_ent,
-                    ]
+                    ],
                 )
                 return "OK"
             else:
                 raise NotFoundException(
-                    "The article you are looking for does not exist."
+                    "The article you are looking for does not exist.",
                 )
     else:
         raise UnauthorizedException("You're not human ;)")

@@ -17,7 +17,7 @@ post_titles: List[str] = [
     u'pokhara-2020-01',
     u'rollwaling-2019-01',
     u'rollwaling-2019-02',
-    u'tech-blog-01'
+    u'tech-blog-01',
 ]
 source_credentials, project_id = default()
 project_id: str = os.environ['PROJECT_ID']
@@ -29,7 +29,7 @@ creds: Credentials = impersonated_credentials.Credentials(
 )
 storage: StorageClient = StorageClient(
     project=project_id,
-    credentials=creds
+    credentials=creds,
 )
 query: Query = storage.query(kind="Article")
 results: Iterator = query.fetch()

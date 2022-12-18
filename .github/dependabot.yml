@@ -2,54 +2,54 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/back/" # Location of package manifests
-    schedule:
-      interval: "daily"
-      time: "14:00"
-      timezone: "Europe/Paris"
-    labels:
-      - "poetry"
-      - "python"
-      - "dependencies"
-    commit-message:
-      prefix: "poetry prod"
-      prefix-development: "poetry dev"
-      include: "scope"
-    open-pull-requests-limit: 10
-    rebase-strategy: "disabled"
-    versioning-strategy: increase
+- package-ecosystem: "pip"   # See documentation for possible values
+  directory: "/back/"   # Location of package manifests
+  schedule:
+    interval: "daily"
+    time: "14:00"
+    timezone: "Europe/Paris"
+  labels:
+  - "poetry"
+  - "python"
+  - "dependencies"
+  commit-message:
+    prefix: "poetry prod"
+    prefix-development: "poetry dev"
+    include: "scope"
+  open-pull-requests-limit: 10
+  rebase-strategy: "disabled"
+  versioning-strategy: increase
 
-  - package-ecosystem: "docker"
-    directory: "/front/"
-    schedule:
-      interval: "daily"
-      time: "14:00"
-      timezone: "Europe/Paris"
-    labels:
-      - "docker"
-      - "front"
-      - "dependencies"
-    commit-message:
-      prefix: "docker frontend prod"
-      include: "scope"
-    open-pull-requests-limit: 10
-    rebase-strategy: "disabled"
-    versioning-strategy: increase
+- package-ecosystem: "docker"
+  directory: "/front/"
+  schedule:
+    interval: "daily"
+    time: "14:00"
+    timezone: "Europe/Paris"
+  labels:
+  - "docker"
+  - "front"
+  - "dependencies"
+  commit-message:
+    prefix: "docker frontend prod"
+    include: "scope"
+  open-pull-requests-limit: 10
+  rebase-strategy: "disabled"
+  versioning-strategy: increase
 
-  - package-ecosystem: "docker"
-    directory: "/back/"
-    schedule:
-      interval: "daily"
-      time: "14:00"
-      timezone: "Europe/Paris"
-    labels:
-      - "docker"
-      - "back"
-      - "dependencies"
-    commit-message:
-      prefix: "docker backend prod"
-      include: "scope"
-    open-pull-requests-limit: 10
-    rebase-strategy: "disabled"
-    versioning-strategy: increase
+- package-ecosystem: "docker"
+  directory: "/back/"
+  schedule:
+    interval: "daily"
+    time: "14:00"
+    timezone: "Europe/Paris"
+  labels:
+  - "docker"
+  - "back"
+  - "dependencies"
+  commit-message:
+    prefix: "docker backend prod"
+    include: "scope"
+  open-pull-requests-limit: 10
+  rebase-strategy: "disabled"
+  versioning-strategy: increase

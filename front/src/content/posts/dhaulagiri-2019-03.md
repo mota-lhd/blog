@@ -26,7 +26,7 @@ Le sentier pour Tilicho commence à Thini. Un petit village Buddhist juste en de
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/03/01.webp "")
 
-J'ai pris une chambre au restaurant où j'avais mangé. J'y ai posé mon sac et je suis descendu vers Jomsom. Probablement la ville la plus moche que je connaisse au Népal. J'y ai retiré du cash et suis remonté vers Thini. J'avais un peu mal aux cuisses et j'appréhendais le lendemain. À l'hôtel j'ai pris une douche en écoutant Labess, ça m'a fait du bien. Ensuite dîner et au lit. 
+J'ai pris une chambre au restaurant où j'avais mangé. J'y ai posé mon sac et je suis descendu vers Jomsom. Probablement la ville la plus moche que je connaisse au Népal. J'y ai retiré du cash et suis remonté vers Thini. J'avais un peu mal aux cuisses et j'appréhendais le lendemain. À l'hôtel j'ai pris une douche en écoutant Labess, ça m'a fait du bien. Ensuite dîner et au lit.
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/03/02.webp "")
 

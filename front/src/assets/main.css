@@ -1722,7 +1722,7 @@ body {
   content: var(--tw-content);
 }
 
-.dark .btn-menu::before,.dark 
+.dark .btn-menu::before,.dark
   .btn-menu::after {
   --tw-invert: invert(100%);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);

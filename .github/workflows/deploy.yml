@@ -2,8 +2,8 @@ name: Deploy infra + apps
 
 on:
   push:
-    branches:    
-      - main
+    branches:
+    - main
 
 jobs:
   deploy:
