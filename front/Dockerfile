@@ -27,7 +27,6 @@ HEALTHCHECK --interval=5m --timeout=3s \
     CMD curl -f http://localhost/ || exit 1
 
 RUN apk -U upgrade
-RUN apk add --no-cache dumb-init
 
 WORKDIR /web
 COPY --from=build /web/public/ /web
@@ -37,5 +36,3 @@ RUN addgroup ${GROUP}
 RUN adduser --disabled-password --no-create-home --ingroup ${GROUP} ${USER}
 
 USER ${USER}
-
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
