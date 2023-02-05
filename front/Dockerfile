@@ -1,7 +1,7 @@
 FROM node:gallium-alpine as build
 
-ENV HUGO_VERSION="0.107.0"
-ENV HUGO_CHECKSUM="042c9b4d0ddff26bd700757b8f939b8d495da4e6fa49a8e8c9d31a5b3c9935bf"
+ENV HUGO_VERSION="0.110.0"
+ENV HUGO_CHECKSUM="a1c97b69a96040e0911f8ce8c9718553c333727b5ffa969e59635837e3b4dcc3"
 
 RUN apk add --no-cache curl
 
@@ -27,6 +27,7 @@ HEALTHCHECK --interval=5m --timeout=3s \
     CMD curl -f http://localhost/ || exit 1
 
 RUN apk -U upgrade
+RUN apk add --no-cache dumb-init
 
 WORKDIR /web
 COPY --from=build /web/public/ /web
@@ -36,3 +37,5 @@ RUN addgroup ${GROUP}
 RUN adduser --disabled-password --no-create-home --ingroup ${GROUP} ${USER}
 
 USER ${USER}
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
