@@ -22,11 +22,12 @@ COPY --from=requirements-step /tmp/requirements.txt /web/requirements.txt
 COPY --chown=back:web ./src/ /web/
 
 RUN apk -U upgrade
+RUN apk add --no-cache dumb-init
 RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 EXPOSE 80
 
 USER back
 
-ENTRYPOINT [ "uvicorn" ]
-CMD ["main:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
