@@ -45,7 +45,7 @@ jobs:
 
     - name: Push latest umami image to our docker reg.
       run: |
-        IMAGE=docker.umami.is/umami-software/umami:postgresql-latest
+        IMAGE=docker.umami.dev/umami-software/umami:postgresql-latest
         DEST=europe-west1-docker.pkg.dev/${{ secrets.PROJECT_NAME }}/docker/umami:latest
 
         docker pull $IMAGE
