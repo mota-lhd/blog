@@ -8,11 +8,11 @@
         "css": "tailwindcss -i ./assets/app.css -o ./assets/main.css"
     },
     "dependencies": {
-        "@tailwindcss/typography": "^0.5.8",
-        "prettier": "^2.7.1",
-        "prettier-plugin-tailwindcss": "^0.1.13",
-        "stylelint": "^14.15.0",
+        "@tailwindcss/typography": "^0.5.9",
+        "prettier": "^2.8.4",
+        "prettier-plugin-tailwindcss": "^0.2.3",
+        "stylelint": "^15.2.0",
         "stylelint-config-one": "^2.3.1",
-        "tailwindcss": "^3.2.4"
+        "tailwindcss": "^3.2.7"
     }
 }
