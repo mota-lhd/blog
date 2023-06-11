@@ -50,8 +50,6 @@ module "umami" {
         key  = "latest"
         name = "umami-db-url"
       }
-    }
-    env_from = {
       "HASH_SALT" = {
         key  = "latest"
         name = "umami-hash-salt"
