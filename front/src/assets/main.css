@@ -437,6 +437,7 @@ body {
 }
 
 :is(.dark body) {
+:is(.dark body) {
   background-color: rgb(0 0 0 / 0.9);
 }
 
@@ -504,6 +505,9 @@ body {
   --tw-pan-y:  ;
   --tw-pinch-zoom:  ;
   --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position:  ;
+  --tw-gradient-via-position:  ;
+  --tw-gradient-to-position:  ;
   --tw-gradient-from-position:  ;
   --tw-gradient-via-position:  ;
   --tw-gradient-to-position:  ;
@@ -1193,8 +1197,9 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.-mr-8 {
-  margin-right: -2rem;
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .-mt-2 {
@@ -1951,18 +1956,23 @@ article blockquote {
 :is(.dark .dark\:text-gray-300) {
   --tw-text-opacity: 1;
   color: rgb(209 213 219 / var(--tw-text-opacity));
+  color: rgb(209 213 219 / var(--tw-text-opacity));
 }
 
+:is(.dark .dark\:text-gray-400) {
 :is(.dark .dark\:text-gray-400) {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
 :is(.dark .dark\:text-white) {
+:is(.dark .dark\:text-white) {
   --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+:is(.dark .dark\:placeholder-gray-600)::-moz-placeholder {
 :is(.dark .dark\:placeholder-gray-600)::-moz-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(75 85 99 / var(--tw-placeholder-opacity));
