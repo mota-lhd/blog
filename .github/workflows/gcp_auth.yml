@@ -1,0 +1,51 @@
+name: OIDC connection + provision Terraform cloud with GCP access-token
+
+on:
+  workflow_call:
+
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Authenticate to Google Cloud using OIDC
+      uses: 'google-github-actions/auth@v1.1.1'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/oidc-pool/providers/ci-cd-jwt'
+        audience: ${{ secrets.OIDC_AUDIENCE }}
+        service_account: ${{ secrets.CI_CD_SA_MAIL }}
+
+    - name: Set up Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v1.1.1'
+
+    - name: Impersonate admin service account
+      id: get_access_token
+      run: |
+        export TOKEN=$(gcloud auth print-access-token --impersonate-service-account=${{ secrets.MAIN_SA_MAIL }})
+        echo "::add-mask::$TOKEN"
+        echo "GOOGLE_OAUTH_ACCESS_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+    - name: Remote authentication on terraform to GCP using OIDC
+      run: |
+        cat << EOF > /tmp/tf-var-set-update.json
+        {
+          "data": {
+            "type": "vars",
+            "attributes": {
+              "key": "GOOGLE_OAUTH_ACCESS_TOKEN",
+              "value": "${{ env.GOOGLE_OAUTH_ACCESS_TOKEN }}",
+              "description": "Access token for main service account ; valid for 1 hour max.",
+              "sensitive": true,
+              "category": "env",
+              "hcl": false
+            }
+          }
+        }
+        EOF
+
+        curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data @/tmp/tf-var-set-update.json \
+          https://app.terraform.io/api/v2/${{ secrets.TF_API_VAR_PATH }}
