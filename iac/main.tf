@@ -53,25 +53,6 @@ module "backend-data" {
   location   = var.location
 }
 
-module "backend" {
-  source           = "./modules/back"
-  project_id       = var.project_id
-  location         = var.location
-  backend_sa_email = module.backend-data.backend_sa_email
-}
-
-module "frontend" {
-  source     = "./modules/front"
-  project_id = var.project_id
-  location   = var.location
-}
-
-module "umami" {
-  source     = "./modules/umami"
-  project_id = var.project_id
-  location   = var.location
-}
-
 module "run-mappings" {
   source                 = "./modules/mappings"
   project_id             = var.project_id
