@@ -58,7 +58,7 @@ module "run-mappings" {
   project_id             = var.project_id
   location               = var.location
   main_domain            = var.main_domain
-  front_cloud_run_name   = module.frontend.cloud_run_name
+  front_cloud_run_name   = module.front.cloud_run_name
   backend_cloud_run_name = module.backend.cloud_run_name
   umami_cloud_run_name   = module.umami.cloud_run_name
   managed_zone_name      = module.dns.managed_zone_name
