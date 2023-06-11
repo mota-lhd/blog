@@ -29,33 +29,32 @@ resource "google_dns_record_set" "verif" {
 }
 
 locals {
-  records = [
+  tmp_data = [
     for index, mapping in google_cloud_run_domain_mapping.mappings : {
       subdomain = index
       data      = { for record in mapping.status[0].resource_records : record.type => record.rrdata... }
     }
   ]
+  records = {
+    for mapping in local.tmp_data : mapping.subdomain => mapping.data
+  }
 }
 
 resource "google_dns_record_set" "a_records" {
-  for_each = {
-    for mapping in local.records : mapping.subdomain => mapping
-  }
+  for_each = local.records
 
   project = var.project_id
   name    = "${each.key}.${var.main_domain}."
-  type    = "AAAA"
+  type    = "A"
   ttl     = 300
 
   managed_zone = google_dns_managed_zone.zone.name
 
-  rrdatas = each.value.data["AAAA"]
+  rrdatas = each.value["A"]
 }
 
 resource "google_dns_record_set" "aaaa_records" {
-  for_each = {
-    for mapping in local.records : mapping.subdomain => mapping
-  }
+  for_each = local.records
 
   project = var.project_id
   name    = "${each.key}.${var.main_domain}."
@@ -64,5 +63,5 @@ resource "google_dns_record_set" "aaaa_records" {
 
   managed_zone = google_dns_managed_zone.zone.name
 
-  rrdatas = each.value.data["AAAA"]
+  rrdatas = each.value["AAAA"]
 }
