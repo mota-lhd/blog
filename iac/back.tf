@@ -11,6 +11,7 @@ module "backend" {
     env = {
       "SERVICE_NAME"    = "Personal Blog API"
       "CAPTCHA_API_URL" = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+      "PROJECT_ID"      = "personal-blog-365822"
     }
     env_from = {
       "CAPTCHA_SERVER_KEY" = {

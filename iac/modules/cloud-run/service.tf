@@ -40,7 +40,7 @@ resource "google_cloud_run_service" "service" {
           limits = {
             # Memory usage limit (per container)
             # https://cloud.google.com/run/docs/configuring/memory-limits
-            memory = "4Gi"
+            memory = "512Mi"
             # CPU usage limit
             # https://cloud.google.com/run/docs/configuring/cpu
             cpu = "1000m" # 1 vCPU
