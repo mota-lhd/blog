@@ -1,37 +1,28 @@
+locals {
+  umami_secret_1_id = "umami-db-url"
+  umami_secret_2_id = "umami-hash-salt"
+}
+
 resource "google_service_account" "umami_sa" {
   project      = var.project_id
   account_id   = "umami-service-account"
   display_name = "A service account used for running umami."
 }
 
-resource "google_secret_manager_secret" "umami_db_url" {
-  project   = var.project_id
-  secret_id = "umami-db-url"
-  replication {
-    automatic = true
-  }
+module "umami_secret_1" {
+  source = "./modules/secret"
+
+  project_id     = var.project_id
+  secret_id      = local.umami_secret_1_id
+  accessor_email = google_service_account.umami_sa.email
 }
 
-resource "google_secret_manager_secret" "umami_hash_salt" {
-  project   = var.project_id
-  secret_id = "umami-hash-salt"
-  replication {
-    automatic = true
-  }
-}
+module "umami_secret_2" {
+  source = "./modules/secret"
 
-resource "google_secret_manager_secret_iam_member" "url_member" {
-  project   = var.project_id
-  secret_id = google_secret_manager_secret.umami_db_url.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.umami_sa.email}"
-}
-
-resource "google_secret_manager_secret_iam_member" "hash_member" {
-  project   = var.project_id
-  secret_id = google_secret_manager_secret.umami_hash_salt.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.umami_sa.email}"
+  project_id     = var.project_id
+  secret_id      = local.umami_secret_2_id
+  accessor_email = google_service_account.umami_sa.email
 }
 
 module "umami" {
@@ -48,11 +39,11 @@ module "umami" {
     env_from = {
       "DATABASE_URL" = {
         key  = "latest"
-        name = "umami-db-url"
+        name = "${local.umami_secret_1_id}"
       }
       "HASH_SALT" = {
         key  = "latest"
-        name = "umami-hash-salt"
+        name = "${local.umami_secret_2_id}"
       }
     }
   }

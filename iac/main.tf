@@ -30,46 +30,25 @@ resource "google_project_service" "default_services" {
   disable_dependent_services = true
 }
 
-module "iam" {
-  source                   = "./modules/iam"
-  project_id               = var.project_id
-  location                 = var.location
-  github_org_url           = var.github_org_url
-  repo_name                = var.repo_name
-  main_custom_role_perms   = var.main_custom_role_perms
-  main_impersonate_account = var.main_impersonate_account
-  main_sa_roles            = var.main_sa_roles
-}
-
-module "dns" {
-  source      = "./modules/net"
-  project_id  = var.project_id
-  main_domain = var.main_domain
-}
-
-module "backend-data" {
-  source     = "./modules/data"
-  project_id = var.project_id
-  location   = var.location
-}
-
 module "run-mappings" {
-  source                 = "./modules/mappings"
-  project_id             = var.project_id
-  location               = var.location
-  main_domain            = var.main_domain
-  front_cloud_run_name   = module.front.cloud_run_name
-  backend_cloud_run_name = module.backend.cloud_run_name
-  umami_cloud_run_name   = module.umami.cloud_run_name
-  managed_zone_name      = module.dns.managed_zone_name
-}
+  source = "./modules/mappings"
 
-module "dns-records" {
-  source            = "./modules/records"
-  project_id        = var.project_id
-  managed_zone_name = module.dns.managed_zone_name
-  main_domain       = var.main_domain
-  back_records      = module.run-mappings.backend_records
-  front_records     = module.run-mappings.front_records
-  umami_records     = module.run-mappings.umami_records
+  project_id  = var.project_id
+  location    = var.location
+  main_domain = var.main_domain
+
+  mappings = {
+    "backend" = {
+      cloud_run_name        = "backend"
+      site_verification_txt = "google-site-verification=TlJejL41u3Cu1Ea3ymLZp2QU8IaaPURi6xkr05SM6RU"
+    }
+    "elmouatassim" = {
+      cloud_run_name        = "elmouatassim"
+      site_verification_txt = "google-site-verification=IiMvco0FcO1xwnBej8eD3kVzFYLAZeswBUfJaK293LY"
+    }
+    "umami" = {
+      cloud_run_name        = "umami"
+      site_verification_txt = "google-site-verification=W4pCsmPQ4hrLaIyHxGteKsUAaU1bf67r3RYzV9re90s"
+    }
+  }
 }
