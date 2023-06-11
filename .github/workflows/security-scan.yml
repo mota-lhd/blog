@@ -15,19 +15,19 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3.1.0
+      uses: actions/checkout@v3.5.3
       with:
         fetch-depth: 0
 
     - name: Detect secrets
-      uses: gitleaks/gitleaks-action@v2.3.1
+      uses: gitleaks/gitleaks-action@v2.3.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITLEAKS_ENABLE_COMMENTS: true
         GITLEAKS_ENABLE_SUMMARY: true
 
     - name: Scan backend Dockerfile
-      uses: aquasecurity/trivy-action@0.8.0
+      uses: aquasecurity/trivy-action@0.11.2
       with:
         scan-type: 'config'
         severity: 'MEDIUM,HIGH,CRITICAL'
@@ -37,7 +37,7 @@ jobs:
         exit-code: 3
 
     - name: Scan frontend Dockerfile
-      uses: aquasecurity/trivy-action@0.8.0
+      uses: aquasecurity/trivy-action@0.11.2
       with:
         scan-type: 'config'
         severity: 'MEDIUM,HIGH,CRITICAL'
@@ -47,17 +47,17 @@ jobs:
         exit-code: 3
 
     - name: Scan terraform code
-      uses: aquasecurity/tfsec-action@v1.0.2
+      uses: aquasecurity/tfsec-action@v1.0.3
       with:
         working_directory: '.'
         soft_fail: false
         additional_args: "--concise-output --minimum-severity=MEDIUM"
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.2.1
+      uses: docker/setup-buildx-action@v2.6.0
 
     - name: Build backend image from Dockerfile
-      uses: docker/build-push-action@v3.2.0
+      uses: docker/build-push-action@v4.1.0
       with:
         context: ./back/
         push: false
@@ -67,11 +67,11 @@ jobs:
         outputs: type=docker
 
     - name: Scan backend image for vulnerabilities
-      uses: aquasecurity/trivy-action@0.8.0
+      uses: aquasecurity/trivy-action@0.11.2
       with:
         scan-type: 'image'
         image-ref: 'local/web:back'
-        security-checks: 'vuln'
+        scanners: 'vuln'
         severity: 'MEDIUM,HIGH,CRITICAL'
         format: 'table'
         exit-code: 3
@@ -79,7 +79,7 @@ jobs:
         vuln-type: 'os,library'
 
     - name: Build frontend image from Dockerfile
-      uses: docker/build-push-action@v3.2.0
+      uses: docker/build-push-action@v4.1.0
       with:
         context: ./front/
         push: false
@@ -89,31 +89,31 @@ jobs:
         outputs: type=docker
 
     - name: Scan frontend image for vulnerabilities
-      uses: aquasecurity/trivy-action@0.8.0
+      uses: aquasecurity/trivy-action@0.11.2
       with:
         scan-type: 'image'
         image-ref: 'local/web:front'
+        scanners: 'vuln'
         severity: 'MEDIUM,HIGH,CRITICAL'
         format: 'table'
-        security-checks: 'vuln'
         exit-code: 3
         ignore-unfixed: true
         vuln-type: 'os,library'
 
     - name: Authenticate to Google Cloud using OIDC
-      uses: 'google-github-actions/auth@v1.0.0'
+      uses: 'google-github-actions/auth@v1.1.1'
       with:
         workload_identity_provider: 'projects/${{ secrets.PROJECT_ID }}/locations/global/workloadIdentityPools/oidc-pool/providers/ci-cd-jwt'
         audience: ${{ secrets.OIDC_AUDIENCE }}
         service_account: ${{ secrets.CI_CD_SA_MAIL }}
 
     - name: Set up Cloud SDK
-      uses: 'google-github-actions/setup-gcloud@v1.0.1'
+      uses: 'google-github-actions/setup-gcloud@v1.1.1'
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2.0.3
       with:
-        terraform_version: 1.3.2
+        terraform_version: 1.4.6
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
     - name: Remote authentication on terraform to GCP using OIDC
