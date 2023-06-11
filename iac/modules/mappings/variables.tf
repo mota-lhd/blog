@@ -1,7 +1,6 @@
 variable "project_id" {
   type        = string
   description = "Project ID"
-  default     = "personal-blog-365822"
 }
 
 variable "location" {
@@ -10,28 +9,16 @@ variable "location" {
   default     = "europe-west1"
 }
 
+variable "mappings" {
+  type = map(object({
+    cloud_run_name        = string,
+    site_verification_txt = string
+  }))
+  description = "Map that maps subdomain with a verification text"
+  default     = {}
+}
+
 variable "main_domain" {
   type        = string
   description = "Domain name of the blog"
-  default     = "louhaidia.info"
-}
-
-variable "front_cloud_run_name" {
-  type        = string
-  description = "Name of frontend cloud-run"
-}
-
-variable "backend_cloud_run_name" {
-  type        = string
-  description = "Name of backend cloud-run"
-}
-
-variable "umami_cloud_run_name" {
-  type        = string
-  description = "Name of umami cloud-run"
-}
-
-variable "managed_zone_name" {
-  type        = string
-  description = "Managed zone name"
 }

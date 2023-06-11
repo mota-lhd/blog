@@ -4,6 +4,12 @@ resource "google_service_account" "main" {
   display_name = "A service account that rules project"
 }
 
+resource "google_service_account" "ci_cd" {
+  project      = var.project_id
+  account_id   = "ci-cd-service-account"
+  display_name = "A service account used for CI/CD ops."
+}
+
 resource "google_project_iam_custom_role" "main_custom" {
   project     = var.project_id
   role_id     = "main_custom_role"
@@ -29,4 +35,10 @@ resource "google_service_account_iam_member" "main_impersonate" {
   service_account_id = google_service_account.main.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "user:${var.main_impersonate_account}"
+}
+
+resource "google_service_account_iam_member" "ci_cd_impersonate_main" {
+  service_account_id = google_service_account.main.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.ci_cd.email}"
 }
