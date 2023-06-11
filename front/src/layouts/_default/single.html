@@ -5,13 +5,15 @@
     <h1 class="!my-0 pb-2.5">{{ .Title }}</h1>
 
     {{ if ne .Type "page" }}
-    <div class="text-sm opacity-50">
+    <div class="text-sm opacity-60">
       {{ if .Date }}
       <time>{{ .Date | time.Format ":date_medium" }}</time>
       {{ end }}<!---->
-      {{ if or .Params.Author site.Author.name }}
+      {{ $single_author := or .Params.Author site.Author.name }}
+      <!---->
+      {{ if $single_author }}
       <span class="mx-1">&middot;</span>
-      <span>{{ .Params.Author | default site.Author.name }}</span>
+      <span>{{ $single_author }}</span>
       {{ end }}
     </div>
     {{ end }}
@@ -24,7 +26,7 @@
   <footer class="mt-12 flex flex-wrap">
     {{ range .Params.tags }} {{ $href := print (absURL "tags/") (urlize .) }}
     <a
-      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      class="mb-1.5 mr-1.5 rounded-lg bg-black/[3%] px-5 py-1.5 no-underline dark:bg-white/[8%]"
       href="{{ $href }}"
       >{{ . }}</a
     >
@@ -61,7 +63,7 @@
 
   <!-- Disqus -->
   {{ if and site.DisqusShortname (not (eq .Params.comments false)) }}
-  <div id="disqus_thread"></div>
+  <div class="mt-24" id="disqus_thread"></div>
   <script>
     const disqusShortname = '{{ site.DisqusShortname }}';
     const script = document.createElement('script');
