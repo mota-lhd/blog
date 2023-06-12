@@ -1,4 +1,4 @@
-name: Deploy infra + apps
+name: Deploy infra and latest services
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Authenticates to GCP using OIDC
+    name: oidc-auth + tf-apply + update
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -103,7 +103,7 @@ jobs:
         terraform -chdir=./iac init
         terraform -chdir=./iac apply -auto-approve -input=false
 
-    - name: Update services (front and back)
+    - name: Update services (umami, front and back)
       run: |
         gcloud run services update --quiet "elmouatassim" \
           --project "${{ secrets.PROJECT_NAME}}" \

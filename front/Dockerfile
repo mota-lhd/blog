@@ -7,7 +7,9 @@ RUN apk add --no-cache curl
 
 RUN curl -sSL https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz -o /tmp/hugo.tar.gz
 RUN echo "${HUGO_CHECKSUM}  /tmp/hugo.tar.gz" | sha256sum -c
-RUN tar xf /tmp/hugo.tar.gz hugo -C /tmp/ && cp /tmp/hugo /usr/bin
+RUN tar xf /tmp/hugo.tar.gz hugo -C /tmp/
+RUN cp /tmp/hugo /usr/bin
+RUN chmod 700 /usr/bin/hugo
 
 WORKDIR /web
 COPY ./src/ /web/

@@ -1,4 +1,4 @@
-name: Scan for security issues in Frontend
+name: Check frontend
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - 'front/**'
 
 jobs:
-  front-checks:
-    name: Frontend image security scans
+  trivy:
+    name: Run trivy
     runs-on: ubuntu-latest
 
     steps:

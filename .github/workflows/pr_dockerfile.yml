@@ -1,4 +1,4 @@
-name: Scan for security issues in Dockerfiles
+name: Check Dockerfiles
 
 on:
   pull_request:
@@ -7,8 +7,8 @@ on:
       - 'front/Dockerfile'
 
 jobs:
-  dockerfile-checks:
-    name: Dockerfile security scans
+  trivy:
+    name: Run trivy
     runs-on: ubuntu-latest
 
     steps:

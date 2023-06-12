@@ -1,4 +1,4 @@
-name: Scan for security issues in Backend image
+name: Check backend
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - 'back/**'
 
 jobs:
-  backend-checks:
-    name: Backend security scans
+  trivy:
+    name: Run trivy
     runs-on: ubuntu-latest
 
     steps:
