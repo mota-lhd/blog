@@ -97,7 +97,7 @@ def check_captcha(token: str) -> bool:
     return res["success"]
 
 
-def raise_g_captcha_error(error_code: str):
+def raise_g_captcha_error(error_code: str) -> None:
     msg: str = f"{error_code}: "
 
     if error_code == "missing-input-secret":

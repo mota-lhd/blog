@@ -1,0 +1,42 @@
+name: Check frontend
+
+on:
+  pull_request:
+    paths:
+      - 'front/**'
+
+jobs:
+  trivy:
+    name: Run trivy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.5.3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.6.0
+
+    - name: Build frontend image from Dockerfile
+      uses: docker/build-push-action@v4.1.0
+      with:
+        context: ./front/
+        push: false
+        tags: local/web:front
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker
+
+    - name: Scan frontend image for vulnerabilities
+      uses: aquasecurity/trivy-action@0.11.2
+      with:
+        scan-type: 'image'
+        image-ref: 'local/web:front'
+        scanners: 'vuln'
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        format: 'table'
+        exit-code: 3
+        ignore-unfixed: true
+        vuln-type: 'os,library'

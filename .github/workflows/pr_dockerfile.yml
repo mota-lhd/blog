@@ -1,0 +1,40 @@
+name: Check Dockerfiles
+
+on:
+  pull_request:
+    paths:
+      - 'back/Dockerfile'
+      - 'front/Dockerfile'
+
+jobs:
+  trivy:
+    name: Run trivy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.5.3
+      with:
+        fetch-depth: 0
+
+    - name: Scan backend Dockerfile
+      uses: aquasecurity/trivy-action@0.11.2
+      with:
+        scan-type: 'config'
+        image-ref: ''
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        scan-ref: './back/Dockerfile'
+        ignore-unfixed: true
+        format: 'table'
+        exit-code: 3
+
+    - name: Scan frontend Dockerfile
+      uses: aquasecurity/trivy-action@0.11.2
+      with:
+        scan-type: 'config'
+        image-ref: ''
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        scan-ref: './front/Dockerfile'
+        ignore-unfixed: true
+        format: 'table'
+        exit-code: 3
