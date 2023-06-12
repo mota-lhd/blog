@@ -3,7 +3,7 @@ name: Scan for security issues in Frontend
 on:
   pull_request:
     paths:
-      - './front/**'
+      - 'front/**'
 
 jobs:
   front-checks:
