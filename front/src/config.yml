@@ -33,6 +33,10 @@ markup:
     renderer:
       unsafe: false
 
+security:
+  gotemplates:
+    allowActionJSTmpl: true
+
 menu:
   main:
     - identifier: about
