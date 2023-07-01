@@ -4,18 +4,13 @@ from datetime import datetime
 from enum import Enum, unique
 from typing import List, Optional
 
-from requests import post
-
-from fastapi import Depends, FastAPI, APIRouter, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
 from google.cloud.datastore import Client as StorageClient
-from google.cloud.datastore import Key, Entity, Query
-
-from pydantic import BaseModel, constr, Field, EmailStr
-
+from google.cloud.datastore import Entity, Key, Query
+from pydantic import BaseModel, EmailStr, constr
+from requests import post
 from settings import settings
-
 
 # Enumerations
 
@@ -44,7 +39,7 @@ class UnauthorizedException(HTTPException):
 
 class Comment(BaseModel):
     who: Optional[EmailStr]
-    content: constr(max_length=500, regex="[\d\w\s]+")
+    content: constr(max_length=500, regex=r"[\d\w\s]+")
     ts: datetime = datetime.now()
 
 
@@ -172,7 +167,7 @@ async def add_comment_to_article(
                         "who": comment.who,
                         "content": comment.content,
                         "ts": comment.ts,
-                        "visible": False
+                        "visible": False,
                     }
                 )
 
