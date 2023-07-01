@@ -1,5 +1,6 @@
 [![Better Uptime Badge](https://betteruptime.com/status-badges/v1/monitor/diai.svg)](https://betteruptime.com/?utm_source=status_badge)
 <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 # Personal blog
 
