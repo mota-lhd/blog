@@ -15,6 +15,9 @@ uvicorn = "^0"
 pydantic = {extras = ["email"], version = "^1"}
 
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.275"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
