@@ -39,3 +39,6 @@ Pulumi.prod.yaml
 public/
 node_modules/
 *lock*
+
+# ruff
+.ruff_cache
