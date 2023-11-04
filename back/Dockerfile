@@ -25,6 +25,7 @@ COPY --chown=${USER}:${GROUP} ./src/ /web/
 
 RUN apk -U upgrade
 RUN apk add --no-cache dumb-init
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 EXPOSE 80
