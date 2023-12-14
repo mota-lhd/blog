@@ -1,7 +1,7 @@
 FROM node:gallium-alpine as build
 
-ENV HUGO_VERSION="0.119.0"
-ENV HUGO_CHECKSUM="c94f12d589a0b3c8955cf5107ccc6e9e89ab5a901fb5eb1de1c889da844b737f"
+ENV HUGO_VERSION="0.121.1"
+ENV HUGO_CHECKSUM="348997284f405abee2a84634525a4e1298b710bbf5bdf5dea30bfc0b1c9aeba5"
 
 RUN apk add --no-cache curl
 
@@ -22,8 +22,6 @@ FROM nginx:stable-alpine as prod
 
 ARG USER=front
 ARG GROUP=web
-
-LABEL org.opencontainers.image.authors="elmouatassim.louhaidia@pm.me"
 
 HEALTHCHECK --interval=5m --timeout=3s \
     CMD curl -f http://localhost/ || exit 1
