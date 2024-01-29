@@ -1,7 +1,7 @@
-FROM node:gallium-alpine as build
+FROM node:gallium-alpine AS build
 
-ENV HUGO_VERSION="0.121.1"
-ENV HUGO_CHECKSUM="348997284f405abee2a84634525a4e1298b710bbf5bdf5dea30bfc0b1c9aeba5"
+ENV HUGO_VERSION="0.122.0"
+ENV HUGO_CHECKSUM="356a4948e8be7c538220210f03f6374b5d2379d9ca440182efec534cfd45ca9c"
 
 RUN apk add --no-cache curl
 
@@ -18,7 +18,7 @@ RUN npm install
 RUN npm run css
 RUN hugo --minify --gc --destination public --source .
 
-FROM nginx:stable-alpine as prod
+FROM nginx:stable-alpine AS prod
 
 ARG USER=front
 ARG GROUP=web
