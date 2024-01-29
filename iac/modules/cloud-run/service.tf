@@ -65,9 +65,7 @@ resource "google_cloud_run_v2_service" "service" {
 
   lifecycle {
     ignore_changes = [
-      template[0].spec[0].containers[0].ports[0].protocol,
       template[0].metadata[0],
-      metadata[0].annotations,
       traffic
     ]
   }
