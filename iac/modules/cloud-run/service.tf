@@ -17,7 +17,7 @@ resource "google_cloud_run_v2_service" "service" {
       }
       startup_probe {
         initial_delay_seconds = 5
-        timeout_seconds       = 15 * 60
+        timeout_seconds       = 5
         period_seconds        = 10
         failure_threshold     = 5
         tcp_socket {
