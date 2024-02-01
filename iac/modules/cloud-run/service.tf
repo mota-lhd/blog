@@ -50,13 +50,12 @@ resource "google_cloud_run_v2_service" "service" {
         }
       }
       resources {
+        cpu_idle          = true
+        startup_cpu_boost = false
+
         limits = {
-          # Memory usage limit (per container)
-          # https://cloud.google.com/run/docs/configuring/memory-limits
           memory = "512Mi"
-          # CPU usage limit
-          # https://cloud.google.com/run/docs/configuring/cpu
-          cpu = "1000m" # 1 vCPU
+          cpu    = "1"
         }
       }
     }
