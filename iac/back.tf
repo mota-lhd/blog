@@ -26,6 +26,7 @@ module "backend" {
   image_name   = "${var.location}-docker.pkg.dev/${var.project_id}/docker/back:latest"
   tcp_port     = 80
   options = {
+    probe_url = "/docs"
     env = {
       "SERVICE_NAME"    = "Personal Blog API"
       "CAPTCHA_API_URL" = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
