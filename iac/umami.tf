@@ -35,7 +35,8 @@ module "umami" {
   image_name   = "europe-west1-docker.pkg.dev/${var.project_id}/docker/umami:latest"
   tcp_port     = 3000
   options = {
-    env = {}
+    probe_url = "/"
+    env       = {}
     env_from = {
       "DATABASE_URL" = {
         key  = "latest"
