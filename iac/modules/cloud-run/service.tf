@@ -26,6 +26,10 @@ resource "google_cloud_run_v2_service" "service" {
         }
       }
       liveness_probe {
+        initial_delay_seconds = 10
+        timeout_seconds       = 300
+        period_seconds        = 180
+        failure_threshold     = 5
         http_get {
           path = var.options.probe_url
         }
