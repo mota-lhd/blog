@@ -30,7 +30,8 @@ variable "tcp_port" {
 
 variable "options" {
   type = object({
-    env = map(string)
+    probe_url = string
+    env       = map(string)
     env_from = map(object({
       key  = string
       name = string
@@ -38,6 +39,7 @@ variable "options" {
   })
   description = "Environment variables and secrets to bind to container"
   default = {
+    probe_url = "/"
     env = {
       # "env_var_name" = "env_var_val"
     }

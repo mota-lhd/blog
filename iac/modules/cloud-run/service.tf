@@ -27,7 +27,7 @@ resource "google_cloud_run_v2_service" "service" {
       }
       liveness_probe {
         http_get {
-          path = "/docs"
+          path = var.options.probe_url
         }
       }
       dynamic "env" {
