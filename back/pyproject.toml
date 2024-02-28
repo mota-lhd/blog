@@ -1,10 +1,7 @@
 [tool.poetry]
-name = "back"
-version = "0.1.0"
-description = ""
-authors = ["Elmouatassim Louhaidia <elmouatassim.louhaidia@pm.me>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
