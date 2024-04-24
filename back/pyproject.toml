@@ -14,7 +14,7 @@ pydantic = {extras = ["email"], version = "^1"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
-black = "^23.3.0"
+black = "^24"
 
 [build-system]
 requires = ["poetry-core"]
