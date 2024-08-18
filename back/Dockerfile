@@ -1,13 +1,14 @@
 FROM python:3.10 as requirements-step
 
 ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VERSION=1.7.1
+
 WORKDIR /tmp
 
 RUN curl -sSL https://install.python-poetry.org | python3  - --yes
-RUN $POETRY_HOME/bin/poetry self add poetry-plugin-export
 
 COPY poetry.lock pyproject.toml /tmp/
-RUN $POETRY_HOME/bin/poetry export -f requirements.txt --output requirements.txt --without-hashes
+RUN ${POETRY_HOME}/bin/poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM python:3.10-alpine as prod
 
