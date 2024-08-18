@@ -1,4 +1,4 @@
-FROM python:3.10 as requirements-step
+FROM python:3.12 as requirements-step
 
 ENV POETRY_HOME=/opt/poetry
 ENV POETRY_VERSION=1.8.3
@@ -12,7 +12,7 @@ RUN ${POETRY_BIN} self add poetry-plugin-export
 COPY poetry.lock pyproject.toml /tmp/
 RUN ${POETRY_BIN} export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM python:3.10-alpine as prod
+FROM python:3.12-alpine as prod
 
 ARG USER=back
 ARG GROUP=web
