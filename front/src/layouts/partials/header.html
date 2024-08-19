@@ -1,8 +1,6 @@
-<header class="mx-auto flex h-[4.5rem] max-w-3xl px-8 lg:justify-center">
+<header class="mx-auto flex h-[4.5rem] max-w-[--w] px-8 lg:justify-center">
   <div class="relative z-50 mr-auto flex items-center">
-    <a
-      class="-translate-x-[1px] -translate-y-[1px] text-2xl font-semibold"
-      href="{{ `` | absURL }}"
+    <a class="-translate-y-[1px] text-2xl font-medium" href="{{ `` | absURL }}"
       >{{ site.Title }}</a
     >
     <div
@@ -68,10 +66,10 @@
   >
     {{ $url := .RelPermalink }}<!---->
     {{ with site.Menus.main }}
-    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-10">
       {{ range . }}
       <a
-        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal"
         href="{{ .URL }}"
         >{{ .Name }}</a
       >
@@ -81,13 +79,13 @@
 
     {{ with $.Scratch.Get "social_list" }}
     <nav
-      class="mt-12 flex justify-center space-x-10 dark:invert lg:ml-12 lg:mt-0 lg:items-center lg:space-x-6"
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:ml-14 lg:mt-0 lg:items-center"
     >
       {{ range . }}<!---->
       <a
-        class="h-8 w-8 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
         style="--url: url(./{{ . }}.svg)"
-        href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}https://{{ . }}.com/{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
+        href="{{ if eq . `rss` }}{{ `index.xml` | absURL }}{{ else if eq . `mastodon` }}{{ index site.Params . }}{{ else }}https://{{ . }}{{ if eq . `threads` }}.net{{ else }}.com{{ end }}/{{ if eq . `linkedin` }}in/{{ end }}{{ index site.Params . }}{{ end }}"
         target="_blank"
         rel="{{ if eq . `rss` }}alternate{{ else }}me{{ end }}"
       >
