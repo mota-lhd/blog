@@ -1,4 +1,4 @@
 ---
 aliases: ['articles']
-author: 'Elmouatassim'
+author: 'elmouatassim'
 ---

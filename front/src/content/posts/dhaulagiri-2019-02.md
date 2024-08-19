@@ -1,19 +1,19 @@
 ---
-title: 'Balades autour du Dhaulagiri et Annapurna, Act. 2'
-author: 'Elmouatassim'
+title: 'balades autour du dhaulagiri et annapurna, act. 2'
+author: 'elmouatassim'
 date: '2019-11-21'
-summary: "Trek autour du Dhaulagiri et des Annapurnas sur 19 jours d'itinérance en partant de Beni, pas loin de Pokhara."
+summary: "trek autour du dhaulagiri et des annapurnas sur 19 jours d'itinérance en partant de beni, pas loin de pokhara."
 tags: [
-    'Annapurna',
-    'Dhaulagiri',
-    'Nepal',
-    'Tilicho',
+    'annapurna',
+    'dhaulagiri',
+    'nepal',
+    'tilicho',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5644004762845184'
-series: ["Trek autour du Dhaulagiri et des Annapurnas"]
+series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 
 ## 17 octobre 2019
@@ -36,11 +36,11 @@ Nous avons appris par la suite que des villageois de Boghara ont installé sur l
 
 ## 18 octobre 2019
 
-**Jour 6.** Ce matin après le rangement des affaires, de la tente et du sac, nous avons pris le chemin du Dhaulagiri base camp. Les paysages sont lunaires et la nature est hostile sur cette partie du trek. Beaucoup de passages délicats entre les crevasses du glacier. Heureusement qu'il n'y a pas de neige, sinon ça aurait été vraiment dangereux.
+**Jour 6.** Ce matin après le rangement des affaires, de la tente et du sac, nous avons pris le chemin du dhaulagiri base camp. Les paysages sont lunaires et la nature est hostile sur cette partie du trek. Beaucoup de passages délicats entre les crevasses du glacier. Heureusement qu'il n'y a pas de neige, sinon ça aurait été vraiment dangereux.
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/02/05.webp "")
 
-À 4500 m j'ai commencé à avoir mal à la tête. En arrivant au camp de base du Dhaulagiri un vent glacial très fort a commencé à souffler. Nous avons peiné à installer la tente dans cette météo. Tout de suite après nous nous sommes écroulés dedans. Pour moi le mal de tête était très fort et probablement le froid l'a accentué plus. La petite sieste et le chaud m'ont fait du bien. Nous avons mangé un peu et ensuite je suis sorti faire des photos avec notre nouvel ami José qu'on avait rencontré la veille.
+À 4500 m j'ai commencé à avoir mal à la tête. En arrivant au camp de base du dhaulagiri un vent glacial très fort a commencé à souffler. Nous avons peiné à installer la tente dans cette météo. Tout de suite après nous nous sommes écroulés dedans. Pour moi le mal de tête était très fort et probablement le froid l'a accentué plus. La petite sieste et le chaud m'ont fait du bien. Nous avons mangé un peu et ensuite je suis sorti faire des photos avec notre nouvel ami José qu'on avait rencontré la veille.
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/02/06.webp "")
 

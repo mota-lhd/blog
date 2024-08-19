@@ -1,19 +1,19 @@
 ---
-title: 'Balades autour du Dhaulagiri et Annapurna, Act. 5'
-author: 'Elmouatassim'
+title: 'balades autour du dhaulagiri et annapurna, act. 5'
+author: 'elmouatassim'
 date: '2019-11-25'
-summary: "Trek autour du Dhaulagiri et des Annapurnas sur 19 jours d'itinérance en partant de Beni, pas loin de Pokhara."
+summary: "trek autour du dhaulagiri et des annapurnas sur 19 jours d'itinérance en partant de beni, pas loin de pokhara."
 tags: [
-    'Annapurna',
-    'Dhaulagiri',
-    'Nepal',
-    'Tilicho',
+    'annapurna',
+    'dhaulagiri',
+    'nepal',
+    'tilicho',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5636645067948032'
-series: ["Trek autour du Dhaulagiri et des Annapurnas"]
+series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 
 ## 29 octobre 2019
@@ -49,7 +49,7 @@ En arrivant au village j'étais surpris d'apprendre que je n'étais pas à Syang
 
 ## 31 octobre 2019
 
-**Jour 19.** J'ai très peu dormi ce soir là, c'était probablement dû aux quatre thés ou le Coca-Cola de la soirée ou le stress de la journée précédente ou peut-être tout ça à la fois. Mais j'étais en forme au petit matin. J'avais pris le temps de manger et ensuite je suis parti avec comme objectif de rejoindre Bhulbule et prendre le bus en début d'après-midi pour Pokhara. Le matin, la femme du propriétaire du lodge avait mis un chant de mantra sur sa radio et avec un encensoir elle passait dans les pièces de sa maison pour les bénir en quelque sorte. Avant de partir elle m'a fait une Tika blanche sur le front et m'a offert des fleurs oranges. Ça m'avait touché. Je l'ai remercié et suis allé rejoindre mon sentier pour monter dans un premier temps à Siurung. J'étais sur le sentier le moins touristique des Annapurna et les villages dans cette partie sont plus authentiques. J'y ai croisé deux petits frères qui emmenaient chez eux une petite poule.
+**Jour 19.** J'ai très peu dormi ce soir là, c'était probablement dû aux quatre thés ou le Coca-Cola de la soirée ou le stress de la journée précédente ou peut-être tout ça à la fois. Mais j'étais en forme au petit matin. J'avais pris le temps de manger et ensuite je suis parti avec comme objectif de rejoindre Bhulbule et prendre le bus en début d'après-midi pour pokhara. Le matin, la femme du propriétaire du lodge avait mis un chant de mantra sur sa radio et avec un encensoir elle passait dans les pièces de sa maison pour les bénir en quelque sorte. Avant de partir elle m'a fait une Tika blanche sur le front et m'a offert des fleurs oranges. Ça m'avait touché. Je l'ai remercié et suis allé rejoindre mon sentier pour monter dans un premier temps à Siurung. J'étais sur le sentier le moins touristique des annapurna et les villages dans cette partie sont plus authentiques. J'y ai croisé deux petits frères qui emmenaient chez eux une petite poule.
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/05/07.webp "")
 
