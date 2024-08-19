@@ -1,18 +1,18 @@
 ---
-title: 'Balades au Rollwaling, Act. 2'
-author: 'Elmouatassim'
+title: 'balades au Rollwaling, act. 2'
+author: 'elmouatassim'
 date: '2020-01-10'
-summary: "Trek autour du Rollwaling en partance de Bharabese et en direction du Tesi Lapcha en vue d'atteindre la vallée du Khumbu et ses 8000 m mythiques."
+summary: "trek autour du Rollwaling en partance de Bharabese et en direction du Tesi Lapcha en vue d'atteindre la vallée du Khumbu et ses 8000 m mythiques."
 tags: [
-    'Rollwaling',
-    'Nepal',
-    'Gaurishankar',
+    'rollwaling',
+    'nepal',
+    'gaurishankar',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5635008819625984'
-series: ["Trek autour du Rollwaling"]
+series: ["trek autour du Rollwaling"]
 ---
 
 ## 14 novembre 2019
@@ -82,4 +82,4 @@ J'avais décidé de continuer à descendre pour rejoindre Simiguaon. J'y ai pass
 
 ![Trail autour de Simi](https://res.cloudinary.com/elmouatassim/image/upload/07/13.webp "Trail autour de Simi")
 
-Le 21 novembre je suis descendu tôt le matin de Simi à Chetchet afin de prendre le bus de 6 am. Je l'ai raté de 5 minutes et j'ai dû attendre celui de 7 am. Après quelques stops le bus était plein à craquer, heureusement que j'avais sécurisé une place assise à Chetchet. J'étais le seul touriste à bord. La route de Chetchet à Charikot est catastrophique malheureusement, de Charikot à Kathmandu elle est encore pire. Je suis arrivé à Katmandou tard vers 8 pm. J'ai pris un lit dans un dortoir et le lendemain j'étais parti à Pokhara me reposer au bord du lac.
+Le 21 novembre je suis descendu tôt le matin de Simi à Chetchet afin de prendre le bus de 6 am. Je l'ai raté de 5 minutes et j'ai dû attendre celui de 7 am. Après quelques stops le bus était plein à craquer, heureusement que j'avais sécurisé une place assise à Chetchet. J'étais le seul touriste à bord. La route de Chetchet à Charikot est catastrophique malheureusement, de Charikot à Kathmandu elle est encore pire. Je suis arrivé à Katmandou tard vers 8 pm. J'ai pris un lit dans un dortoir et le lendemain j'étais parti à pokhara me reposer au bord du lac.

@@ -1,21 +1,21 @@
 ---
-title: 'Balades au Rollwaling, Act. 1'
-author: 'Elmouatassim'
+title: 'balades au Rollwaling, act. 1'
+author: 'elmouatassim'
 date: '2019-12-02'
-summary: "Trek autour du Rollwaling en partance de Bharabese et en direction du Tesi Lapcha en vue d'atteindre la vallée du Khumbu et ses 8000 m mythiques."
+summary: "trek autour du Rollwaling en partance de Bharabese et en direction du Tesi Lapcha en vue d'atteindre la vallée du Khumbu et ses 8000 m mythiques."
 tags: [
-    'Rollwaling',
-    'Nepal',
-    'Gaurishankar',
+    'rollwaling',
+    'nepal',
+    'gaurishankar',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5638358357245952'
-series: ["Trek autour du Rollwaling"]
+series: ["trek autour du Rollwaling"]
 ---
 
-Toujours au Népal et après quelques jours de détente au bord du lac à Pokhara, je suis allé faire un tour au Rollwaling. Le plan initial était de faire la traversée jusqu'au Khumbu en passant par le Tesi Lapcha, mais au final je suis resté uniquement au Rollwaling. J'ai choisi de commencer ce trek à Bharabese parce que le trajet en bus de Kathmandu est agréable et ne dure pas longtemps.
+Toujours au Népal et après quelques jours de détente au bord du lac à pokhara, je suis allé faire un tour au Rollwaling. Le plan initial était de faire la traversée jusqu'au Khumbu en passant par le Tesi Lapcha, mais au final je suis resté uniquement au Rollwaling. J'ai choisi de commencer ce trek à Bharabese parce que le trajet en bus de Kathmandu est agréable et ne dure pas longtemps.
 
 ## Transport 
 

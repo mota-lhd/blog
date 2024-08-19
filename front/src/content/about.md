@@ -1,15 +1,24 @@
 ---
-title: 'About'
-summary: 'Who are you? Where are you at?'
+title: 'about'
+summary: 'who are you? where are you at?'
 date: "2022-06-12"
 aliases: ['about-me', 'about', 'contact']
-author: "Elmouatassim"
+author: "elmouatassim"
 ---
 
-Human, half-nomad, long distance runner, climber, mountain lover and IT guy. In this space I talk about what I enjoyed doing, what I learned and where I failed. I do it for pleasure in French or English.
+hey 👋🏼
 
-I do speak Arabic and Spanish too, but most of the time I mix all of them. Feel free to get in touch.
+i'm a long distance runner, mountain lover and tech guy 👨🏼‍💻.
+i grew up in [algiers city](https://maps.app.goo.gl/n2xZVA788GmWe9xDA) in north africa and had the chance to live in several parts of the world.
 
-Currently in [Montpellier](https://goo.gl/maps/eoTjssrj7xXRrSGW6), south of France.
+in this space you will discover what i enjoy doing, i do it for pleasure in french or english.
+i do speak arabic and spanish too, but most of the time i mix all of them 😅
 
-You can find the source code of this in [here](https://github.com/mota-lhd/blog).
+📍 currently in [montpellier](https://goo.gl/maps/eoTjssrj7xXRrSGW6), south of France.
+
+you can find the source code of this in [here](https://github.com/mota-lhd/blog).
+
+feel free to get in touch.
+
+
+love & light.

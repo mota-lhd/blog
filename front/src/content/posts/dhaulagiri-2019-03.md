@@ -1,24 +1,24 @@
 ---
-title: 'Balades autour du Dhaulagiri et Annapurna, Act. 3'
-author: 'Elmouatassim'
+title: 'balades autour du dhaulagiri et annapurna, act. 3'
+author: 'elmouatassim'
 date: '2019-11-22'
-summary: "Trek autour du Dhaulagiri et des Annapurnas sur 19 jours d'itinérance en partant de Beni, pas loin de Pokhara."
+summary: "trek autour du dhaulagiri et des annapurnas sur 19 jours d'itinérance en partant de beni, pas loin de pokhara."
 tags: [
-    'Annapurna',
-    'Dhaulagiri',
-    'Nepal',
-    'Tilicho',
+    'annapurna',
+    'dhaulagiri',
+    'nepal',
+    'tilicho',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5632499082330112'
-series: ["Trek autour du Dhaulagiri et des Annapurnas"]
+series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 
 ## 21 octobre 2019
 
-**Jour 9.** Aujourd'hui aussi, le réveil était matinal. Nous avons pris le petit déjeuner ensemble avec Clément. Il avait décidé la veille d'arrêter ici et aller se reposer quelques jours à Pokhara. Pour moi le plan était d'aller au lac Tilicho. Je devais alors rejoindre l'autre côté de la rivière pour le départ du sentier.
+**Jour 9.** Aujourd'hui aussi, le réveil était matinal. Nous avons pris le petit déjeuner ensemble avec Clément. Il avait décidé la veille d'arrêter ici et aller se reposer quelques jours à pokhara. Pour moi le plan était d'aller au lac Tilicho. Je devais alors rejoindre l'autre côté de la rivière pour le départ du sentier.
 
 J'ai pris mon temps pour sortir et suis allé ensuite sur le sentier qui mène à Jomsom. C'est terriblement moche malheureusement, beaucoup de pistes bien poussiéreuses et le pire c'est le vent. Avec le vent on respire de la poussière et la douche que j'avais pris la veille a perdu son effet. Je suis à nouveau un dirtbag.
 
@@ -42,7 +42,7 @@ Après une certaine montée qui m'a mené à un camping à 4800 m, j'étais comp
 
 Un peu avant le coucher de soleil, j'ai entendu des cris au col, ça m'avait surpris. Il y avait en effet deux guides avec deux clients qui descendaient le col. Ils avaient fait le trajet dans la journée à partir d'une bergerie pas très loin du camping où j'étais. On a discuté un peu, ça m'a fait du bien de parler après cette journée fatigante, solitaire et silencieuse. Après leur départ j'ai préparé un autre thé et au lit. Enfin, au sac de couchage.
 
-Il faisait déjà noir dehors et il commençait à faire très froid. J'étais bien dans mon sac quand j'entends quelqu'un dire : "hello sir". Surpris, je sors ma tête de la tente. C'était un népalais seul qui venait d'arriver de Pokhara, impressionnant ! Il a pris le bus le matin et ensuite il a enchaîné la montée en pensant qu'il y avait des lodges sur le chemin. Très mal renseigné le pauvre. Je lui ai expliqué que le prochain lodge est à 6 heures de marche, au moins, et qu'il est fortement conseillé de partir demain matin plutôt surtout qu'il n'était pas du tout équipé pour le froid d'un 5000 m le soir. Je lui ai suggéré de descendre aux bergeries et demander refuge aux bergers.
+Il faisait déjà noir dehors et il commençait à faire très froid. J'étais bien dans mon sac quand j'entends quelqu'un dire : "hello sir". Surpris, je sors ma tête de la tente. C'était un népalais seul qui venait d'arriver de pokhara, impressionnant ! Il a pris le bus le matin et ensuite il a enchaîné la montée en pensant qu'il y avait des lodges sur le chemin. Très mal renseigné le pauvre. Je lui ai expliqué que le prochain lodge est à 6 heures de marche, au moins, et qu'il est fortement conseillé de partir demain matin plutôt surtout qu'il n'était pas du tout équipé pour le froid d'un 5000 m le soir. Je lui ai suggéré de descendre aux bergeries et demander refuge aux bergers.
 
 Quinze minutes après, des cris raisonnent dans la vallée, j'étais bien surpris encore une fois. Ce sont des bergers qui descendaient le col. De vrais durs ces hommes, ils descendent sans frontale et avec leurs Yaks en plus. L'un d'eux m'a demandé si j'allais bien, sans sortir de ma tente je lui ai répondu que oui. La nuit fût longue à cause du vent qui s'est levé au coucher du soleil.
 

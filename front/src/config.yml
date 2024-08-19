@@ -1,6 +1,5 @@
 baseURL: 'https://elmouatassim.louhaidia.info/'
-author: Elmouatassim
-copyright: 'Copyright 2023, Elmouatassim Louhaidia ; all rights reserved.'
+author: elmouatassim
 
 paginate: 6
 languageCode: en
@@ -14,19 +13,23 @@ disableKinds: ["RSS"]
 ignoreErrors:
   - error-remote-getjson
 
-title: Elmouatassim.
+title: "mojo rojo"
 
 params:
   color: 'linen'
   github: mota-lhd
   instagram: mota.hills
   linkedin: elmouatassim-louhaidia
-  subtitle: 'Experimentations, adventures, stories.'
+  threads: "@mota.hills"
+  subtitle: 'adventures, stories and some tech.'
   disableHLJS: true
 
-  # avatar: "https://domain.name/path/"
-  # name: "Elmouatassim"
-  # bio: "Discover fresh content"
+  avatar: "gravatar.foki2@passinbox.com"
+  name: elmouatassim
+  bio: >
+    long distance runner, mountain lover and tech guy 👨🏼‍💻
+    currently in montpellier, south of france.
+    feel free to get in touch.
 
 markup:
   goldmark:
@@ -40,19 +43,19 @@ security:
 menu:
   main:
     - identifier: about
-      name: About
+      name: about
       url: /about/
       weight: 10
     - identifier: tags
-      name: Tags
+      name: tags
       url: /tags/
       weight: 20
     - identifier: categories
-      name: Categories
+      name: categories
       url: /categories/
       weight: 30
     - identifier: series
-      name: Series
+      name: series
       url: /series/
       weight: 40
 

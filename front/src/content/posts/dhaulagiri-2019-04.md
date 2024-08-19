@@ -1,19 +1,19 @@
 ---
-title: 'Balades autour du Dhaulagiri et Annapurna, Act. 4'
-author: 'Elmouatassim'
+title: 'balades autour du dhaulagiri et annapurna, act. 4'
+author: 'elmouatassim'
 date: '2019-11-23'
-summary: "Trek autour du Dhaulagiri et des Annapurnas sur 19 jours d'itinérance en partant de Beni, pas loin de Pokhara."
+summary: "trek autour du dhaulagiri et des annapurnas sur 19 jours d'itinérance en partant de beni, pas loin de pokhara."
 tags: [
-    'Annapurna',
-    'Dhaulagiri',
-    'Nepal',
-    'Tilicho',
+    'annapurna',
+    'dhaulagiri',
+    'nepal',
+    'tilicho',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5642368648740864'
-series: ["Trek autour du Dhaulagiri et des Annapurnas"]
+series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 
 ## 25 octobre 2019
@@ -22,7 +22,7 @@ series: ["Trek autour du Dhaulagiri et des Annapurnas"]
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/04/01.webp "")
 
-Ensuite j'ai continué à descendre pour rejoindre le lodge où j'avais passé la nuit. J'y ai récupéré mon sac à dos et direction Ngawal. Mon projet était d'y passer deux nuits afin de monter au col Kang La. C'est le col qui ferme la vallée de Naar-Phu. Une vallée très proche de celle des Annapurna mais bien préservée des ravages du tourisme de masse. Afin d'y accéder il faut payer 75$ pour le permis et obligatoirement prendre un guide avec soi. Un autre projet pour moi dans le futur.
+Ensuite j'ai continué à descendre pour rejoindre le lodge où j'avais passé la nuit. J'y ai récupéré mon sac à dos et direction Ngawal. Mon projet était d'y passer deux nuits afin de monter au col Kang La. C'est le col qui ferme la vallée de Naar-Phu. Une vallée très proche de celle des annapurna mais bien préservée des ravages du tourisme de masse. Afin d'y accéder il faut payer 75$ pour le permis et obligatoirement prendre un guide avec soi. Un autre projet pour moi dans le futur.
 
 Le sentier vers Ngawal n'est pas agréable non plus ; poussière, absence de caillasse, les villages se sont adaptés aux besoins du touriste et ont donc perdu leur charme. En allant vers Ngawal on croise quelques villages. Le dernier m'avait particulièrement marqué. Il était complètement désert et morne. Les maisons sont jaunes et dispersées sur le flanc de la montagne. Elles étaient toutes délabrées. Je ne sais pas si ça date du tremblement de terre. Ce soir j'ai dormi au Tibet lodge. Il est tenu par un couple et leurs fille. Les chambres sont en bois, bien décorées et confortables.
 
@@ -41,9 +41,9 @@ J'ai traîné un peu sur la crête du col. Le paysage y est minéral, aride et g
 
 ## 27 octobre 2019
 
-**Jour 15.** Après deux journées passées à Ngawal, il était temps de partir et continuer ma descente. Olivier m'avait parlé d'un sentier qui rejoint directement Sickles à partir de Timang. Sickles est en effet très proche de Pokhara et ce sentier m'éviterait de faire un long trajet dans le bus. J'ai donc décidé de tenter ce chemin qui n'est pas facile à trouver sans guide apparemment.
+**Jour 15.** Après deux journées passées à Ngawal, il était temps de partir et continuer ma descente. Olivier m'avait parlé d'un sentier qui rejoint directement Sickles à partir de Timang. Sickles est en effet très proche de pokhara et ce sentier m'éviterait de faire un long trajet dans le bus. J'ai donc décidé de tenter ce chemin qui n'est pas facile à trouver sans guide apparemment.
 
-Sur le sentier j'étais le seul à aller dans le sens de Besi Sahar. Tous allaient vers le Thorung La et il y en avait beaucoup qui y allaient. À Ghyaru je me suis arrêté pour le petit déjeuner. Pour ceux qui font le tour des Annapurna classique, ce village se trouve à la fin d'une montée courte mais légèrement raide. À l'entrée du village on retrouve une petite placette à partir de laquelle on a une vue exceptionnelle sur quelques montagnes du massif des Annapurna. C'est ici où se trouve quelques cafés / lodges et une vieille dame très agressive commercialement. En effet elle se jette sur toute personne qui débarque dans le village avec un plateau contenant des donuts, des chaussons aux pommes et des cinnamon rolls. La plupart cédaient. Le spectacle était hilarant. Après mon petit déjeuner j'ai continué la descente vers Pisang. Dans ce village on est censé trouver un sentier qui monte vers le sommet qui porte le même nom, Pisang Ri. Un 6000 m abordable si on est acclimaté à l'altitude. J'ai cherché ce chemin sans succès. Je n'avais pas vraiment insisté. Ensuite j'ai continué ma descente vers Timang. Je me sentais bien et je n'attendais rien du sentier. Je marchais jusqu'à plus envie et j'ai perdu l'envie en arrivant à Talekhu. Petit village très peu touristique. J'y ai pris une chambre, une douche et un bon Dhal-Bat.
+Sur le sentier j'étais le seul à aller dans le sens de Besi Sahar. Tous allaient vers le Thorung La et il y en avait beaucoup qui y allaient. À Ghyaru je me suis arrêté pour le petit déjeuner. Pour ceux qui font le tour des annapurna classique, ce village se trouve à la fin d'une montée courte mais légèrement raide. À l'entrée du village on retrouve une petite placette à partir de laquelle on a une vue exceptionnelle sur quelques montagnes du massif des annapurna. C'est ici où se trouve quelques cafés / lodges et une vieille dame très agressive commercialement. En effet elle se jette sur toute personne qui débarque dans le village avec un plateau contenant des donuts, des chaussons aux pommes et des cinnamon rolls. La plupart cédaient. Le spectacle était hilarant. Après mon petit déjeuner j'ai continué la descente vers Pisang. Dans ce village on est censé trouver un sentier qui monte vers le sommet qui porte le même nom, Pisang Ri. Un 6000 m abordable si on est acclimaté à l'altitude. J'ai cherché ce chemin sans succès. Je n'avais pas vraiment insisté. Ensuite j'ai continué ma descente vers Timang. Je me sentais bien et je n'attendais rien du sentier. Je marchais jusqu'à plus envie et j'ai perdu l'envie en arrivant à Talekhu. Petit village très peu touristique. J'y ai pris une chambre, une douche et un bon Dhal-Bat.
 
 ![Matin / 318m D+ / 582m D-](https://res.cloudinary.com/elmouatassim/image/upload/04/06.webp "Matin / 318m D+ / 582m D-")
 ![Après-midi / 190m D+ / 573m D-](https://res.cloudinary.com/elmouatassim/image/upload/04/07.webp "Après-midi / 190m D+ / 573m D-")

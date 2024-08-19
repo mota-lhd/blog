@@ -1,19 +1,19 @@
 ---
-title: "L'échappée belle. L'intégrale."
-author: 'Elmouatassim'
+title: "l'échappée belle. l'intégrale."
+author: 'elmouatassim'
 date: '2020-08-27'
-summary: "Récit de la course intégrale de l'échappée belle 2020. Ultra trail entre Vizille et Aiguebelle relayant L'Isère à la Savoie et traversant le massif du Belledone."
+summary: "récit de la course intégrale de l'échappée belle 2020. ultra trail entre Vizille et Aiguebelle relayant L'Isère à la Savoie et traversant le massif du Belledone."
 tags: [
-    'Belledone',
-    'Isère',
-    'Savoie',
-    'France',
+    'belledone',
+    'isère',
+    'savoie',
+    'france',
 ]
 categories: [
-    "Ultra trail"
+    "ultra trail"
 ]
 id: '5646488461901824'
-series: ["Récits de trail de montagne"]
+series: ["récits de trail de montagne"]
 weight: 2
 ---
 

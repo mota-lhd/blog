@@ -1,37 +1,37 @@
 ---
-title: 'Balades autour du Dhaulagiri et Annapurna, Act. 1'
-author: 'Elmouatassim'
+title: 'balades autour du dhaulagiri et annapurna, act. 1'
+author: 'elmouatassim'
 date: '2019-11-08'
-summary: "Trek autour du Dhaulagiri et des Annapurnas sur 19 jours d'itinérance en partant de Beni, pas loin de Pokhara."
+summary: "trek autour du dhaulagiri et des annapurnas sur 19 jours d'itinérance en partant de beni, pas loin de pokhara."
 tags: [
-    'Annapurna',
-    'Dhaulagiri',
-    'Nepal',
-    'Tilicho',
+    'annapurna',
+    'dhaulagiri',
+    'nepal',
+    'tilicho',
 ]
 categories: [
-    "Trekking"
+    "trekking"
 ]
 id: '5634161670881280'
-series: ["Trek autour du Dhaulagiri et des Annapurnas"]
+series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 
-Ce trek est au Népal, dans [l'air de conservation de l'Annapurna](https://fr.m.wikipedia.org/wiki/Aire_de_conservation_de_l%27Annapurna). Il commence d'abord autour de la montagne [Dhaulagiri](https://fr.wikipedia.org/wiki/Dhaulagiri), passe par [le lac sacré Tilicho](https://fr.wikipedia.org/wiki/Lac_Tilicho) et fini sur le circuit classique des Annapurna. Ce dernier est d'ailleurs très bien balisé en rouge et blanc depuis quelques années maintenant. Le reste de l'itinéraire n'est pas balisé mais reste facile à trouver.
+Ce trek est au Népal, dans [l'air de conservation de l'annapurna](https://fr.m.wikipedia.org/wiki/Aire_de_conservation_de_l%27annapurna). Il commence d'abord autour de la montagne [dhaulagiri](https://fr.wikipedia.org/wiki/dhaulagiri), passe par [le lac sacré Tilicho](https://fr.wikipedia.org/wiki/Lac_Tilicho) et fini sur le circuit classique des annapurna. Ce dernier est d'ailleurs très bien balisé en rouge et blanc depuis quelques années maintenant. Le reste de l'itinéraire n'est pas balisé mais reste facile à trouver.
 
 ## Transport
 
-Comment s'y rendre ? Ce trek commence à partir de Beni. Pour arriver au point de départ, la solution la moins chère est le bus. On peut le prendre de Katmandou (12 heures de bus) ou de Pokhara (5 heures environ). Nous avons pris le bus à partir de [cette station](https://maps.app.goo.gl/X1dJCYurPtch8AM1A). Il est conseillé d'y aller la veille pour acheter un billet. Le ticket coûtait 950 roupies (environ 9$) en octobre 2019 et le bus part à 7 am. Il faut donc y être 15 ou 20 minutes avant.
+Comment s'y rendre ? Ce trek commence à partir de beni. Pour arriver au point de départ, la solution la moins chère est le bus. On peut le prendre de Katmandou (12 heures de bus) ou de pokhara (5 heures environ). Nous avons pris le bus à partir de [cette station](https://maps.app.goo.gl/X1dJCYurPtch8AM1A). Il est conseillé d'y aller la veille pour acheter un billet. Le ticket coûtait 950 roupies (environ 9$) en octobre 2019 et le bus part à 7 am. Il faut donc y être 15 ou 20 minutes avant.
 
 ## Permis
 
-On peut faire ce trek seul, sans guide, sans porteurs et sans devoir passer par une agence. Il suffit seulement de payer un permis pour le parc national des Annapurna et de faire une carte de trekking (TIMS). Vous pouvez faire le tout à [ce bureau](https://maps.app.goo.gl/TbBEZpaSpaHbbBEm7). En octobre 2019, la carte TIMS coûtait 1000 roupies et le permis du parc national 3000 roupies. Environ 40$ pour le tout.
+On peut faire ce trek seul, sans guide, sans porteurs et sans devoir passer par une agence. Il suffit seulement de payer un permis pour le parc national des annapurna et de faire une carte de trekking (TIMS). Vous pouvez faire le tout à [ce bureau](https://maps.app.goo.gl/TbBEZpaSpaHbbBEm7). En octobre 2019, la carte TIMS coûtait 1000 roupies et le permis du parc national 3000 roupies. Environ 40$ pour le tout.
 
 ## 13 octobre 2019
-**Jour 1.** Après un bon petit déjeuner au Yeti Hotel de Beni, nous avons pris le premier bus pour Darbang. Il est parti à 8 am. Il y en a toutes les heures apparemment. Le bus était plein de monde et nous n'avions pas de places assises la première heure. Nous étions sur nos sacs entre les sièges. La route est catastrophique entre ces deux villages. C'est une piste qui serpente le long d'une rivière. Elle passe par plusieurs petits villages agricoles où la culture principale est le riz. Nous étions quatre touristes dans le bus. Les deux autres allaient au Dolpo inférieur.
+**Jour 1.** Après un bon petit déjeuner au Yeti Hotel de beni, nous avons pris le premier bus pour Darbang. Il est parti à 8 am. Il y en a toutes les heures apparemment. Le bus était plein de monde et nous n'avions pas de places assises la première heure. Nous étions sur nos sacs entre les sièges. La route est catastrophique entre ces deux villages. C'est une piste qui serpente le long d'une rivière. Elle passe par plusieurs petits villages agricoles où la culture principale est le riz. Nous étions quatre touristes dans le bus. Les deux autres allaient au Dolpo inférieur.
 
 Deux personnes curieuses m'ont parlé. Le premier est un jeune qui se rendait au mariage de son frère. Son frère a trouvé l'amour sur Facebook. L'autre est un commerçant musulman qui allait dans un autre village pour le travail. Il était content quand je lui ai dit que j'ai grandi dans un pays musulman. On ne voit pas beaucoup de musulmans dans les régions montagneuses du Népal. La majorité vit plutôt dans les régions chaudes du pays. Pour info, la population népalaise pratique l'hindouisme à 85% et le Bouddhisme à 10%. Le reste est partagé entre musulmans et chrétiens.
 
-Nous sommes arrivés à Darbang vers 11 am du matin. Nous avons commencé tout de suite à marcher. Il faisait très chaud. Le but de la journée était d'atteindre avant 5 pm Phaliagong. Sur le chemin nous nous sommes arrêté à Takam pour nous restaurer un peu. Un village agricole aussi avec une petite maison d'hôtes très basique mais où la nourriture est très bonne et les gens très sympathiques ; comme partout au Népal. Les personnes qui étaient au restaurant vivent à Pokhara mais étaient à Takam pour le festival Dashain afin de le passer avec leur famille. (Pour info, Takam est le dernier village avec du Wi-Fi, le prochain est Marpha).
+Nous sommes arrivés à Darbang vers 11 am du matin. Nous avons commencé tout de suite à marcher. Il faisait très chaud. Le but de la journée était d'atteindre avant 5 pm Phaliagong. Sur le chemin nous nous sommes arrêté à Takam pour nous restaurer un peu. Un village agricole aussi avec une petite maison d'hôtes très basique mais où la nourriture est très bonne et les gens très sympathiques ; comme partout au Népal. Les personnes qui étaient au restaurant vivent à pokhara mais étaient à Takam pour le festival Dashain afin de le passer avec leur famille. (Pour info, Takam est le dernier village avec du Wi-Fi, le prochain est Marpha).
 
 ![Pause déjeuner à Takam](https://res.cloudinary.com/elmouatassim/image/upload/01/01.webp "Pause déjeuner à Takam")
 
@@ -47,7 +47,7 @@ Pleine lune dehors ce soir là, nous nous sommes couchés juste après le dîner
 
 ![](https://res.cloudinary.com/elmouatassim/image/upload/01/03.webp "")
 
-Ensuite le chemin redescend dans la vallée afin de rejoindre un autre pont suspendu. Dans la descente nous sommes passés par une stèle à la mémoire d'un groupe de népalais et coréens morts en octobre 2018 dans une tempête de neige autour du Dhaulagiri. J'ai essayé d'ignorer cette pierre et de ne pas y penser. Dans cette descente nous nous sommes perdus deux fois à travers les rizières ; il faut rester à l'est du ruisseau et rejoindre le pont.
+Ensuite le chemin redescend dans la vallée afin de rejoindre un autre pont suspendu. Dans la descente nous sommes passés par une stèle à la mémoire d'un groupe de népalais et coréens morts en octobre 2018 dans une tempête de neige autour du dhaulagiri. J'ai essayé d'ignorer cette pierre et de ne pas y penser. Dans cette descente nous nous sommes perdus deux fois à travers les rizières ; il faut rester à l'est du ruisseau et rejoindre le pont.
 
 Une fois au pont, il faut encore une fois remonter la vallée à travers un chemin forestier et redescendre de l'autre côté pour rejoindre Naura. Un village très charmant et difficile d'accès, comme tout les villages après Phaliagong d'ailleurs et où la piste n'arrive pas encore. Nous nous sommes arrêtés à Naura pour la pause déjeuner.
 
