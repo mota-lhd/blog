@@ -7,6 +7,6 @@ resource "google_dns_managed_zone" "zone" {
     state = "on"
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
