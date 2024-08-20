@@ -15,8 +15,6 @@
 {{ $paginator := .Paginate $pages }} {{ range $index, $page := $paginator.Pages
 }}<!---->
 
-<!-- avatar -->
-{{ if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) }}<!---->
 
 {{ $avatar_url := $.Scratch.Get "avatar_url" }}<!---->
 {{ if or $avatar_url site.Params.name }}
@@ -44,7 +42,6 @@
   </div>
   {{ end }}
 </div>
-{{ end }}<!---->
 
 {{ end }}
 
