@@ -10,9 +10,11 @@ resource "google_project_service" "default_services" {
 module "run-mappings" {
   source = "./modules/mappings"
 
-  project_id  = var.project_id
-  location    = var.location
-  main_domain = var.main_domain
+  project_id           = var.project_id
+  location             = var.location
+  main_domain          = var.main_domain
+  cloudflare_api_token = var.cloudflare_api_token
+  cf_account_id        = var.cloudflare_account_id
 
   mappings = {
     "backend" = {

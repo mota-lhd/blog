@@ -15,17 +15,14 @@ resource "google_cloud_run_domain_mapping" "mappings" {
 }
 
 # https://www.google.com/webmasters/verification/home
-resource "google_dns_record_set" "verif" {
+resource "cloudflare_record" "verif" {
   for_each = var.mappings
 
-  project = var.project_id
-  name    = "${each.key}.${var.main_domain}."
+  zone_id = cloudflare_zone.main.id
+  name    = "${each.key}.${var.main_domain}"
+  content = each.value.site_verification_txt
   type    = "TXT"
   ttl     = 300
-
-  managed_zone = google_dns_managed_zone.zone.name
-
-  rrdatas = [each.value.site_verification_txt]
 }
 
 locals {
@@ -53,15 +50,13 @@ locals {
   }
 }
 
-resource "google_dns_record_set" "records" {
+resource "cloudflare_record" "records" {
   for_each = local.records
 
-  project = var.project_id
-  name    = "${each.value.subdomain}.${var.main_domain}."
+  zone_id = cloudflare_zone.main.id
+  name    = "${each.value.subdomain}.${var.main_domain}"
+  content = each.value.data[0]
   type    = each.value.type
-  ttl     = 300
-
-  managed_zone = google_dns_managed_zone.zone.name
-
-  rrdatas = each.value.data
+  ttl     = 1
+  proxied = false
 }
