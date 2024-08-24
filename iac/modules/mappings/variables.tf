@@ -1,6 +1,11 @@
 variable "project_id" {
   type        = string
-  description = "Project ID"
+  description = "Google Cloud project ID"
+}
+
+variable "cf_account_id" {
+  type        = string
+  description = "Cloudflare account ID"
 }
 
 variable "location" {
@@ -21,4 +26,9 @@ variable "mappings" {
 variable "main_domain" {
   type        = string
   description = "Domain name of the blog"
+}
+
+variable "cloudflare_api_token" {
+  type        = string
+  description = "CloudFlare API token"
 }

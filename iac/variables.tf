@@ -43,3 +43,13 @@ variable "gcp_api_to_activate" {
   type        = list(any)
   description = "GCP services that need to be activated in the project"
 }
+
+variable "cloudflare_api_token" {
+  type        = string
+  description = "CloudFlare API token"
+}
+
+variable "cloudflare_account_id" {
+  type        = string
+  description = "CloudFlare account ID"
+}

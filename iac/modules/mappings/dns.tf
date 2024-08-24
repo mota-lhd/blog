@@ -1,12 +1,12 @@
-resource "google_dns_managed_zone" "zone" {
-  name     = "default-zone"
-  dns_name = "${var.main_domain}."
-  project  = var.project_id
+resource "cloudflare_zone" "main" {
+  account_id = var.cf_account_id
+  zone       = var.main_domain
 
-  dnssec_config {
-    state = "on"
-  }
-  lifecycle {
-    prevent_destroy = false
-  }
+  plan       = "free"
+  type       = "full"
+  paused     = false
+}
+
+resource "cloudflare_zone_dnssec" "main" {
+  zone_id = cloudflare_zone.main.id
 }
