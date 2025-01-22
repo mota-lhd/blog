@@ -18,7 +18,7 @@ jobs:
         fetch-depth: 0
 
     - name: Scan backend Dockerfile
-      uses: aquasecurity/trivy-action@0.11.2
+      uses: aquasecurity/trivy-action@0.29.0
       with:
         scan-type: 'config'
         image-ref: ''
@@ -29,7 +29,7 @@ jobs:
         exit-code: 3
 
     - name: Scan frontend Dockerfile
-      uses: aquasecurity/trivy-action@0.11.2
+      uses: aquasecurity/trivy-action@0.29.0
       with:
         scan-type: 'config'
         image-ref: ''
