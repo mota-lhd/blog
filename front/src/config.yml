@@ -1,7 +1,10 @@
 baseURL: 'https://elmouatassim.louhaidia.info/'
 author: elmouatassim
 
-paginate: 6
+pagination:
+  disableAliases: false
+  pagerSize: 6
+  path: page
 languageCode: en
 DefaultContentLanguage: en
 enableInlineShortcodes: true
@@ -21,6 +24,7 @@ params:
   instagram: mota.hills
   linkedin: elmouatassim-louhaidia
   threads: "@mota.hills"
+  bluesky: m0jo-roj0.bsky.social
   subtitle: 'adventures, stories and some tech.'
   disableHLJS: true
 
