@@ -1,7 +1,10 @@
 baseURL: 'https://elmouatassim.louhaidia.info/'
 author: elmouatassim
 
-paginate: 6
+pagination:
+  disableAliases: false
+  pagerSize: 6
+  path: page
 languageCode: en
 DefaultContentLanguage: en
 enableInlineShortcodes: true
