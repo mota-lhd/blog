@@ -39,3 +39,4 @@ Pulumi.prod.yaml
 public/
 node_modules/
 *lock*
+.hugo_build.lock
