@@ -9,8 +9,9 @@ resource "google_cloud_run_domain_mapping" "mappings" {
   }
 
   spec {
-    force_override = true
-    route_name     = each.value.cloud_run_name
+    force_override   = true
+    route_name       = each.value.cloud_run_name
+    certificate_mode = "NONE"
   }
 }
 

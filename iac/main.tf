@@ -20,14 +20,17 @@ module "run-mappings" {
     "backend" = {
       cloud_run_name        = "backend"
       site_verification_txt = "google-site-verification=TlJejL41u3Cu1Ea3ymLZp2QU8IaaPURi6xkr05SM6RU"
+      uri = trimprefix(module.backend.uri, "https://")
     }
     "elmouatassim" = {
       cloud_run_name        = "elmouatassim"
       site_verification_txt = "google-site-verification=IiMvco0FcO1xwnBej8eD3kVzFYLAZeswBUfJaK293LY"
+      uri = trimprefix(module.front.uri, "https://")
     }
     "umami" = {
       cloud_run_name        = "umami"
       site_verification_txt = "google-site-verification=W4pCsmPQ4hrLaIyHxGteKsUAaU1bf67r3RYzV9re90s"
+      uri = trimprefix(module.umami.uri, "https://")
     }
   }
 }

@@ -1,22 +1,32 @@
-resource "google_app_engine_application" "app" {
-  project       = var.project_id
-  location_id   = trim(var.location, "1")
-  database_type = "CLOUD_DATASTORE_COMPATIBILITY"
-}
+# resource "google_firestore_database" "database" {
+#   project     = var.project_id
+#   name        = "(default)"
+#   location_id = var.location
 
-resource "google_datastore_index" "blog_post_comment" {
-  kind     = "Comment"
-  ancestor = "ALL_ANCESTORS"
+#   type = "DATASTORE_MODE"
 
-  properties {
-    name      = "visible"
-    direction = "DESCENDING"
-  }
-  properties {
-    name      = "ts"
-    direction = "DESCENDING"
-  }
-}
+#   app_engine_integration_mode = "DISABLED"
+#   delete_protection_state     = "DELETE_PROTECTION_ENABLED"
+# }
+
+# resource "google_firestore_index" "blog_post_comment" {
+#   project    = var.project_id
+#   database   = google_firestore_database.database.name
+#   collection = "Comment"
+
+#   query_scope = "COLLECTION_RECURSIVE"
+#   api_scope   = "DATASTORE_MODE_API"
+
+#   fields {
+#     field_path = "visible"
+#     order      = "DESCENDING"
+#   }
+
+#   fields {
+#     field_path = "ts"
+#     order      = "DESCENDING"
+#   }
+# }
 
 resource "google_project_iam_member" "datastore_user" {
   project = var.project_id

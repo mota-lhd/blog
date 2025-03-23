@@ -4,6 +4,9 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4"
     }
+    tls = {
+      source = "hashicorp/tls"
+    }
   }
 }
 

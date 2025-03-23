@@ -17,7 +17,8 @@ variable "location" {
 variable "mappings" {
   type = map(object({
     cloud_run_name        = string,
-    site_verification_txt = string
+    site_verification_txt = string,
+    uri                   = string
   }))
   description = "Map that maps subdomain with a verification text"
   default     = {}
