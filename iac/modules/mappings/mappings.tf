@@ -28,19 +28,15 @@ resource "cloudflare_record" "verif" {
 locals {
   record_types = ["A", "AAAA"]
 
-  records_by_subdomain = distinct(flatten([
-    for subdomain_key, subdomain_val in var.mappings : {
-      subdomain = subdomain_key
-      data      = { for record in google_cloud_run_domain_mapping.mappings[subdomain_key].status[0].resource_records : record.type => record.rrdata... }
-    }
-  ]))
-
   tmp_data = distinct(flatten([
-    for mapping in local.records_by_subdomain : [
+    for subdomain_key, subdomain_val in var.mappings : [
       for record_type in local.record_types : {
         type      = record_type
-        subdomain = mapping.subdomain
-        data      = mapping.data[record_type]
+        subdomain = subdomain_key
+        data      = [
+          for record in google_cloud_run_domain_mapping.mappings[subdomain_key].status[0].resource_records:
+          record.rrdata if record.type == record_type
+        ]
       }
     ]
   ]))
