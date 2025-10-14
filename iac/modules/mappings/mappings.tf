@@ -29,9 +29,9 @@ locals {
   record_types = ["A", "AAAA"]
 
   records_by_subdomain = distinct(flatten([
-    for index, mapping in google_cloud_run_domain_mapping.mappings : {
-      subdomain = index
-      data      = { for record in mapping.status[0].resource_records : record.type => record.rrdata... }
+    for subdomain_key, subdomain_val in var.mappings : {
+      subdomain = subdomain_key
+      data      = { for record in google_cloud_run_domain_mapping.mappings[subdomain_key].status[0].resource_records : record.type => record.rrdata... }
     }
   ]))
 
