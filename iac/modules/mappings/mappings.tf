@@ -15,7 +15,7 @@ resource "google_cloud_run_domain_mapping" "mappings" {
 }
 
 # https://www.google.com/webmasters/verification/home
-resource "cloudflare_record" "verif" {
+resource "cloudflare_dns_record" "verif" {
   for_each = var.mappings
 
   zone_id = cloudflare_zone.main.id
@@ -46,7 +46,7 @@ locals {
   }
 }
 
-resource "cloudflare_record" "records" {
+resource "cloudflare_dns_record" "records" {
   for_each = local.records
 
   zone_id = cloudflare_zone.main.id
