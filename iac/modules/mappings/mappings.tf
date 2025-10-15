@@ -15,7 +15,7 @@ resource "google_cloud_run_domain_mapping" "mappings" {
 }
 
 # https://www.google.com/webmasters/verification/home
-resource "cloudflare_record" "verif" {
+resource "cloudflare_dns_record" "verif" {
   for_each = var.mappings
 
   zone_id = cloudflare_zone.main.id
@@ -28,19 +28,15 @@ resource "cloudflare_record" "verif" {
 locals {
   record_types = ["A", "AAAA"]
 
-  records_by_subdomain = distinct(flatten([
-    for index, mapping in google_cloud_run_domain_mapping.mappings : {
-      subdomain = index
-      data      = { for record in mapping.status[0].resource_records : record.type => record.rrdata... }
-    }
-  ]))
-
   tmp_data = distinct(flatten([
-    for mapping in local.records_by_subdomain : [
+    for subdomain_key, subdomain_val in var.mappings : [
       for record_type in local.record_types : {
         type      = record_type
-        subdomain = mapping.subdomain
-        data      = mapping.data[record_type]
+        subdomain = subdomain_key
+        data      = [
+          for record in google_cloud_run_domain_mapping.mappings[subdomain_key].status[0].resource_records:
+          record.rrdata if record.type == record_type
+        ]
       }
     ]
   ]))
@@ -50,7 +46,7 @@ locals {
   }
 }
 
-resource "cloudflare_record" "records" {
+resource "cloudflare_dns_record" "records" {
   for_each = local.records
 
   zone_id = cloudflare_zone.main.id
