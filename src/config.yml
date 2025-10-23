@@ -3,7 +3,7 @@ author: elmouatassim
 
 pagination:
   disableAliases: false
-  pagerSize: 6
+  pagerSize: 5
   path: page
 languageCode: en
 DefaultContentLanguage: en
