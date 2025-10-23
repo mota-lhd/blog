@@ -1,7 +1,7 @@
 ---
 title: 'Self hosting'
 author: 'Elmouatassim'
-date: '2022-06-11'
+date: '2025-10-24'
 summary: "How you can build basic tooling yourself, host it in Europe and not depend on big tech corporations?"
 tags: [
     'Tech',
@@ -18,7 +18,8 @@ categories: [
 ]
 id: '5643280054222848'
 series: ["Tech"]
-draft: false
+draft: true
+weight: 3
 ---
 
 # Still in WIP
