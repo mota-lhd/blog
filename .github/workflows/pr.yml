@@ -19,7 +19,7 @@ jobs:
     - name: scan
       uses: trufflesecurity/trufflehog@main
       with:
-        base: ${{ github.base_ref }}
+        base: ${{ github.base_refss }}
         head: ${{ github.head_ref }}
         extra_args: --results=verified,unknown
 
