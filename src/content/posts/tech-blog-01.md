@@ -18,7 +18,7 @@ categories: [
 ]
 id: '5643280054222848'
 series: ["Tech"]
-draft: false
+draft: true
 weight: 3
 ---
 
