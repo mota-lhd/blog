@@ -1,8 +1,0 @@
-/*
-    Caption style for images
-*/
-
-.fig-caption {
-    flex-shrink: 0;
-    font-size: 1rem;
-}
