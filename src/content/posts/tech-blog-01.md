@@ -1,12 +1,13 @@
 ---
-title: 'Brand new blog (for free)'
+title: 'Self hosting'
 author: 'Elmouatassim'
 date: '2022-06-11'
-summary: "How you can build a blog for free using technologies from Docker, Google Cloud, Hugo, Cloudinary, Terraform, Github Actions, Python and FastAPI"
+summary: "How you can build basic tooling yourself, host it in Europe and not depend on big tech corporations?"
 tags: [
     'Tech',
     'Hugo',
     'Docker',
+    'Disco',
     'GCP',
     'Terraform',
     'Github Actions',
@@ -17,8 +18,10 @@ categories: [
 ]
 id: '5643280054222848'
 series: ["Tech"]
-draft: true
+draft: false
 ---
+
+# Still in WIP
 
 I want to share my experience while building a very simple blog. This one, yes! The one you are reading :) I decided to move my blog from wordpress to learn how to build one by myself for less than 1€ per month! Also, having ads on the free plan of wordpress was a bit annoying. So this is it, I will cover during this series of posts how to host static and dynamic content and also how to deploy it using Terraform and secure CI/CD workflows on Github Actions.
 
@@ -48,7 +51,7 @@ Then you need a free account on Pulumi cloud. Once you have it, you just need to
 ```
 
 
-## [Google Cloud Platform](https://cloud.google.com)
+## [Disco](https://disco.cloud/)
 
 ## [Github Actions](https://github.com/features/actions)
 
