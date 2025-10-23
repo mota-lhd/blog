@@ -1,7 +1,9 @@
 name: Frontend checks
 
 on:
-  pull_request
+  pull_request:
+    branches:
+      - frontend
 
 jobs:
   trufflehog:
