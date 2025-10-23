@@ -15,28 +15,3 @@ module "backend_secret" {
   secret_id      = local.backend_secret_id
   accessor_email = google_service_account.backend_sa.email
 }
-
-module "backend" {
-  source = "./modules/cloud-run"
-
-  service_name = "backend"
-  project_name = var.project_id
-  location     = var.location
-  runner_sa    = google_service_account.backend_sa.email
-  image_name   = "${var.location}-docker.pkg.dev/${var.project_id}/docker/back:latest"
-  tcp_port     = 80
-  options = {
-    probe_url = "/docs"
-    env = {
-      "SERVICE_NAME"    = "Personal Blog API"
-      "CAPTCHA_API_URL" = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-      "PROJECT_ID"      = "${var.project_id}"
-    }
-    env_from = {
-      "CAPTCHA_SERVER_KEY" = {
-        key  = "latest"
-        name = "${local.backend_secret_id}"
-      }
-    }
-  }
-}

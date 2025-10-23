@@ -24,28 +24,3 @@ module "umami_secret_2" {
   secret_id      = local.umami_secret_2_id
   accessor_email = google_service_account.umami_sa.email
 }
-
-module "umami" {
-  source = "./modules/cloud-run"
-
-  service_name = "umami"
-  project_name = var.project_id
-  location     = var.location
-  runner_sa    = google_service_account.umami_sa.email
-  image_name   = "europe-west1-docker.pkg.dev/${var.project_id}/docker/umami:latest"
-  tcp_port     = 3000
-  options = {
-    probe_url = "/"
-    env       = {}
-    env_from = {
-      "DATABASE_URL" = {
-        key  = "latest"
-        name = "${local.umami_secret_1_id}"
-      }
-      "HASH_SALT" = {
-        key  = "latest"
-        name = "${local.umami_secret_2_id}"
-      }
-    }
-  }
-}
