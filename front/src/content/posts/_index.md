@@ -1,4 +1,0 @@
----
-aliases: ['articles']
-author: 'elmouatassim'
----

@@ -2,8 +2,8 @@ name: Check frontend
 
 on:
   pull_request:
-    paths:
-      - 'front/**'
+    branches:
+      - frontend
 
 jobs:
   trivy:
@@ -16,13 +16,24 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Scan frontend Dockerfile
+      uses: aquasecurity/trivy-action@0.29.0
+      with:
+        scan-type: 'config'
+        image-ref: ''
+        severity: 'MEDIUM,HIGH,CRITICAL'
+        scan-ref: './Dockerfile'
+        ignore-unfixed: true
+        format: 'table'
+        exit-code: 3
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2.6.0
 
     - name: Build frontend image from Dockerfile
       uses: docker/build-push-action@v4.1.0
       with:
-        context: ./front/
+        context: ./
         push: false
         tags: local/web:front
         cache-from: type=gha
