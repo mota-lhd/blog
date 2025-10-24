@@ -125,7 +125,6 @@ async def add_comment_to_article(
         response = (
             storage.table("blog_posts").select("*").eq("id", article_id).execute()
         )
-
         if response.count > 0:
             return "OK"
         else:
