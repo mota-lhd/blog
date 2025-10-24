@@ -5,8 +5,7 @@ RUN pip install --no-cache-dir poetry poetry-plugin-export
 COPY poetry.lock pyproject.toml /tmp/
 RUN poetry export --format=requirements.txt \
   --output=requirements.txt \
-  --without-hashes \
-  --without=dev
+  --without-hashes
 
 FROM python:3.13-alpine as prod
 
