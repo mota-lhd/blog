@@ -7,7 +7,7 @@ RUN poetry export --format=requirements.txt \
   --output=requirements.txt \
   --without-hashes
 
-FROM python:3.13-alpine as prod
+FROM python:3.13-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
@@ -28,9 +28,6 @@ RUN apk add --no-cache dumb-init
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
-EXPOSE 80
+EXPOSE 8000
 
 USER ${USER}
-
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

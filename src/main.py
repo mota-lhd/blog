@@ -122,16 +122,16 @@ async def add_comment_to_article(
     storage: Client = Depends(get_db),
 ):
     if check_captcha(comment.captcha):
-      response = (
-        storage.table("blog_posts").select("*").eq("id", article_id).execute()
-      )
+        response = (
+            storage.table("blog_posts").select("*").eq("id", article_id).execute()
+        )
 
-      if response.count > 0:
-        return "OK"
-      else:
-        raise Exception("The article you are looking for does not exist.")
+        if response.count > 0:
+            return "OK"
+        else:
+            raise Exception("The article you are looking for does not exist.")
     else:
-      raise Exception("You're not human ;)")
+        raise Exception("You're not human ;)")
 
 
 # FastAPI program
