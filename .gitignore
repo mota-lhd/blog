@@ -38,5 +38,4 @@ Pulumi.prod.yaml
 # hugo generated files
 public/
 node_modules/
-*lock*
 .hugo_build.lock
