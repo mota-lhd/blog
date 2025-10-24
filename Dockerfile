@@ -1,18 +1,14 @@
-FROM python:3.12 as requirements-step
-
-ENV POETRY_HOME=/opt/poetry
-ENV POETRY_VERSION=2.0.1
-ENV POETRY_BIN=${POETRY_HOME}/bin/poetry
-
+# Setup python requirements
+FROM python:3.13 AS requirements
 WORKDIR /tmp
-
-RUN curl -sSL https://install.python-poetry.org | python3  - --yes
-RUN ${POETRY_BIN} self add poetry-plugin-export
-
+RUN pip install --no-cache-dir poetry poetry-plugin-export
 COPY poetry.lock pyproject.toml /tmp/
-RUN ${POETRY_BIN} export -f requirements.txt --output requirements.txt --without-hashes
+RUN poetry export --format=requirements.txt \
+  --output=requirements.txt \
+  --without-hashes \
+  --without=dev
 
-FROM python:3.12-alpine as prod
+FROM python:3.13-alpine as prod
 
 ARG USER=back
 ARG GROUP=web
