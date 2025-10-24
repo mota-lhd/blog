@@ -1,5 +1,5 @@
-# Setup python requirements
 FROM python:3.13 AS requirements
+
 WORKDIR /tmp
 RUN pip install --no-cache-dir poetry poetry-plugin-export
 COPY poetry.lock pyproject.toml /tmp/
@@ -21,7 +21,7 @@ RUN addgroup ${GROUP}
 RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
 
 WORKDIR /web
-COPY --from=requirements-step /tmp/requirements.txt /web/requirements.txt
+COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
 COPY --chown=${USER}:${GROUP} ./src/ /web/
 
 RUN apk -U upgrade
