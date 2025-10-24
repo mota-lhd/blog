@@ -13,9 +13,6 @@ ARG USER=back
 ARG GROUP=web
 LABEL org.opencontainers.image.authors="elmouatassim.louhaidia@pm.me"
 
-HEALTHCHECK --interval=5m --timeout=3s \
-    CMD curl -f http://localhost/docs || exit 1
-
 RUN addgroup ${GROUP}
 RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
 

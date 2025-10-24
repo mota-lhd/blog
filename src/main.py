@@ -38,10 +38,6 @@ class Article(BaseModel):
 # Global variables
 
 
-origins: list = [
-    # PROD
-    "https://elmouatassim.louhaidia.info",
-]
 router: APIRouter = APIRouter()
 
 
@@ -146,7 +142,6 @@ def get_app() -> FastAPI:
     _app.include_router(router, prefix=settings.API_V1_STR)
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["GET", "POST"],
         expose_headers=[],
