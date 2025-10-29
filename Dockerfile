@@ -23,9 +23,6 @@ FROM nginx:stable-alpine AS prod
 ARG USER=front
 ARG GROUP=web
 
-HEALTHCHECK --interval=5m --timeout=3s \
-    CMD curl -f http://localhost/ || exit 1
-
 RUN apk -U upgrade
 
 WORKDIR /web
