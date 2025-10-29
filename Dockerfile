@@ -9,7 +9,6 @@ FROM python:3.13-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
-LABEL org.opencontainers.image.authors="elmouatassim.louhaidia@pm.me"
 
 RUN addgroup ${GROUP}
 RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
