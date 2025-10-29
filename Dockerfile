@@ -1,11 +1,9 @@
 FROM python:3.13 AS requirements
 
 WORKDIR /tmp
-RUN pip install --no-cache-dir poetry poetry-plugin-export
-COPY poetry.lock pyproject.toml /tmp/
-RUN poetry export --format=requirements.txt \
-  --output=requirements.txt \
-  --without-hashes
+RUN pip install uv
+COPY uv.lock pyproject.toml /tmp/
+RUN uv pip freeze > requirements.txt
 
 FROM python:3.13-alpine AS prod
 
