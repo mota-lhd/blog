@@ -24,4 +24,4 @@ RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 USER ${USER}
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]
