@@ -1,11 +1,12 @@
-FROM python:3.13 AS requirements
+FROM python:3.14 AS requirements
 
 WORKDIR /tmp
 RUN pip install uv
 COPY uv.lock pyproject.toml /tmp/
+RUN uv sync
 RUN uv pip freeze > requirements.txt
 
-FROM python:3.13-alpine AS prod
+FROM python:3.14-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
