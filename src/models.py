@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List  # noqa: UP035
 from typing import Optional
 
 from pydantic import EmailStr
@@ -25,11 +24,11 @@ class Comment(CommentBase, table=True):
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  replies: Mapped[List[Comment]] = Relationship(  # noqa: UP006
+  replies: Mapped[list["Comment"]] = Relationship(
     back_populates="parent",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-  parent: Mapped[Optional[Comment]] = Relationship(  # noqa: UP045
+  parent: Mapped[Optional["Comment"]] = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
@@ -49,4 +48,3 @@ class CommentResponse(CommentBase):
 
   class Config:
     from_attributes = True
-    orm_mode = True
