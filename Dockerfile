@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 FROM python:3.14 AS requirements
 
 WORKDIR /tmp
@@ -37,4 +39,4 @@ USER ${USER}
 # create volume mount point for sqlite database
 VOLUME ["${VOLUME_PATH}"]
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/web/entrypoint.sh"]

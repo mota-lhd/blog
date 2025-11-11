@@ -1,5 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 alembic upgrade head
-uvicorn main:app --proxy-headers --host 0.0.0.0 --port 80
+exec uvicorn main:app --proxy-headers --host 0.0.0.0 --port 80
