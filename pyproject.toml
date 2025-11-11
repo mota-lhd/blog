@@ -1,7 +1,7 @@
 [project]
 name = "blog"
 version = "0.1.0"
-description = "Add your description here"
+description = "multi-site backend to handle comments"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -10,6 +10,41 @@ dependencies = [
     "httpx>=0.28.1",
     "loguru>=0.7.3",
     "pydantic-settings>=2.11.0",
-    "supabase>=2.22.3",
+    "sqlmodel>=0.0.27",
     "uvicorn[standard]>=0.38.0",
 ]
+
+[dependency-groups]
+dev = [
+    "alembic>=1.17.1",
+    "ruff>=0.14.4",
+]
+
+[tool.ruff]
+target-version = "py313"
+fix = true
+line-length = 80
+indent-width = 2
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "UP",  # pyupgrade
+  "W",   # pycodestyle warnings
+  "I",   # isort
+  "B",   # flake8-bugbear
+]
+ignore = [
+]
+
+[tool.ruff.lint.isort]
+known-first-party = []
+force-single-line = true
+lines-after-imports = 2
+
+[tool.ruff.format]
+preview = false
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false

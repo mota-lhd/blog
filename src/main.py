@@ -1,154 +1,105 @@
-from datetime import datetime
+from typing import Any
 
-from fastapi import APIRouter
+import httpx
 from fastapi import Depends
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlmodel import Session
+from sqlmodel import SQLModel
+from sqlmodel import create_engine
+from sqlmodel import select
 
-from pydantic import BaseModel
-from pydantic import EmailStr
-
-from pydantic import Field
-
-from supabase import create_client
-from supabase import Client
-from supabase.client import ClientOptions
-
-from httpx import post
+from models import Comment
+from models import CommentCreate
+from models import CommentResponse
 from settings import settings
 
-# Pydantic models
+
+# global
 
 
-class Comment(BaseModel):
-    who: str = EmailStr
-    content: str = Field(max_length=500)
-    ts: datetime = datetime.now()
+def get_app() -> FastAPI:
+  _app: FastAPI = FastAPI(
+    title=settings.service_name,
+    debug=settings.debug,
+    dependencies=[],
+  )
+
+  _app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_origins=["*"],
+    expose_headers=[],
+    allow_headers=[],
+  )
+
+  return _app
 
 
-class CommentIn(Comment):
-    captcha: str
+engine = create_engine(
+  settings.database_url, connect_args={"check_same_thread": False}
+)
+SQLModel.metadata.create_all(engine)
 
-
-class Article(BaseModel):
-    id: int
-    title: str
-
-
-# Global variables
-
-
-router: APIRouter = APIRouter()
-
+app: FastAPI = get_app()
 
 # FastAPI dependencies
 
 
-async def get_db():
-    url: str = settings.SUPABASE_URL
-    key: str = settings.SUPABASE_KEY
-    supabase: Client = create_client(
-        url,
-        key,
-        options=ClientOptions(
-            postgrest_client_timeout=10,
-            storage_client_timeout=10,
-            schema="comments",
-        ),
-    )
-
-    return supabase
+def get_session() -> Any:
+  with Session(engine) as session:
+    yield session
 
 
 # Helper methods
 
 
-def check_captcha(token: str) -> bool:
-    payload: dict = {
-        "secret": settings.CAPTCHA_SERVER_KEY,
-        "response": token,
-    }
+async def check_captcha(token: str) -> bool:
+  payload: dict = {
+    "secret": settings.turnstile_secret,
+    "response": token,
+  }
+  async with httpx.AsyncClient() as client:
+    res: httpx.Response = await client.post(
+      settings.turnstile_api_url, data=payload
+    )
 
-    res = post(settings.CAPTCHA_API_URL, data=payload)
-    res = res.json()
-
-    if not res["success"]:
-        if len(res["error-codes"]) > 0:
-            raise_g_captcha_error(res["error-codes"][0])
-    return res["success"]
+    return res.json().get("success", False)
 
 
-def raise_g_captcha_error(error_code: str) -> None:
-    msg: str = f"{error_code}: "
-
-    if error_code == "missing-input-secret":
-        msg = msg + "Missing server-side secret !!"
-    elif error_code == "invalid-input-secret":
-        msg = msg + "Server side secret is not formed correctly !!"
-    elif error_code == "missing-input-response":
-        msg = msg + "Missing captcha !!"
-    elif error_code == "invalid-input-response":
-        msg = msg + "Captcha is not formed correctly !!"
-    elif error_code == "bad-request":
-        msg = msg + "The request is not formed correctly ..."
-    elif error_code == "timeout-or-duplicate":
-        msg = msg + "Request timed out !"
-    else:
-        msg = msg + "Internal error!"
-
-    raise Exception(msg)
+# methods
 
 
-# HTTP methods
-
-
-@router.get("/articles", response_model=list[Article])
-async def get_articles(storage: Client = Depends(get_db)):
-    response = storage.table("blog_posts").select("*").execute()
-
-    return [Article.model_validate(obj) for obj in response.data]
-
-
-@router.post(
-    "/article/{article_id}/comments/add",
-)
-async def add_comment_to_article(
-    article_id: int,
-    comment: CommentIn,
-    storage: Client = Depends(get_db),
+@app.post("/comments", response_model=CommentResponse)
+async def create_comment(
+  comment: CommentCreate,
+  session: Session = Depends(get_session),  # noqa: B008
 ):
-    if check_captcha(comment.captcha):
-        response = (
-            storage.table("blog_posts").select("*").eq("id", article_id).execute()
-        )
+  if not await check_captcha(comment.turnstile_token):
+    raise HTTPException(status_code=400, detail="Turnstile verification failed")
 
-        if response.count > 0:
-            return "OK"
-        else:
-            raise Exception("The article you are looking for does not exist.")
-    else:
-        raise Exception("You're not human ;)")
+  db_comment: Comment = Comment.model_validate(comment)
+
+  session.add(db_comment)
+  session.commit()
+  session.refresh(db_comment)
+  return db_comment
 
 
-# FastAPI program
-
-
-def get_app() -> FastAPI:
-    _app: FastAPI = FastAPI(
-        title=settings.SERVICE_NAME,
-        debug=settings.DEBUG,
-        dependencies=[],
-    )
-    _app.include_router(router, prefix=settings.API_V1_STR)
-    _app.add_middleware(
-        CORSMiddleware,
-        allow_credentials=True,
-        allow_methods=["GET", "POST"],
-        expose_headers=[],
-        allow_headers=[],
-    )
-
-    return _app
-
-
-app: FastAPI = get_app()
+@app.get(
+  "/comments/{site_id}/{post_slug}", response_model=list[CommentResponse]
+)
+def get_comments(
+  site_id: str,
+  post_slug: str,
+  session: Session = Depends(get_session),  # noqa: B008
+):
+  statement = select(Comment).where(
+    Comment.site_id == site_id,
+    Comment.post_slug == post_slug,
+    Comment.approved,
+    Comment.parent_id is None,
+  )
+  return session.exec(statement).all()
