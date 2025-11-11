@@ -13,10 +13,14 @@ from alembic import context
 modules_path: str = str(Path(__file__).parent.parent)
 
 logger.info(f"using {modules_path} for python packages ...")
-sys.path.insert(0, f"{modules_path}")
 
+if modules_path.endswith("blog"):
+  sys.path.insert(0, f"{modules_path}/src")
+else:
+  sys.path.insert(0, f"{modules_path}")
+
+from models import Comment  # noqa: E402, F401
 from settings import settings  # noqa: E402
-from models import Comment  # noqa: E402
 
 
 config = context.config

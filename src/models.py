@@ -18,21 +18,17 @@ class CommentBase(SQLModel):
 
 
 class Comment(CommentBase, table=True):
-  id: int | None = Field(default=None, primary_key=True)
+  id: int | None = Field(default=None, primary_key=True, index=True)
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  replies = Relationship(
-    back_populates="parent",
-    sa_relationship_kwargs={"remote_side": "Comment.id"},
-  )
-  parent = Relationship(
+  parent: Comment | None = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-
-  class Config:
-    arbitrary_types_allowed = True
+  replies: list[Comment] = Relationship(
+    back_populates="parent",
+  )
 
 
 class CommentCreate(CommentBase):
@@ -46,3 +42,6 @@ class CommentResponse(CommentBase):
 
   class Config:
     from_attributes = True
+
+
+CommentResponse.model_rebuild()

@@ -1,41 +1,8 @@
-# dotenv environment variables file
+comments.db
 .env
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-
-# nuxt.js build output
-.nuxt
-
-# Nuxt generate
-dist
-
-# vuepress build output
-.vuepress/dist
-
-# IDE / Editor
 .idea
-
-# Service worker
-sw.*
-
-# macOS
 .DS_Store
-
-# Vim swap files
-*.swp
-
-# Python
 *.pyc
 .venv/
 __pycache__
-Pulumi.prod.yaml
-
-# Terraform
-**/.terraform*
-**/terraform.tfstate*
-
-# hugo generated files
-public/
-node_modules/
-.hugo_build.lock
+.ruff_cache
