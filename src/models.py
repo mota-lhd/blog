@@ -25,11 +25,11 @@ class Comment(CommentBase, table=True):
   created_at: datetime = Field(default_factory=datetime.now)
 
   # Self-referential relationships
-  parent: Mapped[Optional[Comment]] = Relationship(  # noqa: UP045
+  parent: Mapped[Optional["Comment"]] = Relationship(  # noqa: UP045
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "[Comment.id]"},
   )
-  replies: Mapped[list[Comment]] = Relationship(
+  replies: Mapped[list["Comment"]] = Relationship(
     back_populates="parent",
     cascade_delete=True,
   )
