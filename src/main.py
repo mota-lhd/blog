@@ -85,13 +85,28 @@ async def create_comment(
   session.add(db_comment)
   session.commit()
   session.refresh(db_comment)
+
   return db_comment
+
+
+@app.get(
+  "/comments-to-approve", response_model=list[CommentResponse]
+)
+def get_non_approved_comments(
+  session: Session = Depends(get_session),  # noqa: B008
+):
+  statement = select(Comment).where(
+    not Comment.approved,
+    Comment.parent_id is None,
+  )
+
+  return session.exec(statement).all()
 
 
 @app.get(
   "/comments/{site_id}/{post_slug}", response_model=list[CommentResponse]
 )
-def get_comments(
+def get_post_comments(
   site_id: str,
   post_slug: str,
   session: Session = Depends(get_session),  # noqa: B008
@@ -102,4 +117,5 @@ def get_comments(
     Comment.approved,
     Comment.parent_id is None,
   )
+
   return session.exec(statement).all()
