@@ -19,7 +19,7 @@ RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
 COPY --chown=${USER}:${GROUP} ./src/ /web/
-COPY --chown=${USER}:${GROUP} alembic.ini .
+COPY --chown=${USER}:${GROUP} alembic.ini entrypoint.sh ./
 COPY --chown=${USER}:${GROUP} alembic ./alembic/
 
 RUN apk -U upgrade
@@ -31,4 +31,6 @@ USER ${USER}
 # create volume mount point for sqlite database
 VOLUME ["/app/data"]
 
-CMD alembic upgrade head && uvicorn main:app --proxy-headers --host 0.0.0.0 --port 80
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
