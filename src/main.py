@@ -96,8 +96,8 @@ def get_non_approved_comments(
   session: Session = Depends(get_session),  # noqa: B008
 ):
   statement = select(Comment).where(
-    not Comment.approved,
-    Comment.parent_id is None,
+    Comment.approved == False,  # noqa: E712
+    Comment.parent_id == None,  # noqa: E711
   )
 
   return session.exec(statement).all()
@@ -114,8 +114,8 @@ def get_post_comments(
   statement = select(Comment).where(
     Comment.site_id == site_id,
     Comment.post_slug == post_slug,
-    Comment.approved,
-    Comment.parent_id is None,
+    Comment.approved == True,  # noqa: E712
+    Comment.parent_id == None,  # noqa: E711
   )
 
   return session.exec(statement).all()
