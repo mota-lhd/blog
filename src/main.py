@@ -45,7 +45,7 @@ SQLModel.metadata.create_all(engine)
 
 app: FastAPI = get_app()
 
-# FastAPI dependencies
+# dependencies
 
 
 def get_session() -> Any:
@@ -53,7 +53,7 @@ def get_session() -> Any:
     yield session
 
 
-# Helper methods
+# helper methods
 
 
 async def check_captcha(token: str) -> bool:
@@ -104,7 +104,7 @@ def get_non_approved_comments(
 
 
 @app.get(
-  "/comments/{site_id}/{post_slug}", response_model=list[CommentResponse]
+  "/comments", response_model=list[CommentResponse]
 )
 def get_post_comments(
   site_id: str,
