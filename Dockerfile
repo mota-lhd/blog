@@ -14,10 +14,11 @@ FROM python:3.14-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
-ARG VOLUME_PATH=/app/data
+ARG UID=1001
+ARG GID=1001
 
-RUN addgroup ${GROUP}
-RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
+RUN addgroup -g ${GID} ${GROUP} && \
+    adduser --disabled-password --ingroup ${GROUP} -u ${UID} ${USER}
 
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
@@ -31,12 +32,12 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 # Prepare volume directory and set permissions
-RUN mkdir -p ${VOLUME_PATH} && \
-    chown ${USER}:${GROUP} ${VOLUME_PATH}
+RUN mkdir -p /app/data && \
+    chown -R ${USER}:${GROUP} /app/data
+
+# create volume mount point for sqlite database
+VOLUME ["/app/data"]
 
 USER ${USER}
 
-# create volume mount point for sqlite database
-VOLUME ["${VOLUME_PATH}"]
-
-ENTRYPOINT ["/web/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
