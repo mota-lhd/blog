@@ -28,6 +28,10 @@ class Comment(CommentBase, table=True):
   replies: Mapped[List[Comment]]  # noqa: UP006
   parent: Mapped[Optional[Comment]]  # noqa: UP045
 
+
+  class Config:
+    arbitrary_types_allowed = True
+
 # Define relationships AFTER
 Comment.replies = Relationship(
     back_populates="parent",
@@ -50,3 +54,4 @@ class CommentResponse(CommentBase):
 
   class Config:
     from_attributes = True
+    orm_mode = True
