@@ -26,7 +26,7 @@ class Comment(CommentBase, table=True):
     back_populates="parent",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-  parent: Comment = Relationship(
+  parent: Mapped[Comment | None] = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
