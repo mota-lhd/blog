@@ -3,6 +3,7 @@ const el = (id) => document.getElementById(id);
 
 window.onTurnstileSuccess = function (token) {
   el("turnstileToken").value = token;
+  clearError("captcha");
 };
 
 function escapeHTML(s) {
@@ -17,6 +18,43 @@ function timeAgo(iso) {
   if (diff < 3600) return Math.floor(diff/60) + 'm';
   if (diff < 86400) return Math.floor(diff/3600) + 'h';
   return Math.floor(diff/86400) + 'd';
+}
+
+function showNotification(message, type = 'info', container = el('status')) {
+  const colors = {
+    success: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    error: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+    warning: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
+    info: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+  };
+
+  container.innerHTML = `
+    <div class="p-3 rounded-md border ${colors[type] || colors.info}">
+      ${escapeHTML(message)}
+    </div>
+  `;
+
+  if (type !== 'error') {
+    setTimeout(() => {
+      container.innerHTML = '';
+    }, 5000);
+  }
+}
+
+function clearError(field = null) {
+  if (field) {
+    const input = el(field);
+    if (input) input.classList.remove('border-red-500', 'dark:border-red-500');
+  }
+  el('status').innerHTML = '';
+}
+
+function showFieldError(fieldId, message) {
+  const input = el(fieldId);
+  if (input) {
+    input.classList.add('border-red-500', 'dark:border-red-500');
+  }
+  showNotification(message, 'error');
 }
 
 function createCommentNode(comment) {
@@ -70,6 +108,7 @@ async function fetchComments() {
     comments.forEach(c => renderCommentThread(c));
   } catch (err) {
     console.error('Failed to load comments:', err);
+    showNotification('Failed to load comments', 'error', el('comments'));
   }
 }
 
@@ -83,56 +122,120 @@ function openReplyForm(parentNode, parentId) {
     <div class="mt-2 flex gap-2">
       <input name="author" placeholder="Name" class="px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-sm" required />
       <input name="email" placeholder="Email" class="px-2 py-1 rounded border border-gray-200 dark:border-gray-700 text-sm" required />
-      <button class="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 text-sm">Reply</button>
-      <button type="button" class="px-3 py-1 rounded text-sm text-gray-500" data-cancel>Cancel</button>
-    </div>`;
+      <button class="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 text-sm hover:bg-gray-200 dark:hover:bg-gray-600">Reply</button>
+      <button type="button" class="px-3 py-1 rounded text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" data-cancel>Cancel</button>
+    </div>
+    <div class="mt-2 text-xs" data-reply-status></div>`;
+  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const replyStatus = form.querySelector('[data-reply-status]');
+    
+    const author = form.author.value.trim();
+    const email = form.email.value.trim();
+    const content = form.content.value.trim();
+
+    if (!author) {
+      replyStatus.innerHTML = '<div class="p-2 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">Name is required</div>';
+      return;
+    }
+    if (!email) {
+      replyStatus.innerHTML = '<div class="p-2 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">Email is required</div>';
+      return;
+    }
+    if (!content) {
+      replyStatus.innerHTML = '<div class="p-2 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">Comment cannot be empty</div>';
+      return;
+    }
+
     const payload = {
       site_id: el('siteId').value,
       post_slug: el('postSlug').value,
-      author: form.author.value.trim() || 'Anonymous',
-      email: form.email.value.trim(),
-      content: form.content.value.trim(),
+      author,
+      email,
+      content,
       parent_id: parentId,
       turnstile_token: el('turnstileToken').value || ''
     };
-    await postComment(payload, {onSuccess: (saved) => {
-      insertComment(saved, true);
-      form.remove();
-      if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
-    }});
+    
+    await postComment(payload, {
+      onSuccess: (saved) => {
+        insertComment(saved, true);
+        form.remove();
+        if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
+      },
+      statusElement: replyStatus
+    });
   });
+  
   form.querySelector('[data-cancel]').addEventListener('click', () => form.remove());
   parentNode.querySelector('[data-replies]').prepend(form);
   form.querySelector('textarea').focus();
 }
 
 async function postComment(payload, opts = {}) {
-  const status = el('status');
+  const statusElement = opts.statusElement || el('status');
   const submitBtn = el('submitBtn');
+  
   try {
-    submitBtn.disabled = true;
-    status.textContent = 'Posting...';
+    if (submitBtn) submitBtn.disabled = true;
+    
+    if (!payload.turnstile_token) {
+      showNotification('Please complete the CAPTCHA', 'error', statusElement);
+      return null;
+    }
+
+    showNotification('Posting...', 'info', statusElement);
+
     const res = await fetch(`${API_BASE}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error(await res.text() || res.statusText);
-    const saved = await res.json();
-    status.textContent = '';
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      let errorMessage = 'Failed to post comment';
+      
+      if (data?.detail) {
+        if (typeof data.detail === 'string') {
+          errorMessage = data.detail;
+        } else if (Array.isArray(data.detail)) {
+          errorMessage = data.detail[0]?.msg || errorMessage;
+        }
+      } else if (res.status === 422) {
+        errorMessage = 'Invalid input. Please check your information.';
+      } else if (res.status === 429) {
+        errorMessage = 'Too many requests. Please wait a moment.';
+      } else if (res.status === 401) {
+        errorMessage = 'CAPTCHA verification failed. Please try again.';
+      } else if (res.status >= 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+      
+      showNotification(errorMessage, 'error', statusElement);
+      return null;
+    }
+
+    const saved = data;
+    showNotification('Comment posted! Awaiting approval.', 'success', statusElement);
+    
     if (opts.onSuccess) opts.onSuccess(saved);
-    if (!payload.parent_id) el('content').value = '';
+    if (!payload.parent_id) {
+      el('content').value = '';
+      el('author').value = '';
+      el('email').value = '';
+    }
     if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
+    
     return saved;
   } catch (err) {
     console.error('Post comment failed', err);
-    status.textContent = 'Failed to post';
+    showNotification('Network error. Please try again.', 'error', statusElement);
     return null;
   } finally {
-    submitBtn.disabled = false;
-    setTimeout(()=>{ if (status.textContent === 'Failed to post') status.textContent = ''; }, 3000);
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
@@ -147,16 +250,38 @@ document.addEventListener('click', (e) => {
 
 el('commentForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  clearError();
+  
+  const author = el('author').value.trim();
+  const email = el('email').value.trim();
+  const content = el('content').value.trim();
+
+  if (!author) {
+    showFieldError('author', 'Name is required');
+    return;
+  }
+  if (!email) {
+    showFieldError('email', 'Email is required');
+    return;
+  }
+  if (!content) {
+    showFieldError('content', 'Comment cannot be empty');
+    return;
+  }
+
   const payload = {
     site_id: el('siteId').value,
     post_slug: el('postSlug').value,
-    author: el('author').value.trim() || 'Anonymous',
-    email: el('email').value.trim(),
-    content: el('content').value.trim(),
+    author,
+    email,
+    content,
     parent_id: null,
     turnstile_token: el('turnstileToken').value || ''
   };
-  await postComment(payload, { onSuccess: (saved) => insertComment(saved, true) });
+  
+  await postComment(payload, { 
+    onSuccess: (saved) => insertComment(saved, true)
+  });
 });
 
 // Fetch existing comments on page load
