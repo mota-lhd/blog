@@ -19,16 +19,13 @@ ignoreErrors:
 title: "mojo rojo"
 
 params:
-  color: 'linen'
+  color: linen
   github: mota-lhd
   instagram: m0jo.r0jo
   linkedin: elmouatassim-louhaidia
   threads: "@m0jo.r0jo"
   bluesky: m0jo-roj0.bsky.social
-  subtitle: 'adventures, stories and some tech.'
-  disableHLJS: true
-  commentsApi: 'https://comments.louhaidia.info'
-
+  comments: 'https://comments.louhaidia.info'
   avatar: "gravatar.foki2@passinbox.com"
   name: elmouatassim
   bio: >

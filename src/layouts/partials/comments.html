@@ -32,7 +32,7 @@
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-  const API_BASE = "{{ .Site.Params.commentsApi }}";
+  const API_BASE = "{{ .Site.Params.comments }}";
   const el = (id) => document.getElementById(id);
 
   window.onTurnstileSuccess = function (token) {
