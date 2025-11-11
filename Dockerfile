@@ -1,7 +1,7 @@
 FROM node:gallium-alpine AS build
 
-ENV HUGO_VERSION="0.152.1"
-ENV HUGO_CHECKSUM="e17b325bcd27c235d68e99bff49f3d1581cbfec8d2d3009f9a12bdb742e67a04"
+ENV HUGO_VERSION="0.152.2"
+ENV HUGO_CHECKSUM="52b6eda6c00f4449d96f0cbfd7300e834c26179c4fe68e0510ef566db52dba04"
 
 RUN apk add --no-cache curl
 

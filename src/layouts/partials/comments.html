@@ -1,105 +1,34 @@
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<div id="comments-widget" class="max-w-2xl mx-auto mt-10">
+  <h2 class="text-lg font-medium mb-4">Comments</h2>
 
-<script lang="javascript" async defer>
-  const targetBackend = "https://backend.louhaidia.info/api/article/{{ .articleID }}"
+  <form id="commentForm" class="space-y-2 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+    <input type="hidden" id="siteId" value="{{ .Site.BaseURL }}">
+    <input type="hidden" id="postSlug" value="{{ .File.BaseFileName }}">
 
-  function submitComment(e, form) {
-    e.preventDefault();
-
-    const target = `${targetBackend}/comments/add`
-    const jsonFormData = {};
-
-    for (const pair of new FormData(form)) {
-      jsonFormData[pair[0]] = pair[1];
-    };
-
-    fetch(target, {
-      method: 'POST',
-      credentials: "omit",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(jsonFormData)
-    })
-      .then(checkError)
-      .then(data => {
-        alert('Thanks for your feedback :) Status is: ' + data);
-      })
-      .catch((error) => {
-        if (error.msg === undefined) { // In case the server refuses to talk to me
-          alert('Could not send your comment, sorry ... ')
-        } else {
-          error.msg.then((result) => { // In case server talks to me but my input in not well formatted
-            alert('Error while submitting comment ... ' + result.detail);
-          })
-        }
-      });
-  };
-
-  function checkError(response) {
-    if (response.status >= 200 && response.status <= 299) {
-      return response.json();
-    } else {
-      let err = new Error(response.statusText);
-
-      err.msg = response.json();
-      throw err;
-    }
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const commentForm = document.querySelector("#commentForm");
-
-    if (commentForm) {
-      commentForm.addEventListener("submit", (e) => {
-        submitComment(e, commentForm);
-      });
-    }
-  });
-</script>
-
-<!-- Using templates from https://merakiui.com/components/contact -->
-
-<section class="rounded-lg mt-24 flex bg-white dark:bg-white/[8%]">
-  <div class="container lg:w-full px-6 py-10 mx-auto">
-    <div class="lg:flex lg:items-center lg:w-full lg:-mx-10">
-      <div class="lg:mx-10 w-full">
-        <h1 class="text-xl font-semibold text-gray-800 capitalize dark:text-white">talk to me</h1>
-
-        <p class="mt-4 text-gray-500 dark:text-gray-400">
-          Ask me anything, would love
-          to hear from you
-        </p>
-
-        <form class="mt-12" id="commentForm">
-          <div class="-mx-2 md:items-center md:flex">
-            <div class="flex-1 px-2 mt-4 md:mt-0">
-              <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Email address</label>
-              <input required type="email" placeholder="johndoe@example.com" id="comment_who" name="who" tabindex="1"
-                data-tooltip="Mandatory field"
-                class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" />
-            </div>
-          </div>
-
-          <div class="w-full mt-4">
-            <label class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Message</label>
-            <textarea required id="comment_content" name="content" tabindex="2"
-              class="block w-full h-32 px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md md:h-56 dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
-              placeholder="Tell me everything"></textarea>
-          </div>
-
-          <div class="w-full mt-4">
-            <div class="cf-turnstile justify-start" data-sitekey="0x4AAAAAAABCp0ljCLkn6iFC" data-theme="auto"
-              data-response-field-name="captcha" data-size="compact">
-            </div>
-          </div>
-
-          <button type="submit"
-            class="w-full px-6 py-3 mt-4 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-            get in touch
-          </button>
-        </form>
-      </div>
+    <div class="grid grid-cols-2 gap-2">
+      <input id="author" class="px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm" placeholder="Name" required>
+      <input id="email" type="email" class="px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm" placeholder="Email" required>
     </div>
-  </div>
-</section>
+
+    <textarea id="content" rows="4" class="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm" placeholder="Write a comment..." required></textarea>
+
+    <input type="hidden" id="turnstileToken" value="">
+
+    <!-- Cloudflare Turnstile widget -->
+    <div
+      class="cf-turnstile"
+      data-sitekey="0x4AAAAAAABCp0ljCLkn6iFC"
+      data-callback="onTurnstileSuccess"
+    ></div>
+
+    <div class="flex items-center gap-2">
+      <button type="submit" id="submitBtn" class="px-4 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-sm">Post comment</button>
+      <span id="status" class="text-xs text-gray-500 dark:text-gray-400"></span>
+    </div>
+  </form>
+
+  <div id="comments" class="mt-6 space-y-3"></div>
+</div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="{{ "js/comments.js" | relURL }}"></script>

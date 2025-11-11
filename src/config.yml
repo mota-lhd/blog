@@ -27,6 +27,7 @@ params:
   bluesky: m0jo-roj0.bsky.social
   subtitle: 'adventures, stories and some tech.'
   disableHLJS: true
+  commentsApi: 'https://comments.louhaidia.info'
 
   avatar: "gravatar.foki2@passinbox.com"
   name: elmouatassim
