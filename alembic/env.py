@@ -12,8 +12,8 @@ from alembic import context
 
 modules_path: str = str(Path(__file__).parent.parent)
 
-logger.info(f"using {modules_path}/src for python packages ...")
-sys.path.insert(0, f"{modules_path}/src")
+logger.info(f"using {modules_path} for python packages ...")
+sys.path.insert(0, f"{modules_path}")
 
 from settings import settings  # noqa: E402
 from models import Comment  # noqa: E402

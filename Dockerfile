@@ -12,6 +12,7 @@ FROM python:3.14-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
+ARG VOLUME_PATH=/app/data
 
 RUN addgroup ${GROUP}
 RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
@@ -19,18 +20,21 @@ RUN adduser --disabled-password --ingroup ${GROUP} ${USER}
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
 COPY --chown=${USER}:${GROUP} ./src/ /web/
-COPY --chown=${USER}:${GROUP} alembic.ini entrypoint.sh ./
-COPY --chown=${USER}:${GROUP} alembic ./alembic/
+COPY --chown=${USER}:${GROUP} ./alembic.ini /web/
+COPY --chown=${USER}:${GROUP} ./alembic /web/alembic/
+COPY --chown=${USER}:${GROUP} --chmod=754 ./entrypoint.sh /web/
 
 RUN apk -U upgrade
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
+# Prepare volume directory and set permissions
+RUN mkdir -p ${VOLUME_PATH} && \
+    chown ${USER}:${GROUP} ${VOLUME_PATH}
+
 USER ${USER}
 
 # create volume mount point for sqlite database
-VOLUME ["/app/data"]
-
-RUN chmod +x entrypoint.sh
+VOLUME ["${VOLUME_PATH}"]
 
 ENTRYPOINT ["./entrypoint.sh"]
