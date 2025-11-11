@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import EmailStr
+from sqlalchemy.orm import Mapped
 from sqlmodel import Field
 from sqlmodel import Relationship
 from sqlmodel import SQLModel
@@ -23,15 +24,15 @@ class Comment(CommentBase, table=True):
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  parent: Optional[Comment] = Relationship(  # noqa: UP045
+  # Self-referential relationships
+  parent: Mapped[Optional[Comment]] = Relationship(  # noqa: UP045
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "[Comment.id]"},
   )
-  replies: list[Comment] = Relationship(
+  replies: Mapped[list[Comment]] = Relationship(
     back_populates="parent",
     cascade_delete=True,
   )
-
 
 class CommentCreate(CommentBase):
   turnstile_token: str
