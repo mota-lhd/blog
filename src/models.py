@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from pydantic import EmailStr
@@ -19,11 +21,11 @@ class Comment(CommentBase, table=True):
   id: int | None = Field(default=None, primary_key=True)
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
-  replies: list["Comment"] = Relationship(
+  replies: list[Comment] = Relationship(
     back_populates="parent",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-  parent: "Comment | None" = Relationship(
+  parent: Comment = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
@@ -36,7 +38,7 @@ class CommentCreate(CommentBase):
 class CommentResponse(CommentBase):
   id: int
   created_at: datetime
-  replies: list["CommentResponse"] = []
+  replies: list[CommentResponse] = []
 
   class Config:
     from_attributes = True
