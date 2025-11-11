@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Optional
 
@@ -24,7 +22,7 @@ class Comment(CommentBase, table=True):
   created_at: datetime = Field(default_factory=datetime.now)
 
   # Self-referential relationships
-  parent: Optional[Comment] = Relationship(  # noqa: UP045
+  parent: Optional["Comment"] = Relationship(  # noqa: UP045
     back_populates="replies",
     sa_relationship_kwargs={
       "remote_side": "Comment.id",
@@ -32,7 +30,7 @@ class Comment(CommentBase, table=True):
       "uselist": False,
     },
   )
-  replies: list[Comment] = Relationship(
+  replies: list["Comment"] = Relationship(
     back_populates="parent",
     cascade_delete=True,
   )
@@ -45,7 +43,7 @@ class CommentCreate(CommentBase):
 class CommentResponse(CommentBase):
   id: int
   created_at: datetime
-  replies: list[CommentResponse] = []
+  replies: list["CommentResponse"] = []
 
   class Config:
     from_attributes = True
