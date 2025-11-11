@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import EmailStr
-from sqlalchemy.orm import Mapped
 from sqlmodel import Field
 from sqlmodel import Relationship
 from sqlmodel import SQLModel
@@ -24,11 +22,11 @@ class Comment(CommentBase, table=True):
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  replies: Mapped[list["Comment"]] = Relationship(
+  replies: list[Comment] = Relationship(
     back_populates="parent",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-  parent: Mapped[Optional["Comment"]] = Relationship(
+  parent: Comment | None = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
