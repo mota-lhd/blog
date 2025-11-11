@@ -111,6 +111,12 @@ def get_post_comments(
   post_slug: str,
   session: Session = Depends(get_session),  # noqa: B008
 ):
+  # Debug: Check all comments in DB
+  all_comments = session.exec(select(Comment)).all()
+  print(f"Total comments in DB: {len(all_comments)}")
+  for c in all_comments:
+    print(f"  - ID: {c.id}, site_id: {c.site_id}, post_slug: {c.post_slug}, approved: {c.approved}, parent_id: {c.parent_id}")
+
   statement = select(Comment).where(
     Comment.site_id == site_id,
     Comment.post_slug == post_slug,
