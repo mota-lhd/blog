@@ -22,11 +22,11 @@ class Comment(CommentBase, table=True):
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  replies: list[Comment] = Relationship(
+  replies = Relationship(
     back_populates="parent",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
-  parent: Comment | None = Relationship(
+  parent = Relationship(
     back_populates="replies",
     sa_relationship_kwargs={"remote_side": "Comment.id"},
   )
