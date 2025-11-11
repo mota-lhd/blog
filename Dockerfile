@@ -33,11 +33,11 @@ RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 # Prepare volume directory and set permissions
 RUN mkdir -p /app/data && \
-    chown -R ${USER}:${GROUP} /app/data
+    chown -R ${USER}:${GROUP} /app
 
 # create volume mount point for sqlite database
 VOLUME ["/app/data"]
 
 USER ${USER}
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
