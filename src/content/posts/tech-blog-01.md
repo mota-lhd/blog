@@ -16,7 +16,7 @@ tags: [
 categories: [
     "Tech"
 ]
-id: '5643280054222848'
+id: 'tech-blog-01'
 series: ["Tech"]
 draft: true
 weight: 3

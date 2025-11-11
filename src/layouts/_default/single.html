@@ -37,7 +37,7 @@
   <!-- Comments fetch / show -->
 
   {{ if .Params.id }}
-    {{ partial "comments.html" (dict "context" . "articleID" .Params.id ) }}
+    {{ partial "comments.html" . }}
   {{ end }}
 
   <!-- Post Nav -->

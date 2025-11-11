@@ -12,7 +12,7 @@ tags: [
 categories: [
     "trekking"
 ]
-id: '5636645067948032'
+id: 'dhaulagiri-2019-05'
 series: ["trek autour du dhaulagiri et des annapurnas"]
 ---
 

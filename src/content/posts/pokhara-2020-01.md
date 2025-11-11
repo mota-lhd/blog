@@ -11,7 +11,7 @@ tags: [
 categories: [
     "travel"
 ]
-id: '5631671361601536'
+id: 'pokhara-2020-01'
 series: ["villes népalaises"]
 ---
 

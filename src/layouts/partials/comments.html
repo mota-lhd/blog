@@ -135,7 +135,10 @@
     const siteId = el('siteId').value;
     const postSlug = el('postSlug').value;
     try {
-      const res = await fetch(`${API_BASE}/comments/${encodeURIComponent(siteId)}/${encodeURIComponent(postSlug)}`);
+      const res = await fetch(
+        `${API_BASE}/comments?site_id=${encodeURIComponent(siteId)}&post_slug=${encodeURIComponent(postSlug)}`,
+        { headers: { 'accept': 'application/json' } }
+      );
       if (!res.ok) throw new Error(await res.text() || res.statusText);
       const comments = await res.json();
       el('comments').innerHTML = '';
