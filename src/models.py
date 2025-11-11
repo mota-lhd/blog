@@ -25,22 +25,17 @@ class Comment(CommentBase, table=True):
   approved: bool = Field(default=False)
   created_at: datetime = Field(default_factory=datetime.now)
 
-  replies: Mapped[List[Comment]]  # noqa: UP006
-  parent: Mapped[Optional[Comment]]  # noqa: UP045
-
+  replies: Mapped[List[Comment]] = Relationship(  # noqa: UP006
+    back_populates="parent",
+    sa_relationship_kwargs={"remote_side": "Comment.id"},
+  )
+  parent: Mapped[Optional[Comment]] = Relationship(  # noqa: UP045
+    back_populates="replies",
+    sa_relationship_kwargs={"remote_side": "Comment.id"},
+  )
 
   class Config:
     arbitrary_types_allowed = True
-
-# Define relationships AFTER
-Comment.replies = Relationship(
-    back_populates="parent",
-    sa_relationship_kwargs={"remote_side": "Comment.id"},
-)
-Comment.parent = Relationship(
-    back_populates="replies",
-    sa_relationship_kwargs={"remote_side": "Comment.id"},
-)
 
 
 class CommentCreate(CommentBase):
