@@ -60,7 +60,7 @@ def get_session() -> Any:
 def sanitize_text(text: str) -> str:
   if not text:
     return ""
-  return nh3.clean(text, tags=set(), strip=True)
+  return nh3.clean(text)
 
 
 def sanitize_comment(comment: Comment) -> None:
