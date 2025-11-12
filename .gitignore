@@ -10,3 +10,4 @@ node_modules/
 alembic
 __pycache__
 comments.db
+alembic
