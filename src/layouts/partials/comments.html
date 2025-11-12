@@ -34,6 +34,8 @@
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
+  import { Picker } from 'emoji-mart';
+
   const API_BASE = "{{ .Site.Params.commentsBackend }}";
   const el = (id) => document.getElementById(id);
 
@@ -335,8 +337,6 @@
       picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
       return;
     }
-
-    const { Picker } = await import('emoji-mart');
 
     new Picker({
       data: async () => {
