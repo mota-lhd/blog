@@ -41,6 +41,19 @@ markup:
 security:
   gotemplates:
     allowActionJSTmpl: true
+  csp:
+    directives:
+      default-src:
+        - "'self'"
+      script-src:
+        - "'self'"
+        - "challenges.cloudflare.com"
+        - "cdn.jsdelivr.net"
+      frame-src:
+        - "challenges.cloudflare.com"
+      connect-src:
+        - "'self'"
+        - "https://comments.louhaidia.info"
 
 menu:
   main:
