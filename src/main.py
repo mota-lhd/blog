@@ -63,12 +63,17 @@ def sanitize_text(text: str) -> str:
   return nh3.clean(text, tags=set(), strip=True)
 
 
-def sanitize_comment(comment: CommentResponse) -> None:
+def sanitize_comment(comment: Comment) -> None:
   comment.author = sanitize_text(comment.author)
   comment.content = sanitize_text(comment.content)
 
   for reply in comment.replies:
     sanitize_comment(reply)
+
+
+def sanitize_comments(comments: list[Comment]) -> None:
+  for c in comments:
+    sanitize_comment(c)
 
 
 async def check_captcha(token: str) -> bool:
@@ -114,7 +119,8 @@ def get_non_approved_comments(
   )
   comments: list[Comment] = session.exec(statement).all()
 
-  return [sanitize_comment(c) for c in comments]
+  sanitize_comments(comments)
+  return comments
 
 
 @app.get("/comments", response_model=list[CommentResponse])
@@ -129,7 +135,7 @@ def get_post_comments(
     Comment.approved == True,  # noqa: E712
     Comment.parent_id == None,  # noqa: E711
   )
-
   comments: list[Comment] = session.exec(statement).all()
 
-  return [sanitize_comment(c) for c in comments]
+  sanitize_comments(comments)
+  return comments
