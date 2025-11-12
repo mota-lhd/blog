@@ -25,7 +25,7 @@ params:
   linkedin: elmouatassim-louhaidia
   threads: "@m0jo.r0jo"
   bluesky: m0jo-roj0.bsky.social
-  comments: 'https://comments.louhaidia.info'
+  commentsBackend: 'https://comments.louhaidia.info'
   avatar: "gravatar.foki2@passinbox.com"
   name: elmouatassim
   bio: >
