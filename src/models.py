@@ -18,7 +18,7 @@ class CommentBase(SQLModel):
 
 class Comment(CommentBase, table=True):
   id: int | None = Field(default=None, primary_key=True, index=True)
-  approved: bool = Field(default=False)
+  approved: bool = Field(default=True)
   created_at: datetime = Field(default_factory=datetime.now)
 
   # Self-referential relationships
