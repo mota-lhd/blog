@@ -1,6 +1,7 @@
 from typing import Any
 
 import httpx
+import nh3
 from fastapi import Depends
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -56,6 +57,20 @@ def get_session() -> Any:
 # helper methods
 
 
+def sanitize_text(text: str) -> str:
+  if not text:
+    return ""
+  return nh3.clean(text, tags=set(), strip=True)
+
+
+def sanitize_comment(comment: CommentResponse) -> None:
+  comment.author = sanitize_text(comment.author)
+  comment.content = sanitize_text(comment.content)
+
+  for reply in comment.replies:
+    sanitize_comment(reply)
+
+
 async def check_captcha(token: str) -> bool:
   payload: dict = {
     "secret": settings.turnstile_secret,
@@ -86,26 +101,23 @@ async def create_comment(
   session.commit()
   session.refresh(db_comment)
 
-  return db_comment
+  return sanitize_comment(db_comment)
 
 
-@app.get(
-  "/comments-to-approve", response_model=list[CommentResponse]
-)
+@app.get("/comments-to-approve", response_model=list[CommentResponse])
 def get_non_approved_comments(
   session: Session = Depends(get_session),  # noqa: B008
 ):
   statement = select(Comment).where(
     Comment.approved == False,  # noqa: E712
-    Comment.parent_id == None  # noqa: E711
+    Comment.parent_id == None,  # noqa: E711
   )
+  comments: list[Comment] = session.exec(statement).all()
 
-  return session.exec(statement).all()
+  return [sanitize_comment(c) for c in comments]
 
 
-@app.get(
-  "/comments", response_model=list[CommentResponse]
-)
+@app.get("/comments", response_model=list[CommentResponse])
 def get_post_comments(
   site_id: str,
   post_slug: str,
@@ -115,7 +127,9 @@ def get_post_comments(
     Comment.site_id == site_id,
     Comment.post_slug == post_slug,
     Comment.approved == True,  # noqa: E712
-    Comment.parent_id == None  # noqa: E711
+    Comment.parent_id == None,  # noqa: E711
   )
 
-  return session.exec(statement).all()
+  comments: list[Comment] = session.exec(statement).all()
+
+  return [sanitize_comment(c) for c in comments]
