@@ -106,7 +106,7 @@ async def create_comment(
   session.commit()
   session.refresh(db_comment)
   sanitize_comment(db_comment)
-  return comment
+  return db_comment
 
 
 @app.get("/comments-to-approve", response_model=list[CommentResponse])
