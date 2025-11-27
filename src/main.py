@@ -93,7 +93,7 @@ async def check_captcha(token: str) -> bool:
 
 
 @app.post("/comments", response_model=CommentResponse)
-async def create_comment(
+async def create_comment_bis(
   comment: CommentCreate,
   session: Session = Depends(get_session),  # noqa: B008
 ):
