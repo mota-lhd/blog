@@ -18,7 +18,7 @@ ARG UID=1001
 ARG GID=1001
 
 RUN addgroup -g ${GID} ${GROUP} && \
-    adduser --disabled-password --ingroup ${GROUP} -u ${UID} ${USER}
+  adduser --disabled-password --ingroup ${GROUP} -u ${UID} ${USER}
 
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
@@ -27,13 +27,14 @@ COPY --chown=${USER}:${GROUP} ./alembic.ini /web/
 COPY --chown=${USER}:${GROUP} ./alembic /web/alembic/
 COPY --chown=${USER}:${GROUP} --chmod=754 ./entrypoint.sh /web/
 
-RUN apk -U upgrade
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir --upgrade -r /web/requirements.txt
+RUN apk -U upgrade --no-cache && \
+  apk add tini --no-cache && \
+  pip install --upgrade pip && \
+  pip install --no-cache-dir --upgrade -r /web/requirements.txt
 
 # Prepare volume directory and set permissions
 RUN mkdir -p /app/data && \
-    chown -R ${USER}:${GROUP} /app
+  chown -R ${USER}:${GROUP} /app
 
 # create volume mount point for sqlite database
 VOLUME ["/app/data"]
