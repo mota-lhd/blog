@@ -134,8 +134,12 @@ jobs:
   success:
     runs-on: ubuntu-slim
     needs: [backend, frontend]
-    if: |
-      (needs.backend.result == 'success' || needs.backend.result == 'skipped') &&
-      (needs.frontend.result == 'success' || needs.frontend.result == 'skipped')
+    if: always()
     steps:
-      - run: echo "All good :)"
+      - run: |
+          if [[ ("${{ needs.backend.result }}" != "success" && "${{ needs.backend.result }}" != "skipped") || \
+                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") ]]; then
+            echo "❌ Failed :( Please check frontend or backend !!"
+            exit 1
+          fi
+          echo "✅ All good :)"
