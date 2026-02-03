@@ -1,0 +1,9 @@
+name: "Custom CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - backend/**/*.py
+  - frontend/**/*.js
+  - .github/workflows/*.yml
