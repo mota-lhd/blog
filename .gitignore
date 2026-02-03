@@ -1,3 +1,6 @@
+node_modules/
+*lock*
+alembic
 comments.db
 .env
 .idea

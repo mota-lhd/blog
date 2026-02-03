@@ -1,0 +1,13 @@
+.env
+.idea
+.DS_Store
+public/
+node_modules/
+*lock*
+.hugo_build.lock
+.venv
+.ruff_cache
+alembic
+__pycache__
+comments.db
+alembic
