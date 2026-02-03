@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [synchronize, opened, reopened]
 
+permissions:
+  contents: read
+
 jobs:
   secrets:
     name: secrets/scan
@@ -130,3 +133,16 @@ jobs:
         exit-code: 3
         ignore-unfixed: true
         vuln-type: 'os,library'
+
+  success:
+    runs-on: ubuntu-slim
+    needs: [backend, frontend]
+    if: always()
+    steps:
+      - run: |
+          if [[ ("${{ needs.backend.result }}" != "success" && "${{ needs.backend.result }}" != "skipped") || \
+                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") ]]; then
+            echo "❌ Failed :( Please check frontend or backend !!"
+            exit 1
+          fi
+          echo "✅ All good :)"
