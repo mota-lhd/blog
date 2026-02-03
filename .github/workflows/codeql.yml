@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   schedule:
-    - cron: '21 17 * * 2'
+    - cron: '35 17 * * 2'
 
 jobs:
   analyze:
