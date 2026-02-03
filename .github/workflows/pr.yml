@@ -130,3 +130,12 @@ jobs:
         exit-code: 3
         ignore-unfixed: true
         vuln-type: 'os,library'
+
+  success:
+    runs-on: ubuntu-slim
+    needs: [backend, frontend]
+    if: |
+      (needs.backend.result == 'success' || needs.backend.result == 'skipped') &&
+      (needs.frontend.result == 'success' || needs.frontend.result == 'skipped')
+    steps:
+      - run: echo "All good :)"
