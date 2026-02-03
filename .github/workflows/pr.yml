@@ -42,7 +42,7 @@ jobs:
   backend:
     needs: changes
     name: backend/scan
-    if: ${{ steps.changes.outputs.backend == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - name: checkout
@@ -88,7 +88,7 @@ jobs:
   frontend:
     needs: changes
     name: frontend/scan
-    if: ${{ steps.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - name: checkout
