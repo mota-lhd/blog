@@ -1,0 +1,12 @@
+name: "Python CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - backend/**/*.py
+
+query-filters:
+- exclude:
+    problem.severity:
+      - note
