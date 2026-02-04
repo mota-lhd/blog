@@ -1,0 +1,12 @@
+name: "Github actions CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - .github/workflows/*.yml
+
+query-filters:
+- exclude:
+    problem.severity:
+      - note

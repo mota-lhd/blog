@@ -1,0 +1,13 @@
+name: "JS CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - frontend/**/*.js
+  - frontend/**/*.html
+
+query-filters:
+- exclude:
+    problem.severity:
+      - note
