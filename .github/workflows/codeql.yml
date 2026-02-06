@@ -1,12 +1,63 @@
-name: "CodeQL Advanced"
+name: "CodeQL"
 
 on:
   push:
     branches: [ "main" ]
   schedule:
-    - cron: '13 01 * * 3'
+    - cron: '13 13 * * *'
 
 jobs:
+  docker:
+    name: Analyze (${{ matrix.docker_image }})
+    runs-on: ubuntu-slim
+    permissions:
+      # required for all workflows
+      security-events: write
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - docker_image: frontend
+        - docker_image: backend
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.0.1
+
+    - name: docker/setup
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+    - name: docker/build
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      with:
+        context: './${{ matrix.docker_image }}/'
+        push: false
+        tags: local/web:${{ matrix.docker_image }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker
+
+    - name: image/scan
+      id: "scan"
+      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
+      with:
+        image: 'local/web:${{ matrix.docker_image }}'
+        fail-build: false
+        output-format: sarif
+        only-fixed: true
+    - name: scan/upload
+      uses: github/codeql-action/upload-sarif@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4.32.2
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
+
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-slim
@@ -37,13 +88,13 @@ jobs:
       uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.0.1
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@6bc82e05fd0ea64601dd4b465378bbcf57de0314 #v4.32.1
+      uses: github/codeql-action/init@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 #v4.32.2
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
         config-file: ./.github/codeql/${{ matrix.language }}-config.yml
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@6bc82e05fd0ea64601dd4b465378bbcf57de0314 #v4.32.1
+      uses: github/codeql-action/analyze@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 #v4.32.2
       with:
         category: "/language:${{matrix.language}}"
