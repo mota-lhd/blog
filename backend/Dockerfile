@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM python:3.14 AS requirements
+FROM python:3.15 AS requirements
 
 WORKDIR /tmp
 RUN pip install uv
@@ -10,7 +10,7 @@ COPY uv.lock pyproject.toml /tmp/
 RUN uv sync --frozen
 RUN uv pip freeze > requirements.txt
 
-FROM python:3.14-alpine AS prod
+FROM python:3.15-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
