@@ -9,7 +9,7 @@ on:
 jobs:
   docker:
     name: Analyze (${{ matrix.docker_image }})
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     permissions:
       # required for all workflows
       security-events: write
@@ -19,7 +19,7 @@ jobs:
 
       # only required for workflows in private repositories
       actions: read
-      contents: read
+      contents: write
 
     strategy:
       fail-fast: false
