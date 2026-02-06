@@ -1,4 +1,4 @@
-name: checks
+name: "Pull request"
 
 on:
   pull_request:
@@ -47,6 +47,10 @@ jobs:
     name: backend/scan
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -77,22 +81,24 @@ jobs:
         outputs: type=docker
 
     - name: image/scan
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+      id: backend_scan
+      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
       with:
-        scan-type: 'image'
-        image-ref: 'local/web:back'
-        scanners: 'vuln'
-        severity: 'MEDIUM,HIGH,CRITICAL'
-        format: 'table'
-        exit-code: 3
-        ignore-unfixed: true
-        vuln-type: 'os,library'
+        image: 'local/web:back'
+        fail-build: true
+        output-format: table
+        severity-cutoff: medium
+        only-fixed: true
 
   frontend:
     needs: changes
     name: frontend/scan
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -123,16 +129,14 @@ jobs:
         outputs: type=docker
 
     - name: image/scan
-      uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+      id: frontend_scan
+      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
       with:
-        scan-type: 'image'
-        image-ref: 'local/web:front'
-        scanners: 'vuln'
-        severity: 'MEDIUM,HIGH,CRITICAL'
-        format: 'table'
-        exit-code: 3
-        ignore-unfixed: true
-        vuln-type: 'os,library'
+        image: 'local/web:front'
+        fail-build: true
+        output-format: table
+        severity-cutoff: medium
+        only-fixed: true
 
   success:
     runs-on: ubuntu-slim
