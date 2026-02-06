@@ -9,4 +9,4 @@ paths:
 query-filters:
 - exclude:
     problem.severity:
-      - note
+      - recommendation
