@@ -87,7 +87,7 @@ jobs:
         image: 'local/web:back'
         fail-build: true
         output-format: table
-        severity-cutoff: medium
+        severity-cutoff: high
         only-fixed: true
 
   frontend:
@@ -135,7 +135,7 @@ jobs:
         image: 'local/web:front'
         fail-build: true
         output-format: table
-        severity-cutoff: medium
+        severity-cutoff: high
         only-fixed: true
 
   success:
