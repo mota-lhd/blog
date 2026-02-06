@@ -1,4 +1,4 @@
-name: checks
+name: "Pull request"
 
 on:
   pull_request:
@@ -47,6 +47,10 @@ jobs:
     name: backend/scan
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -93,6 +97,10 @@ jobs:
     name: frontend/scan
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -123,10 +131,23 @@ jobs:
         outputs: type=docker
 
     - name: image/scan
+      id: frontend_scan
+      uses: anchore/scan-action@v7
+      with:
+        image: 'local/web:front'
+        fail-build: true
+        config: ./grype.yml
+        only-fixed: true
+    - name: upload Anchore scan SARIF report
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: ${{ steps.frontend_scan.outputs.sarif }}
+
+    - name: image/scan
       uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
       with:
         scan-type: 'image'
-        image-ref: 'local/web:front'
+        image-ref: 
         scanners: 'vuln'
         severity: 'MEDIUM,HIGH,CRITICAL'
         format: 'table'
