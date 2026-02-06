@@ -23,7 +23,7 @@ FROM nginx:stable-alpine AS prod
 ARG USER=front
 ARG GROUP=web
 
-RUN apk -U upgrade
+RUN apk -U upgrade --no-cache
 
 WORKDIR /web
 COPY --from=build /web/public/ /web
