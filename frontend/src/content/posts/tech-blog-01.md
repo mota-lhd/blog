@@ -1,58 +1,126 @@
 ---
-title: 'Self hosting'
-author: 'Elmouatassim'
-date: '2025-10-24'
-summary: "How you can build basic tooling yourself, host it in Europe and not depend on big tech corporations?"
+title: '[github] signing commits with ssh keys'
+author: 'elmouatassim'
+date: '2026-02-06'
+summary: "how to configure signed commits in github using your authentication ssh key?"
 tags: [
-    'Tech',
-    'Hugo',
-    'Docker',
-    'Disco',
-    'GCP',
-    'Terraform',
-    'Github Actions',
-    'FastAPI'
+    'tech',
+    'github',
+    'security',
 ]
 categories: [
-    "Tech"
+    "tech"
 ]
 id: 'tech-blog-01'
-series: ["Tech"]
-draft: true
-weight: 3
+series: ["tech"]
 ---
 
-# Still in WIP
+in this serie, the goal is to share my experience while building a very simple blog. this one, yes! the one you are reading :)
 
-I want to share my experience while building a very simple blog. This one, yes! The one you are reading :) I decided to move my blog from wordpress to learn how to build one by myself for less than 1€ per month! Also, having ads on the free plan of wordpress was a bit annoying. So this is it, I will cover during this series of posts how to host static and dynamic content and also how to deploy it using Terraform and secure CI/CD workflows on Github Actions.
+i decided to move my blog from wordpress to learn how to build one by myself for less than 1€ a month! also, having ads on the free plan of wordpress was a bit annoying. so this is it, i will cover during this serie of posts how to host static and dynamic content and also how to deploy it on your own server, **securely**.
 
-## [Hugo](https://gohugo.io)
+but first things first, where to host your blog source code? for me, the best solution is github. so first, let's see how to configure a couple of options in github.
 
-They claim to be the world's fastest framework for generating static websites. Didn't benchmark it, but looks pretty fast while testing it. I decided to go for a very [simple theme](https://github.com/nanxiaobei/hugo-paper) that I tweaked a bit. The proje
 
-## [Cloudinary](https://cloudinary.com)
+## why sign your github commits?
 
-For hosting images, I decided to use this service so I can get out of my repo the pictures and store them on a CDN (Content Delivery Network). The code repo stays light and the delivery of images is more efficient. I chose Cloudinary because it offers an interesting free tier plan. Whenever I need to show some picture on my blog, I use the following type of link:
+commit signing is an important security practice that verifies the authenticity of your code contributions. when you sign a commit, you're proving that the code came from you and wasn't tampered with. github displays a "Verified" badge next to signed commits, building trust in your repository's history.
 
-> https://res.cloudinary.com/elmouatassim/image/upload/08/01.webp
+in this post, i'll walk you through configuring signed commits using an ssh key that you already use for authentication. eliminating the need to manage yet another key pair.
 
-I upload my pictures in any file format (JPEG, PNG, RAW, etc.) but when I reference an image, I change the file format to [WEBP](https://fr.wikipedia.org/wiki/WebP) and Cloudinary does the conversion for me :) I think they do it automatically when I upload an image and keep it in some kind of hot cache. Anyhow, it's quiet fast when you load a page containing transformed pictures. Why I am using WebP? It's an image compression alternative that suits well the world of the internet and does not consume too much bandwith while keeping a decent quality of the image.
+## generate ssh key pair on macOS
 
-## [FastAPI](https://fastapi.tiangolo.com)
+if you don't already have an ssh key pair, follow these steps to generate one on macOS:
 
-## [Docker](https://www.docker.com)
+### check for existing key
 
-## [Terraform Cloud](https://app.terraform.io/)
+first, verify if you already have an ssh key:
 
-To deploy on Google Cloud I went for something automatic and to maintain the configuration of my app on GCP I chose an IAC (Infrastructure As Code) framework called Terraform. You describe your configuration in their language (HCL) and Terraform makes sure it's deployed like you want it. It also detects when the configuration changes and deploys only the difference.
-
-Then you need a free account on Pulumi cloud. Once you have it, you just need to start a new project and install a provider for your cloud solution, for me it was the Digital Ocean provider.
-
-```python
+```bash
+ls -la ~/.ssh/
 ```
 
+if you see `id_rsa` and `id_rsa.pub`, you already have a key pair and can skip to **next section**.
 
-## [Disco](https://disco.cloud/)
+### generate a key pair on macOS
 
-## [Github Actions](https://github.com/features/actions)
+if you don't have a ssh key, generate one using rsa-4096 (strong algorithm):
 
+```bash
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ~/.ssh/id_rsa
+```
+
+when prompted, press **Enter** twice to skip the passphrase (or enter one if you prefer):
+
+### add private key to ssh agent locally
+
+on macOS, add your private key to the ssh agent so it's available for use and make sure it is readable only by your identity
+
+```bash
+chmod 0600 ~/.ssh/id_rsa
+ssh-add --apple-use-keychain ~/.ssh/id_rsa
+```
+
+You should see:
+```
+Identity added: /Users/your_username/.ssh/id_rsa
+```
+
+### add public key to github for signing    
+
+copy your public key to your clipboard:
+
+```bash
+cat ~/.ssh/id_rsa.pub
+```
+
+then:
+1. go to [GitHub Settings → SSH and GPG keys](https://github.com/settings/keys)
+2. click **New SSH key**
+3. paste your key and give it a descriptive title (e.g., "MacBook Air")
+4. select in **Key type** the value **Signing key**
+4. click **Add SSH key**
+
+### verify connection
+
+to test if your ssh key works with gitHub:
+
+```bash
+ssh -T git@github.com
+```
+
+you should see:
+```
+Hi your_username! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+your ssh key is now ready for both authentication and commit signing!
+
+## configure git to use your ssh key for signing
+
+tell git to use your ssh key for signing commits:
+
+```bash
+git config --global user.signingkey ~/.ssh/id_rsa.pub
+git config --global gpg.format ssh
+git config --global commit.gpgsign true
+
+# these are to configure properly the user
+
+git config --global user.name your_username
+git config --global user.email your_email@example.com
+git config --global push.autosetupremote true
+```
+
+now you can sign commits. if you enabled automatic signing, commits are signed by default:
+
+```bash
+git commit -m "my signed commit"
+```
+
+## key benefits
+
+✅ **single key**: reuse your existing ssh authentication key. no separate gpg key needed.
+✅ **built-in verification**: gitHub automatically verifies signatures against your registered ssh keys.
+✅ **trustworthy history**: the "Verified" badge on commits demonstrates code authenticity.
+✅ **simple setup**: minimal configuration compared to gpg signing.
