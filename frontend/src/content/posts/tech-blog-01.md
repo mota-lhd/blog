@@ -1,5 +1,5 @@
 ---
-title: "[github hardening] signing commits with ssh keys"
+title: "[github hardening] signing commits"
 author: "elmouatassim"
 date: "2026-02-06"
 summary: "how to configure signed commits in github using your authentication ssh key?"
@@ -15,6 +15,7 @@ categories: [
 ]
 id: "tech-blog-01"
 series: ["tech", "github hardening"]
+weight: 2
 ---
 
 in this serie, the goal is to share my experience about hardening github while creating a very simple blog. this one, yes! the one you are reading :)
@@ -115,6 +116,9 @@ git commit -m "my signed commit"
 ## key benefits
 
 ✅ **single key**: reuse your existing ssh authentication key. no separate gpg key needed.
+
 ✅ **built-in verification**: gitHub automatically verifies signatures against your registered ssh keys.
+
 ✅ **trustworthy history**: the "Verified" badge on commits demonstrates code authenticity.
+
 ✅ **simple setup**: minimal configuration compared to gpg signing.
