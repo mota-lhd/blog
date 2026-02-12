@@ -12,9 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-      packages: read
       actions: read
-      contents: write
+      contents: read
 
     strategy:
       fail-fast: false
@@ -68,7 +67,6 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       security-events: write
-      packages: read
       actions: read
       contents: read
 
