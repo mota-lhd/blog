@@ -1,32 +1,41 @@
 ---
-title: '[github] signing commits with ssh keys'
-author: 'elmouatassim'
-date: '2026-02-06'
+title: "[github hardening] signing commits with ssh keys"
+author: "elmouatassim"
+date: "2026-02-06"
 summary: "how to configure signed commits in github using your authentication ssh key?"
 tags: [
-    'tech',
-    'github',
-    'security',
+    "tech",
+    "github",
+    "hardening",
+    "security",
 ]
 categories: [
-    "tech"
+    "tech",
+    "hardening"
 ]
-id: 'tech-blog-01'
-series: ["tech"]
+id: "tech-blog-01"
+series: ["tech", "github hardening"]
 ---
 
-in this serie, the goal is to share my experience while building a very simple blog. this one, yes! the one you are reading :)
+in this serie, the goal is to share my experience about hardening github while creating a very simple blog. this one, yes! the one you are reading :)
 
 i decided to move my blog from wordpress to learn how to build one by myself for less than 1€ a month! also, having ads on the free plan of wordpress was a bit annoying. so this is it, i will cover during this serie of posts how to host static and dynamic content and also how to deploy it on your own server, **securely**.
 
-but first things first, where to host your blog source code? for me, the best solution is github. so first, let's see how to configure a couple of options in github.
-
+but where to host your blog source code? for me, the best solution is github. it is like the social network of code geeks.
+so first, let's see how to configure **commit signing** in github.
 
 ## why sign your github commits?
 
 commit signing is an important security practice that verifies the authenticity of your code contributions. when you sign a commit, you're proving that the code came from you and wasn't tampered with. github displays a "Verified" badge next to signed commits, building trust in your repository's history.
 
-in this post, i'll walk you through configuring signed commits using an ssh key that you already use for authentication. eliminating the need to manage yet another key pair.
+## what risk are we covering here?
+
+a classic scenario we want to handle using commits' signing is when github credentials of a contributor are compromised.
+here the hacker will be able to push commits to repositories where the hacked developer is authorized to push code.
+this can lead to introducing backdoors within a code base if the changes get approved and merged.
+
+this can be prevented using signed commits.
+in the following sections, i'll walk you through configuring signed commits using an ssh key that you already use for authentication. eliminating the need to manage yet another key pair on your machine.
 
 ## generate ssh key pair on macOS
 
@@ -54,7 +63,7 @@ when prompted, press **Enter** twice to skip the passphrase (or enter one if you
 
 ### add private key to ssh agent locally
 
-on macOS, add your private key to the ssh agent so it's available for use and make sure it is readable only by your identity
+on macOS, add your **private key** to the ssh agent so it's available for use and make sure it is readable only by your identity
 
 ```bash
 chmod 0600 ~/.ssh/id_rsa
@@ -77,24 +86,9 @@ cat ~/.ssh/id_rsa.pub
 then:
 1. go to [GitHub Settings → SSH and GPG keys](https://github.com/settings/keys)
 2. click **New SSH key**
-3. paste your key and give it a descriptive title (e.g., "MacBook Air")
+3. paste your key and give it a descriptive title (e.g., "MacBook Air SSH key")
 4. select in **Key type** the value **Signing key**
 4. click **Add SSH key**
-
-### verify connection
-
-to test if your ssh key works with gitHub:
-
-```bash
-ssh -T git@github.com
-```
-
-you should see:
-```
-Hi your_username! You've successfully authenticated, but GitHub does not provide shell access.
-```
-
-your ssh key is now ready for both authentication and commit signing!
 
 ## configure git to use your ssh key for signing
 
