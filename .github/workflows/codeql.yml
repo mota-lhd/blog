@@ -68,7 +68,7 @@ jobs:
       uses: anchore/sbom-action@28d71544de8eaf1b958d335707167c5f783590ad
       with:
         image: 'blog:${{ matrix.docker_image }}'
-        output-format: spdx-json
+        format: spdx-json
         dependency-snapshot: true
         upload-release-assets: false
     - name: scan/upload
