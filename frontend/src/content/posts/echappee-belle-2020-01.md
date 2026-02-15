@@ -14,7 +14,6 @@ categories: [
 ]
 id: 'echappee-belle-2020-01'
 series: ["récits de trail de montagne"]
-weight: 2
 ---
 
 C'était ma troisième participation à cet événement, l'association "Echappée Belle" organise chaque année trois courses de montagne dans le massif du Belledonne, trois formats dans une discipline que l'on appelle "Ultra Trail". Ce sport consiste à courir / marcher une distance supérieur à celle du marathon (42 km). Du plus court "Parcours des crêtes" au plus long "L'intégral" en passant par la "Traversée nord", tous ces parcours se font dans un environnement sauvage et majoritairement alpin qui parcourt le massif du Belledonne à travers le GR 738. Ce GR relie deux villages de deux départements différents, Vizille dans l'Isère et Aiguebelle en Savoie, à travers 145 km de sentiers et 11500 m de dénivelé positif. "L'intégrale" auquel je participais suit ce GR. 

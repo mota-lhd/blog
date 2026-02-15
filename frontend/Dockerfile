@@ -1,7 +1,7 @@
 FROM node:gallium-alpine AS build
 
-ENV HUGO_VERSION="0.155.2"
-ENV HUGO_CHECKSUM="a680e2c6dd0e2244c237c85b549cb8697778cd068c84af1f7b0d9422827a554c"
+ENV HUGO_VERSION="0.155.3"
+ENV HUGO_CHECKSUM="6c280fb8aae09b0dea9a83dbb6c3429bf7fd683839b454bd00c4e21f60440c45"
 
 RUN apk add --no-cache curl
 
@@ -31,5 +31,8 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 
 RUN addgroup ${GROUP}
 RUN adduser --disabled-password --no-create-home --ingroup ${GROUP} ${USER}
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD sh -c 'ps -ef | grep -q "[n]ginx"' || exit 1
 
 USER ${USER}
