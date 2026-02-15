@@ -32,4 +32,7 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 RUN addgroup ${GROUP}
 RUN adduser --disabled-password --no-create-home --ingroup ${GROUP} ${USER}
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD sh -c 'ps -ef | grep -q "[n]ginx"' || exit 1
+
 USER ${USER}
