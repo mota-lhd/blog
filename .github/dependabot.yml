@@ -1,12 +1,14 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/frontend"
+      - "/backend"
     schedule:
       interval: "daily"
 
   - package-ecosystem: "npm"
-    directory: "/frontend"
+    directory: "/frontend/src"
     schedule:
       interval: "daily"
 
@@ -16,6 +18,9 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "github-actions"
-    directory: "/.github"
+    directories:
+      - "/.github/"
+      - "/.github/codeql/"
+      - "/.github/workflows/"
     schedule:
       interval: "daily"
