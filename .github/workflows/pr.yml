@@ -57,7 +57,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@b3c44b4437c93549fc8cfaef9208497ba4955d39
+      uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
       with:
         output_format: cli
         output_file_path: console
@@ -103,7 +103,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@b3c44b4437c93549fc8cfaef9208497ba4955d39
+      uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
       with:
         output_format: cli
         output_file_path: console
