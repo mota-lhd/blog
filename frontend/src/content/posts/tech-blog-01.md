@@ -15,7 +15,6 @@ categories: [
 ]
 id: "tech-blog-01"
 series: ["tech", "github hardening"]
-weight: 2
 ---
 
 in this serie, the goal is to share my experience about hardening github while creating a very simple blog. this one, yes! the one you are reading :)
