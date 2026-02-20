@@ -20,7 +20,7 @@ weight: 1
 
 when i was in highschool i loved listening to a song by dark tranquility called **lethe**. back then, i thought the song was talking about something **lethal** ... only 2 or 3 months ago i discovered that it talks about an ancient mythology with profound existential themes. the track invites us to explore one of antiquity's most intriguing mythological concepts: [**the river of forgetfulness**](https://www.academia.edu/128617614).
 
-{{< youtube id=DrmCT9jYiKk start=40 loading=lazy loop=true mute=false controls=true autoplay=true allowFullScreen=false >}}
+{{< youtube id=DrmCT9jYiKk start=1 loading=lazy loop=true mute=false controls=false autoplay=true allowFullScreen=false >}}
 
 ## origins
 
@@ -39,47 +39,49 @@ the song captures something profound about human experience. we are simultaneous
 here are the lyrics.
 
 ```
-Lethe,
-Give me to drink of the fluid that disintegrates
+Give me the drink of the fluid
+That disintegrates
 And lend me the sweet balm and blessing
 Of forgetfulness, empty and strong
+Lethe
+Oh, lethe
 
 Hold me near, unravel the stars
-As I speed through the heavens,
-I speed through the night
+As I speed through the heavens
+Speed through the night
 For you are my blade and my rope
-You are my Lethe
-(You are my all)
+You are my, you are my lethe
+You are my ALL
 
-In currents of cobalt you storm through my heart
-To sever, to puncture the memories that burn
-Let sweep through the arteries in sharp stabs of pain
+In currents of cobalt
+You storm through my heart
+To sever, to puncture
+The memories that burn
+Let sweep through the arteries
+In sharp stabs of pain
 Your talon-like fingers to kill me again
 
-Steal me, invade me, and charge me again
-(And again, and again, and again)
+Steal me, invade me and charge me again
 For I burn and I shudder
 Burn with each movement of
-
 So, cleansed through a floodlight
 I appear, renewed and reforged
 Caressed by the sweet balm and blessing
 Of forgetfulness, empty and strong
+Lethe
 
-Lethe,
 Hold me near, my one friend and guide
-As I drown through your fingers,
+As I drown through your fingers
 Drown through your love
-For you are the life that I hate
-You are my, you are my...
+For you are the life I hate
+You are my, you are my
+Drag me down, in passionate sighs
+With the ocean above me
+And flames in my eyes
+And grant me a life I can live
+Without
+Take me away
 
-Drag me down in passionate sighs
-With the ocean above me and flames in my eyes
-And grant my a life I can live
-Without...
-
-Take me away...
-Take me away...
 From the life that I hate
 ```
 
