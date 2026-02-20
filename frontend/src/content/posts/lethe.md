@@ -20,7 +20,7 @@ weight: 1
 
 when i was in highschool i loved listening to a song by dark tranquility called **lethe**. back then, i thought the song was talking about something **lethal** ... only 2 or 3 months ago i discovered that it talks about an ancient mythology with profound existential themes. the track invites us to explore one of antiquity's most intriguing mythological concepts: [**the river of forgetfulness**](https://www.academia.edu/128617614).
 
-{{< youtube id=DrmCT9jYiKk start=1 loading=lazy loop=true mute=false controls=false autoplay=true allowFullScreen=false >}}
+{{< youtube id=DrmCT9jYiKk start=1 loading=lazy loop=true mute=false controls=true autoplay=true allowFullScreen=false >}}
 
 ## origins
 
