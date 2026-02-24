@@ -5,3 +5,7 @@ frontend:
 
 backend:
   - 'backend/**'
+
+actions:
+  - '.github/workflows/**'
+  - '.github/dependabot.yml'
