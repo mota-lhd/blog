@@ -28,6 +28,7 @@ jobs:
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
+      actions: ${{ steps.changes.outputs.actions }}
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -60,6 +61,16 @@ jobs:
         file: './backend/Dockerfile'
         framework: "dockerfile"
         quiet: true
+    - name: codeql/init
+      uses: github/codeql-action/init@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        languages: python
+        build-mode: none
+        config-file: ./.github/codeql/python-config.yml
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        category: "/language:python"
 
     - name: docker/setup
       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
@@ -84,6 +95,31 @@ jobs:
         severity-cutoff: high
         only-fixed: true
 
+  actions:
+    needs: changes
+    name: actions/scan
+    if: ${{ needs.changes.outputs.actions == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        fetch-depth: 0
+    - name: codeql/init
+      uses: github/codeql-action/init@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        languages: actions
+        build-mode: none
+        config-file: ./.github/codeql/actions-config.yml
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        category: "/language:actions"
+
   frontend:
     needs: changes
     name: frontend/scan
@@ -106,7 +142,16 @@ jobs:
         file: './backend/Dockerfile'
         framework: "dockerfile"
         quiet: true
-
+    - name: codeql/init
+      uses: github/codeql-action/init@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        languages: javascript-typescript
+        build-mode: none
+        config-file: ./.github/codeql/javascript-typescript-config.yml
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      with:
+        category: "/language:javascript-typescript"
     - name: docker/setup
       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
 
@@ -132,13 +177,14 @@ jobs:
 
   success:
     runs-on: ubuntu-slim
-    needs: [backend, frontend]
+    needs: [backend, frontend, actions]
     if: always()
     steps:
       - run: |
           if [[ ("${{ needs.backend.result }}" != "success" && "${{ needs.backend.result }}" != "skipped") || \
-                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") ]]; then
-            echo "❌ Failed :( Please check frontend or backend !!"
+                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") || \
+                ("${{ needs.actions.result }}" != "success" && "${{ needs.actions.result }}" != "skipped") ]]; then
+            echo "❌ Failed :( Please check frontend or backend or actions !!"
             exit 1
           fi
           echo "✅ All good :)"

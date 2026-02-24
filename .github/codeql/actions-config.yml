@@ -5,6 +5,7 @@ queries:
 
 paths:
   - .github/workflows/*.yml
+  - .github/dependabot.yml
 
 query-filters:
 - exclude:

@@ -14,7 +14,6 @@ jobs:
       security-events: write
       actions: read
       contents: read
-
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +24,6 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
     - name: docker/setup
       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
 
@@ -52,7 +50,6 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         outputs: type=docker
-
     - name: image/scan
       id: "scan"
       uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
@@ -76,7 +73,6 @@ jobs:
       security-events: write
       actions: read
       contents: read
-
     strategy:
       fail-fast: false
       matrix:
