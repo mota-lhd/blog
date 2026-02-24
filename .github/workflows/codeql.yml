@@ -37,7 +37,7 @@ jobs:
         quiet: true
         soft_fail: true
     - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e
       with:
         sarif_file: results-${{ matrix.docker_image }}.sarif
 
@@ -62,7 +62,7 @@ jobs:
         by-cve: true
         cache-db: true
     - name: scan/upload
-      uses: github/codeql-action/upload-sarif@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      uses: github/codeql-action/upload-sarif@89a39a4e59826350b863aa6b6252a07ad50cf83e
       with:
         sarif_file: ${{ steps.scan.outputs.sarif }}
 
@@ -89,13 +89,13 @@ jobs:
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      uses: github/codeql-action/init@89a39a4e59826350b863aa6b6252a07ad50cf83e
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
         config-file: ./.github/codeql/${{ matrix.language }}-config.yml
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
+      uses: github/codeql-action/analyze@89a39a4e59826350b863aa6b6252a07ad50cf83e
       with:
         category: "/language:${{matrix.language}}"
