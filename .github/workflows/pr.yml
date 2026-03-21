@@ -73,7 +73,7 @@ jobs:
         category: "/language:python"
 
     - name: docker/setup
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
@@ -153,7 +153,7 @@ jobs:
       with:
         category: "/language:javascript-typescript"
     - name: docker/setup
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
