@@ -27,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
+      backend_dockerfile: ${{ steps.changes.outputs.backend_dockerfile }}
       frontend: ${{ steps.changes.outputs.frontend }}
+      frontend_dockerfile: ${{ steps.changes.outputs.frontend_dockerfile }}
       actions: ${{ steps.changes.outputs.actions }}
     steps:
     - name: checkout
@@ -45,9 +47,6 @@ jobs:
     name: backend/scan
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: write
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -56,6 +55,7 @@ jobs:
 
     - name: dockerfile/scan
       uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
+      if: ${{ needs.changes.outputs.backend_dockerfile == 'true' }}
       with:
         output_format: cli
         output_file_path: console
@@ -89,9 +89,6 @@ jobs:
     name: frontend/scan
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: write
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -100,10 +97,11 @@ jobs:
 
     - name: dockerfile/scan
       uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
+      if: ${{ needs.changes.outputs.frontend_dockerfile == 'true' }}
       with:
         output_format: cli
         output_file_path: console
-        file: './backend/Dockerfile'
+        file: './frontend/Dockerfile'
         framework: "dockerfile"
         quiet: true
 

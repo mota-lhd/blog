@@ -3,8 +3,14 @@
 frontend:
   - 'frontend/**'
 
+frontend_dockerfile:
+  - 'frontend/Dockerfile'
+
 backend:
   - 'backend/**'
+
+backend_dockerfile:
+  - 'backend/Dockerfile'
 
 actions:
   - '.github/workflows/**'

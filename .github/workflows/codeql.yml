@@ -8,20 +8,19 @@ on:
   pull_request:
     types: [synchronize, opened, reopened]
 
+permissions:
+  contents: read
+
 jobs:
   docker:
-    name: Analyze (${{ matrix.docker_image }})
+    name: docker/scan/${{ matrix.docker_image }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-      actions: read
-      contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - docker_image: frontend
-        - docker_image: backend
+        docker_image: [frontend, backend]
 
     steps:
     - name: checkout
@@ -69,22 +68,14 @@ jobs:
         sarif_file: ${{ steps.scan.outputs.sarif }}
 
   analyze:
-    name: Analyze (${{ matrix.language }})
+    name: codeql/scan/${{ matrix.language }}
     runs-on: ubuntu-slim
     permissions:
       security-events: write
-      actions: read
-      contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - language: actions
-          build-mode: none
-        - language: javascript-typescript
-          build-mode: none
-        - language: python
-          build-mode: none
+        language: [actions, javascript-typescript, python]
 
     steps:
     - name: checkout
@@ -94,7 +85,7 @@ jobs:
       uses: github/codeql-action/init@b8d3b6e8af63cde30bdc382c0bc28114f4346c88
       with:
         languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
+        build-mode: none
         config-file: ./.github/codeql/${{ matrix.language }}-config.yml
 
     - name: Perform CodeQL Analysis
