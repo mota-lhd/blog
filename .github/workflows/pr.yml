@@ -54,7 +54,7 @@ jobs:
         fetch-depth: 0
 
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
+      uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
       if: ${{ needs.changes.outputs.backend_dockerfile == 'true' }}
       with:
         output_format: cli
@@ -64,7 +64,7 @@ jobs:
         quiet: true
 
     - name: docker/setup
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
       with:
@@ -96,7 +96,7 @@ jobs:
         fetch-depth: 0
 
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@05d9f3cd4807c3dea7444d4e60dc44ad57928ab5
+      uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
       if: ${{ needs.changes.outputs.frontend_dockerfile == 'true' }}
       with:
         output_format: cli
@@ -106,7 +106,7 @@ jobs:
         quiet: true
 
     - name: docker/setup
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
       with:
