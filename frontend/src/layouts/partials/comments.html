@@ -2,8 +2,8 @@
   <h2 class="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Comments</h2>
 
   <form id="commentForm" class="space-y-2 bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-    <input type="hidden" id="siteId" value="{{ .Site.BaseURL }}">
-    <input type="hidden" id="postSlug" value="{{ .File.BaseFileName }}">
+    <input type="hidden" id="siteId" value="{{- .Site.BaseURL -}}">
+    <input type="hidden" id="postSlug" value="{{- .File.BaseFileName -}}">
 
     <div class="grid grid-cols-2 gap-2">
       <input id="author" class="px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm placeholder-gray-500 dark:placeholder-gray-400" placeholder="Name" required>
@@ -32,7 +32,7 @@
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-  const API_BASE = "{{ .Site.Params.commentsBackend }}";
+  const API_BASE = "{{- .Site.Params.commentsBackend -}}";
   const el = (id) => document.getElementById(id);
 
   window.onTurnstileSuccess = function (token) {
