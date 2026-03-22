@@ -347,6 +347,10 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
   margin-top: calc(var(--spacing) * 0);
   margin-bottom: calc(var(--spacing) * 0);
 }
+.my-0\!:not(#\#) {
+  margin-top: calc(var(--spacing) * 0) !important;
+  margin-bottom: calc(var(--spacing) * 0) !important;
+}
 .my-10:not(#\#):not(#\#):not(#\#):not(#\#) {
   margin-top: calc(var(--spacing) * 10);
   margin-bottom: calc(var(--spacing) * 10);
@@ -1007,6 +1011,14 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
 .bg-\(--bg\):not(#\#):not(#\#):not(#\#):not(#\#) {
   background-color: var(--bg);
 }
+.bg-black\/5\!:not(#\#) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .bg-black\/5\!:not(#\#) {
+    background-color: color-mix(in oklab, var(--color-black) 5%, transparent) !important;
+  }
+}
 .bg-black\/\[3\%\]:not(#\#):not(#\#):not(#\#):not(#\#) {
   background-color: rgba(0, 0, 0, 0.03);
 }
@@ -1123,6 +1135,9 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
 .text-xs:not(#\#):not(#\#):not(#\#):not(#\#) {
   font-size: var(--text-xs);
   line-height: var(--tw-leading, var(--text-xs--line-height));
+}
+.text-\[0px\]:not(#\#):not(#\#):not(#\#):not(#\#) {
+  font-size: 0px;
 }
 .\!leading-\[1\.2\]:not(#\#) {
   --tw-leading: 1.2 !important;
@@ -1503,6 +1518,14 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
 .dark\:bg-black:where(.dark,.dark *):not(#\#):not(#\#):not(#\#):not(#\#) {
   background-color: var(--color-black);
 }
+.dark\:bg-black\/80\!:where(.dark,.dark *):not(#\#) {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .dark\:bg-black\/80\!:where(.dark,.dark *):not(#\#) {
+    background-color: color-mix(in oklab, var(--color-black) 80%, transparent) !important;
+  }
+}
 .dark\:bg-blue-900\/20:where(.dark,.dark *):not(#\#):not(#\#):not(#\#):not(#\#) {
   background-color: rgba(28, 57, 142, 0.2);
 }
@@ -1534,6 +1557,14 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
 @supports (color: color-mix(in lab, red, red)) {
   .dark\:bg-red-900\/20:where(.dark,.dark *):not(#\#):not(#\#):not(#\#):not(#\#) {
     background-color: color-mix(in oklab, var(--color-red-900) 20%, transparent);
+  }
+}
+.dark\:bg-white\/90\!:where(.dark,.dark *):not(#\#) {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .dark\:bg-white\/90\!:where(.dark,.dark *):not(#\#) {
+    background-color: color-mix(in oklab, var(--color-white) 90%, transparent) !important;
   }
 }
 .dark\:bg-white\/\[8\%\]:where(.dark,.dark *):not(#\#):not(#\#):not(#\#):not(#\#) {
