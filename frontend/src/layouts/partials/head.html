@@ -8,7 +8,7 @@
   <meta name="google-site-verification" content="9UvHRKy_vNDJIjeCalD_OAYRGqDvlM7qyk3dkTDOucM" />
 
   <!-- title -->
-  <title>{{- if not .IsHome -}}{{- .Title -}} - {{- end -}}{{- site.Title -}}</title>
+  <title>{{- if not .IsHome -}}{{- .Title }} - {{ end -}}{{- site.Title -}}</title>
 
   <!-- meta -->
   <meta name="theme-color" />
@@ -34,7 +34,7 @@
   {{- $custom := resources.Get "custom.css" -}}
   <!---->
   {{- $css := slice $main $custom | resources.Concat "main.css" | minify | fingerprint -}}
-  <link rel="preload stylesheet" as="style" href="{{- $css.Permalink -}}" integrity="{{- $css.Data.Integrity -}}" />
+  <link rel="preload stylesheet" as="style" href="{{- $css.Permalink -}}" integrity="{{ $css.Data.Integrity }}" />
 
   <!-- dark icon -->
   {{- $dark_icon := "theme.png" -}}
