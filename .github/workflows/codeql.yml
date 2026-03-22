@@ -70,8 +70,6 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       security-events: write
-      actions: read
-      contents: read
     strategy:
       fail-fast: false
       matrix:
