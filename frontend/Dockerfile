@@ -1,4 +1,4 @@
-FROM alpine:3 as installer
+FROM alpine:3 AS installer
 
 ENV HUGO_VERSION="0.158.0"
 ENV HUGO_CHECKSUM="d0d8f0735dccef76e900719a70102f269c418e010a02e3e0f9e206a208346e2f"
