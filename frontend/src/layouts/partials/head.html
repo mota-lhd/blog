@@ -14,7 +14,7 @@
   <meta name="theme-color" />
 
   <!-- author -->
-  {{ $site_author := or site.Author.name site.Params.name site.Title }}
+  {{ $site_author := or .Params.author site.Params.author site.Title }}
   <!---->
   {{ if eq .Kind "page" }}
   <meta name="description" content="{{ .Summary }}" />
@@ -33,8 +33,8 @@
   <!---->
   {{ $custom := resources.Get "custom.css" }}
   <!---->
-  {{ $css := slice $main $custom | resources.Concat "main.css" | minify }}
-  <link rel="preload stylesheet" as="style" href="{{ $css.Permalink }}" />
+  {{ $css := slice $main $custom | resources.Concat "main.css" | minify | fingerprint }}
+  <link rel="preload stylesheet" as="style" href="{{- $css.Permalink -}}" integrity="{{ $css.Data.Integrity }}" />
 
   <!-- dark icon -->
   {{ $dark_icon := "theme.png" }}
