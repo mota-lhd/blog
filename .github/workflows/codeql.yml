@@ -5,8 +5,6 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '13 13 * * *'
-  pull_request:
-    types: [synchronize, opened, reopened]
 
 permissions:
   contents: read
@@ -27,7 +25,6 @@ jobs:
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
     - name: docker/setup
       uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
-
     - name: dockerfile/scan
       uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
       with:
@@ -41,7 +38,6 @@ jobs:
       uses: github/codeql-action/upload-sarif@b1bff81932f5cdfc8695c7752dcee935dcd061c8
       with:
         sarif_file: results-${{ matrix.docker_image }}.sarif
-
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
       with:
@@ -80,14 +76,12 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
     - name: Initialize CodeQL
       uses: github/codeql-action/init@b1bff81932f5cdfc8695c7752dcee935dcd061c8
       with:
         languages: ${{ matrix.language }}
         build-mode: none
         config-file: ./.github/codeql/${{ matrix.language }}-config.yml
-
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@b1bff81932f5cdfc8695c7752dcee935dcd061c8
       with:
