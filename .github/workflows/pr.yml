@@ -3,8 +3,6 @@ name: "Pull-Request"
 on:
   pull_request:
     types: [synchronize, opened, reopened]
-  push:
-    branches: [main]
 
 permissions:
   contents: read
