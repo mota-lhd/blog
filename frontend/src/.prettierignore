@@ -1,0 +1,4 @@
+/static
+.git*
+.prettierignore
+*.lock

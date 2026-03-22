@@ -1,8 +1,10 @@
-name: "Pull request"
+name: "Pull-Request"
 
 on:
   pull_request:
     types: [synchronize, opened, reopened]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -27,7 +29,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
+      backend_dockerfile: ${{ steps.changes.outputs.backend_dockerfile }}
+      backend_python: ${{ steps.changes.outputs.backend_python }}
       frontend: ${{ steps.changes.outputs.frontend }}
+      frontend_dockerfile: ${{ steps.changes.outputs.frontend_dockerfile }}
+      frontend_js: ${{ steps.changes.outputs.frontend_js }}
       actions: ${{ steps.changes.outputs.actions }}
     steps:
     - name: checkout
@@ -46,8 +52,7 @@ jobs:
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: write
+      security-events: read
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -55,6 +60,7 @@ jobs:
         fetch-depth: 0
     - name: dockerfile/scan
       uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
+      if: ${{ needs.changes.outputs.backend_dockerfile == 'true' }}
       with:
         output_format: cli
         output_file_path: console
@@ -63,18 +69,19 @@ jobs:
         quiet: true
     - name: codeql/init
       uses: github/codeql-action/init@b1bff81932f5cdfc8695c7752dcee935dcd061c8
+      if: ${{ needs.changes.outputs.backend_python == 'true' }}
       with:
         languages: python
+        tools: linked
         build-mode: none
         config-file: ./.github/codeql/python-config.yml
-    - name: Perform CodeQL Analysis
+    - name: codeql/analyze
       uses: github/codeql-action/analyze@b1bff81932f5cdfc8695c7752dcee935dcd061c8
+      if: ${{ needs.changes.outputs.backend_python == 'true' }}
       with:
         category: "/language:python"
-
     - name: docker/setup
       uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
-
     - name: docker/build
       uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
       with:
@@ -84,12 +91,66 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         outputs: type=docker
-
     - name: image/scan
       id: backend_scan
       uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
       with:
         image: 'local/web:back'
+        fail-build: true
+        output-format: table
+        severity-cutoff: high
+        only-fixed: true
+
+  frontend:
+    needs: changes
+    name: frontend/scan
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        fetch-depth: 0
+    - name: dockerfile/scan
+      uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
+      if: ${{ needs.changes.outputs.frontend_dockerfile == 'true' }}
+      with:
+        output_format: cli
+        output_file_path: console
+        file: './frontend/Dockerfile'
+        framework: "dockerfile"
+        quiet: true
+    - name: codeql/init
+      uses: github/codeql-action/init@b1bff81932f5cdfc8695c7752dcee935dcd061c8
+      if: ${{ needs.changes.outputs.frontend_js == 'true' }}
+      with:
+        tools: linked
+        languages: javascript-typescript
+        build-mode: none
+        config-file: ./.github/codeql/javascript-typescript-config.yml
+    - name: codeql/analyze
+      uses: github/codeql-action/analyze@b1bff81932f5cdfc8695c7752dcee935dcd061c8
+      if: ${{ needs.changes.outputs.frontend_js == 'true' }}
+      with:
+        category: "/language:javascript-typescript"
+    - name: docker/setup
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
+    - name: docker/build
+      uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
+      with:
+        context: './frontend/'
+        push: false
+        tags: local/web:front
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker
+    - name: image/scan
+      id: frontend_scan
+      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
+      with:
+        image: 'local/web:front'
         fail-build: true
         output-format: table
         severity-cutoff: high
@@ -101,9 +162,7 @@ jobs:
     if: ${{ needs.changes.outputs.actions == 'true' }}
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: write
-
+      security-events: read
     steps:
     - name: checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -112,68 +171,14 @@ jobs:
     - name: codeql/init
       uses: github/codeql-action/init@b1bff81932f5cdfc8695c7752dcee935dcd061c8
       with:
+        tools: linked
         languages: actions
         build-mode: none
         config-file: ./.github/codeql/actions-config.yml
-    - name: Perform CodeQL Analysis
+    - name: codeql/analyze
       uses: github/codeql-action/analyze@b1bff81932f5cdfc8695c7752dcee935dcd061c8
       with:
         category: "/language:actions"
-
-  frontend:
-    needs: changes
-    name: frontend/scan
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: write
-
-    steps:
-    - name: checkout
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      with:
-        fetch-depth: 0
-    - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@2fd3901c8feb52417f27f0d9800259a106c1ec1e
-      with:
-        output_format: cli
-        output_file_path: console
-        file: './backend/Dockerfile'
-        framework: "dockerfile"
-        quiet: true
-    - name: codeql/init
-      uses: github/codeql-action/init@b1bff81932f5cdfc8695c7752dcee935dcd061c8
-      with:
-        languages: javascript-typescript
-        build-mode: none
-        config-file: ./.github/codeql/javascript-typescript-config.yml
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b1bff81932f5cdfc8695c7752dcee935dcd061c8
-      with:
-        category: "/language:javascript-typescript"
-    - name: docker/setup
-      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
-
-    - name: docker/build
-      uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
-      with:
-        context: './frontend/'
-        push: false
-        tags: local/web:front
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        outputs: type=docker
-
-    - name: image/scan
-      id: frontend_scan
-      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
-      with:
-        image: 'local/web:front'
-        fail-build: true
-        output-format: table
-        severity-cutoff: high
-        only-fixed: true
 
   success:
     runs-on: ubuntu-slim
@@ -182,9 +187,9 @@ jobs:
     steps:
       - run: |
           if [[ ("${{ needs.backend.result }}" != "success" && "${{ needs.backend.result }}" != "skipped") || \
-                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") || \
-                ("${{ needs.actions.result }}" != "success" && "${{ needs.actions.result }}" != "skipped") ]]; then
-            echo "❌ Failed :( Please check frontend or backend or actions !!"
+                ("${{ needs.actions.result }}" != "success" && "${{ needs.actions.result }}" != "skipped") || \
+                ("${{ needs.frontend.result }}" != "success" && "${{ needs.frontend.result }}" != "skipped") ]]; then
+            echo "❌ Failed :( Please check frontend or backend !!"
             exit 1
           fi
           echo "✅ All good :)"
