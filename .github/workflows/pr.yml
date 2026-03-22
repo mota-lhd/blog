@@ -151,7 +151,7 @@ jobs:
         image: 'local/web:front'
         fail-build: true
         output-format: table
-        severity-cutoff: high
+        severity-cutoff: medium
         only-fixed: true
 
   actions:

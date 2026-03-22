@@ -85,7 +85,7 @@ article {
 }
 
 .prose {
-  @apply break-words;
+  @apply wrap-break-word;
 
   kbd:has(kbd) {
     @apply shadow-none;

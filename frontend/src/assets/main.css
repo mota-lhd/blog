@@ -177,7 +177,6 @@ ol:not(#\#):not(#\#), ul:not(#\#):not(#\#), menu:not(#\#):not(#\#) {
 }
 img:not(#\#):not(#\#), svg:not(#\#):not(#\#), video:not(#\#):not(#\#), canvas:not(#\#):not(#\#), audio:not(#\#):not(#\#), iframe:not(#\#):not(#\#), embed:not(#\#):not(#\#), object:not(#\#):not(#\#) {
   display: block;
-  vertical-align: middle;
 }
 img:not(#\#):not(#\#), video:not(#\#):not(#\#) {
   max-width: 100%;
