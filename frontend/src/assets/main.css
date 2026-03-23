@@ -61,6 +61,7 @@
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --tracking-normal: 0em;
   --tracking-wider: 0.05em;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
@@ -177,6 +178,7 @@ ol:not(#\#):not(#\#), ul:not(#\#):not(#\#), menu:not(#\#):not(#\#) {
 }
 img:not(#\#):not(#\#), svg:not(#\#):not(#\#), video:not(#\#):not(#\#), canvas:not(#\#):not(#\#), audio:not(#\#):not(#\#), iframe:not(#\#):not(#\#), embed:not(#\#):not(#\#), object:not(#\#):not(#\#) {
   display: block;
+  vertical-align: middle;
 }
 img:not(#\#):not(#\#), video:not(#\#):not(#\#) {
   max-width: 100%;
@@ -1137,6 +1139,10 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
 .font-medium:not(#\#):not(#\#):not(#\#):not(#\#) {
   --tw-font-weight: var(--font-weight-medium);
   font-weight: var(--font-weight-medium);
+}
+.tracking-normal:not(#\#):not(#\#):not(#\#):not(#\#) {
+  --tw-tracking: var(--tracking-normal);
+  letter-spacing: var(--tracking-normal);
 }
 .tracking-wider:not(#\#):not(#\#):not(#\#):not(#\#) {
   --tw-tracking: var(--tracking-wider);
