@@ -91,7 +91,7 @@ jobs:
         outputs: type=docker
     - name: image/scan
       id: backend_scan
-      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
+      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
       with:
         image: 'local/web:back'
         fail-build: true
@@ -146,7 +146,7 @@ jobs:
         outputs: type=docker
     - name: image/scan
       id: frontend_scan
-      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
+      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
       with:
         image: 'local/web:front'
         fail-build: true
