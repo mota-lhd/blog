@@ -1,0 +1,253 @@
+name: Sync (hugo-paper)
+
+env:
+  UPSTREAM_REPO: "nanxiaobei/hugo-paper"
+  UPSTREAM_BRANCH: "main"
+  SYNC_BRANCH_PREFIX: "chore/upstream-sync"
+  PR_LABEL: "sync:hugo-paper"
+  INITIAL_SYNC_SINCE_DATE: "2026-03-24"
+
+on:
+  schedule:
+    - cron: "0 8 * * 1" # Every Monday at 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-upstream:
+    name: sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: upstream
+        run: |
+          git remote add upstream \
+            "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git fetch upstream ${{ env.UPSTREAM_BRANCH }} --no-tags
+
+      - name: detect
+        id: detect
+        run: |
+          UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
+          echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
+
+          # ── Is this the first time? ──────────────────────────────────────
+          if git log --oneline --all -- "/" | grep -q .; then
+            IS_FIRST_TIME="false"
+          else
+            IS_FIRST_TIME="true"
+          fi
+          echo "is_first_time=${IS_FIRST_TIME}" >> "$GITHUB_OUTPUT"
+          echo "▶ First-time sync: ${IS_FIRST_TIME}"
+
+          # ── For first-time: resolve the anchor SHA ───────────────────────
+          if [ "${IS_FIRST_TIME}" = "true" ] && [ -n "${{ env.INITIAL_SYNC_SINCE_DATE }}" ]; then
+            # Last upstream commit on or before INITIAL_SYNC_SINCE_DATE
+            ANCHOR_SHA=$(git log upstream/${{ env.UPSTREAM_BRANCH }} \
+              --before="${{ env.INITIAL_SYNC_SINCE_DATE }} 23:59:59" \
+              --format="%H" | head -1)
+
+            if [ -z "${ANCHOR_SHA}" ]; then
+              echo "::error::No upstream commit found on or before ${{ env.INITIAL_SYNC_SINCE_DATE }}."
+              echo "::error::Check INITIAL_SYNC_SINCE_DATE or leave it empty to use full history."
+              exit 1
+            fi
+
+            # Are there any commits AFTER the anchor up to HEAD?
+            NEW_COMMITS=$(git rev-list "${ANCHOR_SHA}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
+            echo "anchor_sha=${ANCHOR_SHA}"     >> "$GITHUB_OUTPUT"
+            echo "new_commits=${NEW_COMMITS}"   >> "$GITHUB_OUTPUT"
+            echo "▶ Anchor SHA (at ${{ env.INITIAL_SYNC_SINCE_DATE }}): ${ANCHOR_SHA}"
+            echo "▶ New commits after anchor: ${NEW_COMMITS}"
+
+          elif [ "${IS_FIRST_TIME}" = "true" ]; then
+            # No since-date: import full history
+            echo "anchor_sha="      >> "$GITHUB_OUTPUT"
+            echo "new_commits=1"    >> "$GITHUB_OUTPUT"
+
+          else
+            # ── Incremental run: count commits since last subtree sync ─────
+            LOCAL_SPLIT=$(git subtree split \
+              --prefix="/" 2>/dev/null || echo "")
+
+            if [ -n "${LOCAL_SPLIT}" ]; then
+              NEW_COMMITS=$(git rev-list "${LOCAL_SPLIT}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
+            else
+              NEW_COMMITS=1
+            fi
+            echo "anchor_sha="                  >> "$GITHUB_OUTPUT"
+            echo "new_commits=${NEW_COMMITS}"   >> "$GITHUB_OUTPUT"
+            echo "▶ New commits since last sync: ${NEW_COMMITS}"
+          fi
+
+      - name: skip
+        if: steps.detect.outputs.new_commits == '0'
+        run: |
+          echo "✅ We are already up-to-date with ${{ env.UPSTREAM_REPO }}. Nothing to do."
+
+      - name: branch
+        if: steps.detect.outputs.new_commits != '0'
+        id: branch
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          SHORT_SHA=$(echo "${{ steps.detect.outputs.upstream_sha }}" | cut -c1-7)
+          BRANCH_NAME="${{ env.SYNC_BRANCH_PREFIX }}/${DATE}-${SHORT_SHA}"
+          echo "branch_name=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
+
+          git checkout -b "${BRANCH_NAME}"
+          echo "▶ Working on branch: ${BRANCH_NAME}"
+
+      - name: "first-time"
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          steps.detect.outputs.is_first_time == 'true' &&
+          steps.detect.outputs.anchor_sha != ''
+        id: seed
+        run: |
+          ANCHOR="${{ steps.detect.outputs.anchor_sha }}"
+          echo "▶ Seeding subtree at anchor: ${ANCHOR}"
+
+          git subtree add \
+            --prefix="/" \
+            "${ANCHOR}" \
+            --squash \
+            -m "chore: initialize subtree from ${{ env.UPSTREAM_REPO }} @ ${ANCHOR} (anchor for ${{ env.INITIAL_SYNC_SINCE_DATE }})" \
+          && echo "status=success" >> "$GITHUB_OUTPUT" \
+          || echo "status=conflict" >> "$GITHUB_OUTPUT"
+
+      - name: "not-first-time"
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          (steps.detect.outputs.is_first_time != 'true' ||
+           steps.detect.outputs.anchor_sha == '' ||
+           steps.seed.outputs.status == 'success')
+        id: subtree
+        run: |
+          git subtree pull \
+            --prefix="/" \
+            upstream \
+            "${{ env.UPSTREAM_BRANCH }}" \
+            --squash \
+            -m "chore: sync upstream ${{ env.UPSTREAM_REPO }} @ ${{ steps.detect.outputs.upstream_sha }}" \
+          && echo "status=success" >> "$GITHUB_OUTPUT" \
+          || echo "status=conflict" >> "$GITHUB_OUTPUT"
+
+      - name: abort-on-conflict
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          (steps.subtree.outputs.status == 'conflict' ||
+           steps.seed.outputs.status == 'conflict')
+        run: |
+          echo "::error::Merge conflict detected during subtree operation."
+          echo "::error::Resolve manually:"
+          echo "::error::  git subtree pull --prefix=/ upstream ${{ env.UPSTREAM_BRANCH }} --squash"
+          git merge --abort 2>/dev/null || true
+          exit 1
+
+      - name: push
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          steps.subtree.outputs.status == 'success'
+        run: |
+          git push origin "${{ steps.branch.outputs.branch_name }}"
+
+      - name: pr/build
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          steps.subtree.outputs.status == 'success'
+        id: changelog
+        run: |
+          IS_FIRST="${{ steps.detect.outputs.is_first_time }}"
+          ANCHOR="${{ steps.detect.outputs.anchor_sha }}"
+
+          if [ "${IS_FIRST}" = "true" ] && [ -n "${ANCHOR}" ]; then
+            # Only list commits that arrived after the anchor (the interesting ones)
+            LOG=$(git log \
+              --pretty=format:"- %h %s (%an, %ad)" \
+              --date=short \
+              "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" \
+              | head -50)
+            SINCE_NOTE="> ⚓ History before \`${{ env.INITIAL_SYNC_SINCE_DATE }}\` was used as silent anchor and is not listed."
+          elif [ "${IS_FIRST}" = "true" ]; then
+            LOG="_(First-time full-history import — commit list omitted for brevity)_"
+            SINCE_NOTE=""
+          else
+            LOCAL_SPLIT=$(git subtree split \
+              --prefix="/" \
+              HEAD~1 2>/dev/null || echo "")
+            if [ -n "${LOCAL_SPLIT}" ]; then
+              LOG=$(git log \
+                --pretty=format:"- %h %s (%an, %ad)" \
+                --date=short \
+                "${LOCAL_SPLIT}..upstream/${{ env.UPSTREAM_BRANCH }}" \
+                | head -50)
+            else
+              LOG="_(Could not determine incremental commit range)_"
+            fi
+            SINCE_NOTE=""
+          fi
+
+          {
+            echo "log<<EOF"
+            echo "${LOG}"
+            echo "EOF"
+            echo "since_note<<EOF"
+            echo "${SINCE_NOTE}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: pr/create
+        if: >
+          steps.detect.outputs.new_commits != '0' &&
+          steps.subtree.outputs.status == 'success'
+        run: |
+          UPSTREAM_URL="https://github.com/${{ env.UPSTREAM_REPO }}"
+          DATE=$(date +%Y-%m-%d)
+          IS_FIRST="${{ steps.detect.outputs.is_first_time }}"
+          TITLE_TAG=$([ "${IS_FIRST}" = "true" ] && echo "🆕 first-time sync" || echo "weekly sync")
+
+          gh pr create \
+            --title "chore: ${TITLE_TAG} from ${{ env.UPSTREAM_REPO }} (${DATE})" \
+            --body "## 🔄 Upstream sync — ${{ env.UPSTREAM_REPO }}
+
+          **Source repository:** [\`${{ env.UPSTREAM_REPO }}\`](${UPSTREAM_URL})
+          **Branch tracked:** \`${{ env.UPSTREAM_BRANCH }}\`
+          **Upstream SHA:** \`${{ steps.detect.outputs.upstream_sha }}\`
+          **Subtree path in this repo:** \`/\`
+          **First-time sync:** \`${IS_FIRST}\`$([ -n "${{ steps.detect.outputs.anchor_sha }}" ] && echo "
+          **Anchor SHA (history before \`${{ env.INITIAL_SYNC_SINCE_DATE }}\` excluded):** \`${{ steps.detect.outputs.anchor_sha }}\`")
+
+          ---
+
+          ### 📋 Upstream commits included
+
+          ${{ steps.changelog.outputs.log }}
+
+          ${{ steps.changelog.outputs.since_note }}
+
+          ---
+
+          ### ✅ Review checklist
+
+          - [ ] Scan the diff for breaking API changes
+          - [ ] Check if any dependency versions changed
+          - [ ] Run the full test suite locally if needed
+          - [ ] Update \`CHANGELOG.md\` if this affects public behaviour
+
+          > _This PR was created automatically by the \`Weekly Upstream Sync\` workflow._" \
+            --base main \
+            --head "${{ steps.branch.outputs.branch_name }}" \
+            --label "${{ env.PR_LABEL }}"
