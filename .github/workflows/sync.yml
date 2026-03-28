@@ -68,36 +68,24 @@ jobs:
           git checkout -b "${NAME}"
           echo "name=${NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: branch/seed
+      - name: branch/squash
         if: steps.anchor.outputs.new != '0'
-        run: |
-          git subtree add \
-            --prefix="./" \
-            "${{ steps.anchor.outputs.sha }}" \
-            --squash \
-            -m "chore: subtree anchor @ ${{ steps.anchor.outputs.sha }}"
-
-      - name: branch/pull
-        if: steps.anchor.outputs.new != '0'
-        id: pull
+        id: squash
         run: |
           UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
           echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
 
-          git subtree pull \
-            --prefix="./" \
-            upstream "${{ env.UPSTREAM_BRANCH }}" \
-            --squash \
-            -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}" \
-          && echo "status=ok" >> "$GITHUB_OUTPUT" \
-          || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git merge --abort 2>/dev/null; exit 1; }
+          git cherry-pick --no-commit ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }}
+          git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}"
+          echo "status=ok" >> "$GITHUB_OUTPUT" \
+          || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git cherry-pick --abort 2>/dev/null || true; exit 1; }
 
       - name: branch/push
-        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         run: git push origin "${{ steps.branch.outputs.name }}"
 
       - name: changelog
-        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         id: log
         run: |
           LOG=$(git log \
@@ -112,7 +100,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: pull-request
-        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         run: |
           gh pr create \
             --title "chore: sync ${{ env.UPSTREAM_REPO }} — commits after ${{ inputs.since_date }}" \
@@ -121,8 +109,8 @@ jobs:
           | | |
           |---|---|
           | **Since date** | \`${{ inputs.since_date }}\` |
-          | **Upstream HEAD** | \`${{ steps.pull.outputs.upstream_sha }}\` |
-          | **Subtree path** | \`./\` |
+          | **Upstream HEAD** | \`${{ steps.squash.outputs.upstream_sha }}\` |
+          | **Merge type** | \`Squash\` |
 
           ### 📋 Commits included
 
