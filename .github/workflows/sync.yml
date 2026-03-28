@@ -33,8 +33,7 @@ jobs:
 
       - name: git/fetch-upstream
         run: |
-          git remote add upstream \
-            "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git remote add upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
           git fetch upstream ${{ env.UPSTREAM_BRANCH }} --no-tags
 
       - name: git/get-anchor
@@ -89,7 +88,7 @@ jobs:
             --prefix="./" \
             upstream "${{ env.UPSTREAM_BRANCH }}" \
             --squash \
-            -m "chore: sync repository-b commits after ${{ inputs.since_date }}" \
+            -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}" \
           && echo "status=ok" >> "$GITHUB_OUTPUT" \
           || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git merge --abort 2>/dev/null; exit 1; }
 
@@ -116,7 +115,7 @@ jobs:
         if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
         run: |
           gh pr create \
-            --title "chore: sync repository-b — commits after ${{ inputs.since_date }}" \
+            --title "chore: sync ${{ env.UPSTREAM_REPO }} — commits after ${{ inputs.since_date }}" \
             --body "## 🔄 Upstream sync from \`${{ env.UPSTREAM_REPO }}\`
 
           | | |
