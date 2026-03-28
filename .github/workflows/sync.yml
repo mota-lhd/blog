@@ -75,7 +75,7 @@ jobs:
           UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
           echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
 
-          git cherry-pick --no-commit ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }}
+          git cherry-pick --no-commit --no-merges ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} \
           git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}"
           echo "status=ok" >> "$GITHUB_OUTPUT" \
           || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git cherry-pick --abort 2>/dev/null || true; exit 1; }
