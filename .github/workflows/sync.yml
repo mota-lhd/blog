@@ -1,0 +1,134 @@
+name: Sync from nanxiaobei/hugo-paper
+
+on:
+  workflow_dispatch:
+    inputs:
+      since_date:
+        description: "Include commits after this date (YYYY-MM-DD)"
+        required: true
+        type: string
+
+env:
+  UPSTREAM_REPO: "nanxiaobei/hugo-paper"
+  UPSTREAM_BRANCH: "main"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: git/configure
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: git/fetch-upstream
+        run: |
+          git remote add upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git fetch upstream ${{ env.UPSTREAM_BRANCH }} --no-tags
+
+      - name: git/get-anchor
+        id: anchor
+        run: |
+          ANCHOR=$(git log upstream/${{ env.UPSTREAM_BRANCH }} \
+            --before="${{ inputs.since_date }} 23:59:59" \
+            --format="%H" | head -1)
+
+          if [ -z "${ANCHOR}" ]; then
+            echo "::error::No commit found on or before ${{ inputs.since_date }} in ${{ env.UPSTREAM_REPO }}."
+            exit 1
+          fi
+
+          NEW=$(git rev-list "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
+          echo "sha=${ANCHOR}"   >> "$GITHUB_OUTPUT"
+          echo "new=${NEW}"      >> "$GITHUB_OUTPUT"
+          echo "▶ Anchor : ${ANCHOR}"
+          echo "▶ New commits after ${{ inputs.since_date }}: ${NEW}"
+
+      - name: exit
+        if: steps.anchor.outputs.new == '0'
+        run: |
+          echo "✅ no new commits after ${{ inputs.since_date }}. nothing to do."
+
+      - name: branch/new
+        if: steps.anchor.outputs.new != '0'
+        id: branch
+        run: |
+          SHORT=$(echo "${{ steps.anchor.outputs.sha }}" | cut -c1-7)
+          NAME="chore/upstream-sync/${{ inputs.since_date }}-${SHORT}"
+          git checkout -b "${NAME}"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: branch/seed
+        if: steps.anchor.outputs.new != '0'
+        run: |
+          git subtree add \
+            --prefix="./" \
+            "${{ steps.anchor.outputs.sha }}" \
+            --squash \
+            -m "chore: subtree anchor @ ${{ steps.anchor.outputs.sha }}"
+
+      - name: branch/pull
+        if: steps.anchor.outputs.new != '0'
+        id: pull
+        run: |
+          UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
+          echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
+
+          git subtree pull \
+            --prefix="./" \
+            upstream "${{ env.UPSTREAM_BRANCH }}" \
+            --squash \
+            -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}" \
+          && echo "status=ok" >> "$GITHUB_OUTPUT" \
+          || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git merge --abort 2>/dev/null; exit 1; }
+
+      - name: branch/push
+        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        run: git push origin "${{ steps.branch.outputs.name }}"
+
+      - name: changelog
+        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        id: log
+        run: |
+          LOG=$(git log \
+            --pretty=format:"- %h %s (%an, %ad)" \
+            --date=short \
+            "${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }}" \
+            | head -60)
+          {
+            echo "content<<EOF"
+            echo "${LOG}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: pull-request
+        if: steps.anchor.outputs.new != '0' && steps.pull.outputs.status == 'ok'
+        run: |
+          gh pr create \
+            --title "chore: sync ${{ env.UPSTREAM_REPO }} — commits after ${{ inputs.since_date }}" \
+            --body "## 🔄 Upstream sync from \`${{ env.UPSTREAM_REPO }}\`
+
+          | | |
+          |---|---|
+          | **Since date** | \`${{ inputs.since_date }}\` |
+          | **Upstream HEAD** | \`${{ steps.pull.outputs.upstream_sha }}\` |
+          | **Subtree path** | \`./\` |
+
+          ### 📋 Commits included
+
+          ${{ steps.log.outputs.content }}
+
+          > _Triggered manually via \`workflow_dispatch\`._" \
+            --base main \
+            --head "${{ steps.branch.outputs.name }}" \
+            --label "upstream-sync"
