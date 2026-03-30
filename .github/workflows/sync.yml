@@ -148,4 +148,4 @@ jobs:
           > _Triggered manually via \`workflow_dispatch\`._" \
             --base main \
             --head "${{ steps.branch.outputs.name }}" \
-            --label "sync:hugo-paper"
+            --label "sync"
