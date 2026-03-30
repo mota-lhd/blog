@@ -1,5 +1,9 @@
 name: Sync from nanxiaobei/hugo-paper
 
+# This workflow syncs non-merge commits from the upstream hugo-paper repository
+# on/after a specified date, squashing them into a single commit for review.
+# Optimized to use direct date-based filtering and efficient cherry-picking.
+
 on:
   workflow_dispatch:
     inputs:
@@ -34,30 +38,40 @@ jobs:
       - name: git/fetch-upstream
         run: |
           git remote add upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git remote set-url upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
           git fetch upstream ${{ env.UPSTREAM_BRANCH }} --no-tags
 
       - name: git/get-anchor
         id: anchor
         run: |
-          ANCHOR=$(git log upstream/${{ env.UPSTREAM_BRANCH }} \
-            --before="${{ inputs.since_date }} 23:59:59" \
-            --format="%H" | head -1)
+          # Find the first non-merge commit on/after the since_date
+          FIRST_COMMIT=$(git log upstream/${{ env.UPSTREAM_BRANCH }} \
+            --since="${{ inputs.since_date }} 00:00:00" \
+            --no-merges \
+            --format="%H" | tail -1)
 
-          if [ -z "${ANCHOR}" ]; then
-            echo "::error::No commit found on or before ${{ inputs.since_date }} in ${{ env.UPSTREAM_REPO }}."
-            exit 1
+          # No commits since the date
+          if [ -z "${FIRST_COMMIT}" ]; then
+            echo "sha=" >> "$GITHUB_OUTPUT"
+            echo "new=0" >> "$GITHUB_OUTPUT"
+            echo "▶ No commits found on/after ${{ inputs.since_date }}"
+            exit 0
           fi
 
-          NEW=$(git rev-list "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
-          echo "sha=${ANCHOR}"   >> "$GITHUB_OUTPUT"
-          echo "new=${NEW}"      >> "$GITHUB_OUTPUT"
-          echo "▶ Anchor : ${ANCHOR}"
-          echo "▶ New commits after ${{ inputs.since_date }}: ${NEW}"
+          # Use the parent of the first commit as anchor (or initial commit if no parent)
+          ANCHOR=$(git rev-parse "${FIRST_COMMIT}^" 2>/dev/null || git rev-list --max-parents=0 upstream/${{ env.UPSTREAM_BRANCH }})
+
+          NEW=$(git rev-list --no-merges "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
+          echo "sha=${ANCHOR}" >> "$GITHUB_OUTPUT"
+          echo "new=${NEW}" >> "$GITHUB_OUTPUT"
+          echo "▶ Anchor: ${ANCHOR}"
+          echo "▶ First commit on/after date: ${FIRST_COMMIT}"
+          echo "▶ New non-merge commits on/after ${{ inputs.since_date }}: ${NEW}"
 
       - name: exit
         if: steps.anchor.outputs.new == '0'
         run: |
-          echo "✅ no new commits after ${{ inputs.since_date }}. nothing to do."
+          echo "✅ no new non-merge commits on/after ${{ inputs.since_date }}. nothing to do."
 
       - name: branch/new
         if: steps.anchor.outputs.new != '0'
@@ -75,10 +89,21 @@ jobs:
           UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
           echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
 
-          git cherry-pick --no-commit -m 1 ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} \
-          git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits after ${{ inputs.since_date }}"
-          echo "status=ok" >> "$GITHUB_OUTPUT" \
-          || { echo "status=conflict" >> "$GITHUB_OUTPUT"; git cherry-pick --abort 2>/dev/null || true; exit 1; }
+          # Get non-merge commits after anchor and cherry-pick them
+          if ! git log --oneline --no-merges --reverse ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} | cut -d' ' -f1 | while read -r commit; do
+              if ! git cherry-pick --no-commit "$commit"; then
+                echo "Failed to cherry-pick $commit" >&2
+                exit 1
+              fi
+            done; then
+            echo "status=conflict" >> "$GITHUB_OUTPUT"
+            git cherry-pick --abort 2>/dev/null || true
+            exit 1
+          fi
+
+          # Commit the squashed changes
+          git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits on/after ${{ inputs.since_date }}"
+          echo "status=ok" >> "$GITHUB_OUTPUT"
 
       - name: branch/push
         if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
@@ -88,10 +113,13 @@ jobs:
         if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         id: log
         run: |
+          # Only include commits that were actually cherry-picked (non-merge, on/after date)
           LOG=$(git log \
             --pretty=format:"- %h %s (%an, %ad)" \
             --date=short \
-            "${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }}" \
+            --no-merges \
+            --since="${{ inputs.since_date }} 00:00:00" \
+            upstream/${{ env.UPSTREAM_BRANCH }} \
             | head -60)
           {
             echo "content<<EOF"
@@ -103,16 +131,16 @@ jobs:
         if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         run: |
           gh pr create \
-            --title "chore: sync ${{ env.UPSTREAM_REPO }} — commits after ${{ inputs.since_date }}" \
+            --title "chore: sync ${{ env.UPSTREAM_REPO }} — non-merge commits on/after ${{ inputs.since_date }}" \
             --body "## 🔄 Upstream sync from \`${{ env.UPSTREAM_REPO }}\`
 
           | | |
           |---|---|
-          | **Since date** | \`${{ inputs.since_date }}\` |
+          | **Since date** | \`${{ inputs.since_date }}\` (inclusive) |
           | **Upstream HEAD** | \`${{ steps.squash.outputs.upstream_sha }}\` |
-          | **Merge type** | \`Squash\` |
+          | **Merge type** | \`Squash (non-merge commits only)\` |
 
-          ### 📋 Commits included
+          ### 📋 Non-merge commits included
 
           ${{ steps.log.outputs.content }}
 
