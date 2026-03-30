@@ -95,7 +95,7 @@ jobs:
 
           # Switch back to sync branch and merge with upstream preference
           git checkout -
-          git merge temp-upstream --squash --strategy=recursive -X theirs
+          git merge temp-upstream --squash --strategy=recursive -X theirs --allow-unrelated-histories
 
           # Commit the squashed changes
           git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits on/after ${{ inputs.since_date }}"
