@@ -2,7 +2,7 @@ name: Sync from nanxiaobei/hugo-paper
 
 # This workflow syncs non-merge commits from the upstream hugo-paper repository
 # on/after a specified date, squashing them into a single commit for review.
-# Automatically resolves merge conflicts by preferring upstream changes.
+# Automatically resolves all merge conflicts by preferring upstream changes.
 
 on:
   workflow_dispatch:
@@ -89,21 +89,27 @@ jobs:
           UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
           echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
 
+          # Tag the current branch state for later squash
+          git tag temp-branch-start
+
           # Get non-merge commits after anchor and cherry-pick them with upstream preference
-          # Uses -X theirs to automatically resolve conflicts in favor of upstream changes with upstream preference
-          if ! git log --oneline --no-merges --reverse ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} | cut -d' ' -f1 | while read -r commit; do
-              if ! git cherry-pick --no-commit --strategy=recursive -X theirs "$commit"; then
-                echo "Failed to cherry-pick $commit" >&2
+          # Automatically resolves conflicts by preferring upstream changes
+          git log --oneline --no-merges --reverse ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} | cut -d' ' -f1 | while read -r commit; do
+            if ! git cherry-pick --strategy=recursive -X theirs "$commit"; then
+              # Resolve conflicts by accepting upstream versions
+              git add -A
+              if ! git cherry-pick --continue; then
+                echo "Failed to continue cherry-pick for $commit" >&2
+                git cherry-pick --abort 2>/dev/null || true
                 exit 1
               fi
-            done; then
-            echo "status=conflict" >> "$GITHUB_OUTPUT"
-            git cherry-pick --abort 2>/dev/null || true
-            exit 1
-          fi
+            fi
+          done
 
-          # Commit the squashed changes
+          # Squash all cherry-picked commits into one
+          git reset --soft temp-branch-start
           git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits on/after ${{ inputs.since_date }}"
+          git tag -d temp-branch-start
           echo "status=ok" >> "$GITHUB_OUTPUT"
 
       - name: branch/push
