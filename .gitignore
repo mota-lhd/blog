@@ -1,12 +1,3 @@
-node_modules/
-alembic
-comments.db
-.env
-.idea
-.DS_Store
-*.pyc
-.venv/
-__pycache__
-.ruff_cache
-.hugo_build*
-public
+/node_modules
+/public
+.hugo_build.lock
