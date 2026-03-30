@@ -2,7 +2,7 @@ name: Sync from nanxiaobei/hugo-paper
 
 # This workflow syncs non-merge commits from the upstream hugo-paper repository
 # on/after a specified date, squashing them into a single commit for review.
-# Optimized to use direct date-based filtering and efficient cherry-picking.
+# Automatically resolves merge conflicts by preferring upstream changes.
 
 on:
   workflow_dispatch:
@@ -89,9 +89,10 @@ jobs:
           UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
           echo "upstream_sha=${UPSTREAM_SHA}" >> "$GITHUB_OUTPUT"
 
-          # Get non-merge commits after anchor and cherry-pick them
+          # Get non-merge commits after anchor and cherry-pick them with upstream preference
+          # Uses -X theirs to automatically resolve conflicts in favor of upstream changes with upstream preference
           if ! git log --oneline --no-merges --reverse ${{ steps.anchor.outputs.sha }}..upstream/${{ env.UPSTREAM_BRANCH }} | cut -d' ' -f1 | while read -r commit; do
-              if ! git cherry-pick --no-commit "$commit"; then
+              if ! git cherry-pick --no-commit --strategy=recursive -X theirs "$commit"; then
                 echo "Failed to cherry-pick $commit" >&2
                 exit 1
               fi
@@ -138,7 +139,7 @@ jobs:
           |---|---|
           | **Since date** | \`${{ inputs.since_date }}\` (inclusive) |
           | **Upstream HEAD** | \`${{ steps.squash.outputs.upstream_sha }}\` |
-          | **Merge type** | \`Squash (non-merge commits only)\` |
+          | **Merge type** | \`Squash (non-merge commits only, upstream preferred)\` |
 
           ### 📋 Non-merge commits included
 
