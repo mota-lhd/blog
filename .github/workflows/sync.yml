@@ -38,8 +38,10 @@ jobs:
 
       - name: git/fetch-upstream
         run: |
-          git remote add upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
-          git remote set-url upstream "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git remote add upstream \
+            "https://github.com/${{ env.UPSTREAM_REPO }}.git"
+          git remote set-url upstream \
+            "https://github.com/${{ env.UPSTREAM_REPO }}.git"
           git fetch upstream ${{ env.UPSTREAM_BRANCH }} --no-tags
 
       - name: git/get-anchor
@@ -59,20 +61,24 @@ jobs:
             exit 0
           fi
 
-          # Use the parent of the first commit as anchor (or initial commit if no parent)
-          ANCHOR=$(git rev-parse "${FIRST_COMMIT}^" 2>/dev/null || git rev-list --max-parents=0 upstream/${{ env.UPSTREAM_BRANCH }})
+          # Use the parent of the first commit as anchor
+          # (or initial commit if no parent)
+          ANCHOR=$(git rev-parse "${FIRST_COMMIT}^" 2>/dev/null || \
+            git rev-list --max-parents=0 upstream/${{ env.UPSTREAM_BRANCH }})
 
-          NEW=$(git rev-list --no-merges "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
+          NEW=$(git rev-list --no-merges \
+            "${ANCHOR}..upstream/${{ env.UPSTREAM_BRANCH }}" --count)
           echo "sha=${ANCHOR}" >> "$GITHUB_OUTPUT"
           echo "new=${NEW}" >> "$GITHUB_OUTPUT"
           echo "▶ Anchor: ${ANCHOR}"
           echo "▶ First commit on/after date: ${FIRST_COMMIT}"
-          echo "▶ New non-merge commits on/after ${{ inputs.since_date }}: ${NEW}"
+          echo "▶ New non-merge commits on/after ${{ inputs.since_date }}: \
+            ${NEW}"
 
       - name: exit
         if: steps.anchor.outputs.new == '0'
         run: |
-          echo "✅ no new non-merge commits on/after ${{ inputs.since_date }}. nothing to do."
+          echo "✅ no new commits since ${{ inputs.since_date }}. skipping."
 
       - name: branch/new
         if: steps.anchor.outputs.new != '0'
@@ -96,10 +102,13 @@ jobs:
 
           # Switch back to sync branch and merge with upstream preference
           git checkout -
-          git merge temp-upstream --squash --strategy=recursive -X theirs --allow-unrelated-histories
+          git merge temp-upstream --squash --strategy=recursive \
+            -X theirs --allow-unrelated-histories
 
           # Commit the squashed changes
-          git commit -m "chore: sync ${{ env.UPSTREAM_REPO }} commits on/after ${{ inputs.since_date }}"
+          git commit -m \
+            "chore: sync ${{ env.UPSTREAM_REPO }} commits on/after \
+            ${{ inputs.since_date }}"
 
           # Clean up temp branch
           git branch -D temp-upstream
@@ -113,7 +122,8 @@ jobs:
         if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         id: log
         run: |
-          # Only include commits that were actually cherry-picked (non-merge, on/after date)
+          # Only include commits that were actually cherry-picked
+          # (non-merge, on/after date)
           LOG=$(git log \
             --pretty=format:"- %h %s (%an, %ad)" \
             --date=short \
@@ -130,11 +140,12 @@ jobs:
       - name: pull-request
         if: steps.anchor.outputs.new != '0' && steps.squash.outputs.status == 'ok'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          gh pr create \
-            --title "chore: sync ${{ env.UPSTREAM_REPO }} — non-merge commits on/after ${{ inputs.since_date }}" \
-            --body "## 🔄 Upstream sync from \`${{ env.UPSTREAM_REPO }}\`
+          # Create pull request using GitHub REST API
+          TITLE="chore: sync ${{ env.UPSTREAM_REPO }} — non-merge commits \
+            on/after ${{ inputs.since_date }}"
+          BODY="## 🔄 Upstream sync from \`${{ env.UPSTREAM_REPO }}\`
 
           | | |
           |---|---|
@@ -146,6 +157,29 @@ jobs:
 
           ${{ steps.log.outputs.content }}
 
-          > _Triggered manually via \`workflow_dispatch\`._" \
-            --base main \
-            --head "${{ steps.branch.outputs.name }}"
+          > _Triggered manually via \`workflow_dispatch\`._"
+
+          PR_RESPONSE=$(curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls \
+            -d @- << EOF
+          {
+            "title": "$TITLE",
+            "body": "$BODY",
+            "head": "${{ steps.branch.outputs.name }}",
+            "base": "main"
+          }
+          EOF
+          )
+
+          # Check if PR was created successfully
+          if echo "$PR_RESPONSE" | jq -e '.number' > /dev/null; then
+            PR_NUMBER=$(echo "$PR_RESPONSE" | jq -r '.number')
+            PR_URL=$(echo "$PR_RESPONSE" | jq -r '.html_url')
+            echo "✅ Pull request created: $PR_URL"
+          else
+            echo "❌ Failed to create pull request"
+            echo "Response: $PR_RESPONSE"
+            exit 1
+          fi
