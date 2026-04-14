@@ -12,13 +12,13 @@ dependencies = [
     "nh3>=0.3.2",
     "pydantic-settings>=2.11.0",
     "sqlmodel>=0.0.27",
-    "uvicorn[standard]>=0.38.0",
+    "uvicorn[standard]>=0.44.0",
 ]
 
 [dependency-groups]
 dev = [
     "alembic>=1.17.1",
-    "ruff>=0.14.4",
+    "ruff>=0.15.10",
 ]
 
 [tool.ruff]
