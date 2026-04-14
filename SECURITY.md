@@ -16,13 +16,13 @@ If you discover a security vulnerability in this blog (e.g., in the source code,
 
 ### How to Report
 
-1. Send an email to the repository owner at **[elmouatassim.louhaidia@pm.me]**.
+1. Use the form available in [here](https://github.com/mota-lhd/blog/security/advisories/new).
 2. Include a clear description of the vulnerability, steps to reproduce it and the potential impact.
 3. If possible, suggest a fix or mitigation.
 
 ### What to Expect
 
-- You will receive an acknowledgment of your report within **48 hours**.
+- You will receive an acknowledgment of your report **immediately**.
 - The owner will investigate and provide a timeline for a fix, usually within **7–14 days**.
 - Once the issue is resolved, a public thank-you and credit may be given (unless you prefer to remain anonymous).
 
