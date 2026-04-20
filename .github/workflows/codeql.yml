@@ -28,7 +28,7 @@ jobs:
     - name: docker/setup
       uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@de2bfaecd21d58ef232e0d2a3391c33c32c460d7
+      uses: bridgecrewio/checkov-action@5ef773c6dcc9416c0e1973045ca575493c4ce41a
       with:
         output_format: cli,sarif
         output_file_path: console,results-${{ matrix.docker_image }}.sarif
