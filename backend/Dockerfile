@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.4
 
-FROM python:3.14 AS requirements
+FROM python:3.15-rc-alpine AS requirements
+
+RUN apk add --no-cache libgcc gcc build-base
 
 WORKDIR /tmp
 RUN pip install uv
@@ -10,7 +12,7 @@ COPY uv.lock pyproject.toml /tmp/
 RUN uv sync --frozen
 RUN uv pip freeze > requirements.txt
 
-FROM python:3.14-alpine AS prod
+FROM python:3.15-rc-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
@@ -22,6 +24,7 @@ RUN addgroup -g ${GID} ${GROUP} && \
 
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
+COPY --from=requirements /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
 COPY --chown=${USER}:${GROUP} ./src/ /web/
 COPY --chown=${USER}:${GROUP} ./alembic.ini /web/
 COPY --chown=${USER}:${GROUP} ./alembic /web/alembic/
