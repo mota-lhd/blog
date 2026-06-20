@@ -2,7 +2,8 @@
 
 FROM python:3.15-rc AS requirements
 
-RUN apk add --no-cache libgcc
+RUN apt-get update && \
+    apt-get install -y --no-cache libgcc
 
 WORKDIR /tmp
 
