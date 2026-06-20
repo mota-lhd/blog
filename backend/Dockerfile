@@ -2,6 +2,8 @@
 
 FROM python:3.15-rc AS requirements
 
+RUN apk add --no-cache libgcc
+
 WORKDIR /tmp
 RUN pip install uv
 COPY uv.lock pyproject.toml /tmp/
@@ -22,6 +24,7 @@ RUN addgroup -g ${GID} ${GROUP} && \
 
 WORKDIR /web
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
+COPY --from=requirements /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
 COPY --chown=${USER}:${GROUP} ./src/ /web/
 COPY --chown=${USER}:${GROUP} ./alembic.ini /web/
 COPY --chown=${USER}:${GROUP} ./alembic /web/alembic/
