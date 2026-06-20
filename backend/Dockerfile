@@ -5,6 +5,7 @@ FROM python:3.15-rc AS requirements
 RUN apk add --no-cache libgcc
 
 WORKDIR /tmp
+
 RUN pip install uv
 COPY uv.lock pyproject.toml /tmp/
 
@@ -23,6 +24,7 @@ RUN addgroup -g ${GID} ${GROUP} && \
   adduser --disabled-password --ingroup ${GROUP} -u ${UID} ${USER}
 
 WORKDIR /web
+
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
 COPY --from=requirements /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
 COPY --chown=${USER}:${GROUP} ./src/ /web/
