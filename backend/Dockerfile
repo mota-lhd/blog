@@ -2,7 +2,7 @@
 
 FROM python:3.15-rc-alpine AS requirements
 
-RUN apk add --no-cache libgcc
+RUN apk add --no-cache libgcc gcc
 
 WORKDIR /tmp
 RUN pip install uv
