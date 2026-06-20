@@ -1,12 +1,10 @@
 # syntax=docker/dockerfile:1.4
 
-FROM python:3.15-rc AS requirements
+FROM python:3.15-rc-alpine AS requirements
 
-RUN apt-get update && \
-    apt-get install -y --no-cache libgcc
+RUN apk add --no-cache libgcc
 
 WORKDIR /tmp
-
 RUN pip install uv
 COPY uv.lock pyproject.toml /tmp/
 
@@ -25,10 +23,8 @@ RUN addgroup -g ${GID} ${GROUP} && \
   adduser --disabled-password --ingroup ${GROUP} -u ${UID} ${USER}
 
 WORKDIR /web
-
 COPY --from=requirements /tmp/requirements.txt /web/requirements.txt
 COPY --from=requirements /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-
 COPY --chown=${USER}:${GROUP} ./src/ /web/
 COPY --chown=${USER}:${GROUP} ./alembic.ini /web/
 COPY --chown=${USER}:${GROUP} ./alembic /web/alembic/
