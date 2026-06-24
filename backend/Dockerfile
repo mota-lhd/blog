@@ -10,7 +10,7 @@ COPY uv.lock pyproject.toml /tmp/
 RUN uv sync --frozen
 RUN uv pip freeze > requirements.txt
 
-FROM python:3.14-alpine AS prod
+FROM python:3.14.5-alpine AS prod
 
 ARG USER=back
 ARG GROUP=web
