@@ -92,10 +92,13 @@ jobs:
     - name: image/scan
       id: backend_scan
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
-      env:
-        GRYPE_CONFIG: .github/grype.yaml
       with:
         image: 'local/web:back'
+        fail-build: true
+        output-format: table
+        severity-cutoff: high
+        only-fixed: true
+        config: .github/grype.yaml
 
   frontend:
     needs: changes
@@ -145,10 +148,13 @@ jobs:
     - name: image/scan
       id: frontend_scan
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
-      env:
-        GRYPE_CONFIG: .github/grype.yaml
       with:
         image: 'local/web:front'
+        fail-build: true
+        output-format: table
+        severity-cutoff: high
+        only-fixed: true
+        config: .github/grype.yaml
 
   actions:
     needs: changes
