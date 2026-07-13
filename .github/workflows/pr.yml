@@ -94,7 +94,6 @@ jobs:
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
       with:
         image: 'local/web:back'
-        config: ./.grype.yaml
 
   frontend:
     needs: changes
@@ -146,10 +145,6 @@ jobs:
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
       with:
         image: 'local/web:front'
-        fail-build: true
-        output-format: table
-        severity-cutoff: medium
-        only-fixed: true
 
   actions:
     needs: changes
