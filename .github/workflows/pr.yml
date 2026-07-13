@@ -92,6 +92,8 @@ jobs:
     - name: image/scan
       id: backend_scan
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
+      env:
+        GRYPE_CONFIG: .github/grype.yaml
       with:
         image: 'local/web:back'
 
@@ -143,6 +145,8 @@ jobs:
     - name: image/scan
       id: frontend_scan
       uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
+      env:
+        GRYPE_CONFIG: .github/grype.yaml
       with:
         image: 'local/web:front'
 
