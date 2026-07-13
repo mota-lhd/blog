@@ -6,7 +6,7 @@ output:
 pretty: true
 only-fixed: true
 only-notfixed: false
-ignore: []
+ignore:
   - vulnerability: CVE-2026-15308
     fix-state: fixed
     reason: "To fix this, we need to upgrade the base image to 3.15, which is not possible at this time."
