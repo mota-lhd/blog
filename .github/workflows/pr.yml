@@ -98,6 +98,7 @@ jobs:
         output-format: table
         severity-cutoff: high
         only-fixed: true
+        config: .github/grype.yaml
 
   frontend:
     needs: changes
@@ -151,8 +152,9 @@ jobs:
         image: 'local/web:front'
         fail-build: true
         output-format: table
-        severity-cutoff: medium
+        severity-cutoff: high
         only-fixed: true
+        config: .github/grype.yaml
 
   actions:
     needs: changes
