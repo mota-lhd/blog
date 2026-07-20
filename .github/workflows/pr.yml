@@ -66,7 +66,7 @@ jobs:
         framework: "dockerfile"
         quiet: true
     - name: codeql/init
-      uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9
+      uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a
       if: ${{ needs.changes.outputs.backend_python == 'true' }}
       with:
         languages: python
@@ -122,7 +122,7 @@ jobs:
         framework: "dockerfile"
         quiet: true
     - name: codeql/init
-      uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9
+      uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a
       if: ${{ needs.changes.outputs.frontend_js == 'true' }}
       with:
         tools: linked
@@ -169,7 +169,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: codeql/init
-      uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9
+      uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a
       with:
         tools: linked
         languages: actions
