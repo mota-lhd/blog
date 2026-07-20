@@ -20,7 +20,14 @@ updates:
   - package-ecosystem: "github-actions"
     directories:
       - "/.github/"
-      - "/.github/codeql/"
-      - "/.github/workflows/"
     schedule:
       interval: "daily"
+    groups:
+      codeql:
+        patterns:
+          - "github/codeql-action"
+      misc:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "github/codeql-action"
