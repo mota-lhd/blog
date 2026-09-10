@@ -49,22 +49,21 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         outputs: type=docker
-    - name: image/scan
-      id: "scan"
-      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
+    - name: image/sbom
+      id: "sbom"
+      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
       with:
         image: 'blog:${{ matrix.docker_image }}'
-        fail-build: false
-        output-format: sarif
-        only-fixed: true
-        add-cpes-if-none: true
-        by-cve: true
-        cache-db: true
-        severity-cutoff: low
-    - name: scan/upload
-      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
+        output-file: /tmp/blog-${{ matrix.docker_image }}.sbom.json
+        format: cyclonedx-json
+    - name: sbom/upload
+      uses: DependencyTrack/gh-upload-sbom@95c2b5a810450509ef8a67e4f854b42d2ddf7fbf
       with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
+        projectname: "elmouatassim-blog-${{ matrix.docker_image }}"
+        projectversion: "latest"
+        bomfilename: /tmp/blog-${{ matrix.docker_image }}.sbom.json
+        apikey: ${{ secrets.DTRACK_API_KEY }}
+        serverhostname: dtrack.louhaidia.info
 
   analyze:
     name: codeql/scan/${{ matrix.language }}
