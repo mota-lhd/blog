@@ -58,17 +58,22 @@ jobs:
         format: cyclonedx-json
         upload-artifact: false
     - name: sbom/upload
+      shell: bash
+      env:
+        DTRACK_URL: https://dtrack.louhaidia.info
+        DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+        SBOM_FILE: /tmp/blog-${{ matrix.docker_image }}.sbom.json
       run: |
-        BOM_BASE64=$(base64 -w 0 /tmp/blog-${{ matrix.docker_image }}.sbom.json)
-        curl -X PUT "https://dtrack.louhaidia.info/api/v1/bom" \
-             -H "X-Api-Key: ${{ secrets.DTRACK_API_KEY }}" \
+        payload="$(mktemp)"
+        trap 'rm -f "$payload"' EXIT
+        base64 -w 0 "$SBOM_FILE" \
+          | jq -Rs --arg pn "elmouatassim-blog-${{ matrix.docker_image }}" --arg pv "latest" \
+              '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
+          > "$payload"
+        curl -sS -f -X PUT "${DTRACK_URL}/api/v1/bom" \
+             -H "X-Api-Key: ${DTRACK_API_KEY}" \
              -H "Content-Type: application/json" \
-             -d "{
-               \"projectName\": \"elmouatassim-blog-${{ matrix.docker_image }}\",
-               \"projectVersion\": \"latest\",
-               \"autoCreate\": false,
-               \"bom\": \"${BOM_BASE64}\"
-             }"
+             --data-binary "@${payload}"
 
   analyze:
     name: codeql/scan/${{ matrix.language }}
