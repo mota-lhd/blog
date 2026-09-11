@@ -32,7 +32,7 @@ jobs:
       with:
         image: ${{ matrix.image }}
         output-file: /tmp/sbom.json
-        format: cyclonedx-json
+        format: spdx-json
         upload-artifact: false
     - name: sbom/upload
       shell: bash
@@ -97,7 +97,7 @@ jobs:
       with:
         image: 'blog:${{ matrix.docker_image }}'
         output-file: /tmp/blog-${{ matrix.docker_image }}.sbom.json
-        format: cyclonedx-json
+        format: spdx-json
         upload-artifact: false
     - name: image/sbom/upload
       shell: bash
