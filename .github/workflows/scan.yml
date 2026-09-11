@@ -10,11 +10,53 @@ permissions:
   contents: read
 
 jobs:
-  docker:
-    name: docker/scan/${{ matrix.docker_image }}
+  tools:
+    name: tools/scan/${{ matrix.project }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { image: ghcr.io/umami-software/umami:latest, project: umami }
+          - { image: outlinewiki/outline:latest, project: outline }
+          - { image: databasus/databasus:latest, project: databasus }
+          - { image: ghcr.io/immich-app/immich-server:release, project: immich }
+          - { image: coollabsio/coolify:latest, project: coolify }
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+    steps:
+    - name: image/sbom
+      id: "sbom"
+      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
+      with:
+        image: ${{ matrix.image }}
+        output-file: /tmp/sbom.json
+        format: cyclonedx-json
+        upload-artifact: false
+    - name: sbom/upload
+      shell: bash
+      env:
+        DTRACK_URL: https://dtrack.louhaidia.info
+        DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+        SBOM_FILE: /tmp/sbom.json
+      run: |
+        payload="$(mktemp)"
+        trap 'rm -f "$payload"' EXIT
+        base64 -w 0 "$SBOM_FILE" \
+          | jq -Rs --arg pn "${{ matrix.project }}" --arg pv "latest" \
+              '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
+          > "$payload"
+        curl -sS -f -X PUT "${DTRACK_URL}/api/v1/bom" \
+             -H "X-Api-Key: ${DTRACK_API_KEY}" \
+             -H "Content-Type: application/json" \
+             --data-binary "@${payload}"
+
+  docker:
+    name: docker/scan/${{ matrix.docker_image }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
