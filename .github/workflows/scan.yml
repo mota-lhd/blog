@@ -26,26 +26,19 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
-    - name: cdxgen/download
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh release download v13.1.0 \
-          --repo cdxgen/cdxgen \
-          --pattern 'cdxgen-linux-amd64' \
-          --pattern 'cdxgen-linux-amd64.sha256'
-        sha256sum -c cdxgen-linux-amd64.sha256
-        chmod +x cdxgen-linux-amd64
-        ./cdxgen-linux-amd64 --version
-
     - name: sbom
       run: |
-        ./cdxgen-linux-amd64 \
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${{ github.workspace }}:/app \
+          ghcr.io/cyclonedx/cdxgen:latest \
           -t docker \
-          -o /tmp/sbom.json \
+          --deep \
           --exclude "/usr/bin/**" --exclude "/usr/sbin/**" \
           --exclude "/bin/**" --exclude "/sbin/**" \
+          --exclude "/lib/**" --exclude "/etc/**" \
           --required-only \
+          --filter "pkg:generic" \
           --server-url "https://dtrack.louhaidia.info" \
           --api-key "${{ secrets.DTRACK_API_KEY }}" \
           --project-id "${{ matrix.project }}" \
