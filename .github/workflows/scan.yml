@@ -32,6 +32,7 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v ${{ github.workspace }}:/app \
           ghcr.io/cyclonedx/cdxgen:latest \
+          -o /app/sbom.json \
           -t docker \
           --deep \
           --exclude "/usr/bin/**" --exclude "/usr/sbin/**" \
