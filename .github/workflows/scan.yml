@@ -26,13 +26,15 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
+    - name: checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
     - name: image/sbom
       id: "sbom"
       uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
       with:
         image: ${{ matrix.image }}
+        config: .github/syft.yaml
         output-file: /tmp/sbom.json
-        format: cyclonedx-json
         upload-artifact: false
     - name: sbom/upload
       shell: bash
@@ -96,8 +98,8 @@ jobs:
       uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
       with:
         image: 'blog:${{ matrix.docker_image }}'
+        config: .github/syft.yaml
         output-file: /tmp/blog-${{ matrix.docker_image }}.sbom.json
-        format: cyclonedx-json
         upload-artifact: false
     - name: image/sbom/upload
       shell: bash
