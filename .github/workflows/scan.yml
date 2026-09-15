@@ -36,7 +36,7 @@ jobs:
           -o /app/sbom.json \
           -t docker \
           --deep \
-          -r /app
+          -r /app \
           --exclude "/usr/bin/**" --exclude "/usr/sbin/**" \
           --exclude "/bin/**" --exclude "/sbin/**" \
           --exclude "/lib/**" --exclude "/etc/**" \
