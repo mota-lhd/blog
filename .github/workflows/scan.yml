@@ -31,18 +31,39 @@ jobs:
       with:
         image: ${{ matrix.image }}
         output-file: /tmp/sbom.json
-        format: cyclonedx-json@1.4
+        format: cyclonedx-json@1.7
         upload-artifact: false
     - name: sbom/upload
       shell: bash
       env:
         DTRACK_URL: https://dtrack.louhaidia.info
         DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-        SBOM_FILE: /tmp/sbom.json
+        SBOM_FILE: 
       run: |
         payload="$(mktemp)"
         trap 'rm -f "$payload"' EXIT
-        base64 -w 0 "$SBOM_FILE" \
+
+        jq \
+          --arg name "${{ matrix.project }}" \
+          --arg version "latest" \
+            '($name + "@" + $version) as $rootRef |
+
+            # Use bracket notation for "bom-ref"
+            ([.components[]["bom-ref"]] - [.dependencies[]?.dependsOn[]?]) as $topLevelRefs |
+
+            .metadata.component = {
+              "type": "container",
+              "name": $name,
+              "version": $version,
+              "bom-ref": $rootRef
+            } |
+
+            .components += [.metadata.component] |
+
+            .dependencies = [{ "ref": $rootRef, "dependsOn": $topLevelRefs }] + (.dependencies // [])' \
+          /tmp/sbom.json > /tmp/sbom-with-root.json
+
+        base64 -w 0 /tmp/sbom-with-root.json \
           | jq -Rs --arg pn "${{ matrix.project }}" --arg pv "latest" \
               '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
           > "$payload"
@@ -96,7 +117,7 @@ jobs:
       with:
         image: 'blog:${{ matrix.docker_image }}'
         output-file: /tmp/sbom.json
-        format: cyclonedx-json@1.4
+        format: cyclonedx-json@1.7
         upload-artifact: false
     - name: image/sbom/upload
       shell: bash
