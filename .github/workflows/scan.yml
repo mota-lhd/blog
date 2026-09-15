@@ -26,29 +26,6 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
-<<<<<<< Updated upstream
-    - name: sbom
-      run: |
-        docker run --rm \
-          -e CDXGEN_DEBUG_MODE=debug \
-          -v /tmp:/tmp -t ghcr.io/cdxgen/cdxgen-bun:master \
-          -v ${{ github.workspace }}:/app:rw \
-          -t ghcr.io/cyclonedx/cdxgen:latest \
-          -o /app/sbom.json \
-          -t docker \
-          --deep \
-          -r /app \
-          --exclude "/usr/bin/**" --exclude "/usr/sbin/**" \
-          --exclude "/bin/**" --exclude "/sbin/**" \
-          --exclude "/lib/**" --exclude "/etc/**" \
-          --required-only \
-          --filter "pkg:generic" \
-          --server-url "https://dtrack.louhaidia.info" \
-          --api-key "${{ secrets.DTRACK_API_KEY }}" \
-          --project-id "${{ matrix.project }}" \
-          --project-version "latest" \
-          ${{ matrix.image }}
-=======
     - name: image/sbom
       id: "sbom"
       uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
@@ -74,7 +51,6 @@ jobs:
              -H "X-Api-Key: ${DTRACK_API_KEY}" \
              -H "Content-Type: application/json" \
              --data-binary "@${payload}"
->>>>>>> Stashed changes
 
   docker:
     name: docker/scan/${{ matrix.docker_image }}
