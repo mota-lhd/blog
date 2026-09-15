@@ -17,17 +17,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { image: ghcr.io/umami-software/umami:latest, project: 4c8465d0-f77a-4622-81e8-57d21fccd5af }
-          - { image: outlinewiki/outline:latest, project: 9ede34a9-9c7b-45c0-938b-77589016d8ef }
-          - { image: databasus/databasus:latest, project: 0c5094d1-0135-4090-8f2b-b08fe14906d9 }
-          - { image: ghcr.io/immich-app/immich-server:release, project: bf723b5e-4ec8-4a0a-9961-4faacabd2797 }
-          - { image: coollabsio/coolify:latest, project: baf00f56-6832-4f08-b192-7f418ae74d5e }
+          - { image: ghcr.io/umami-software/umami:latest, project: umami }
+          - { image: outlinewiki/outline:latest, project: outline }
+          - { image: databasus/databasus:latest, project: databasus }
+          - { image: ghcr.io/immich-app/immich-server:release, project: immich }
+          - { image: coollabsio/coolify:latest, project: coolify }
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
     - name: image/sbom
-      id: "sbom"
       uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
       with:
         image: ${{ matrix.image }}
