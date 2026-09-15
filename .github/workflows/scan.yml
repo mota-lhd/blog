@@ -29,12 +29,14 @@ jobs:
     - name: sbom
       run: |
         docker run --rm \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -v ${{ github.workspace }}:/app \
-          ghcr.io/cyclonedx/cdxgen:latest \
+          -e CDXGEN_DEBUG_MODE=debug \
+          -v /tmp:/tmp -t ghcr.io/cdxgen/cdxgen-bun:master \
+          -v ${{ github.workspace }}:/app:rw \
+          -t ghcr.io/cyclonedx/cdxgen:latest \
           -o /app/sbom.json \
           -t docker \
           --deep \
+          -r /app
           --exclude "/usr/bin/**" --exclude "/usr/sbin/**" \
           --exclude "/bin/**" --exclude "/sbin/**" \
           --exclude "/lib/**" --exclude "/etc/**" \
