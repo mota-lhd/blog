@@ -3,7 +3,7 @@ log:
   level: 'warn'
 
 output:
-  - "cyclonedx-json@1.6=/tmp/sbom.json"
+  - "cyclonedx-json@1.6"
 
 check-for-app-update: true
 

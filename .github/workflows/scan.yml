@@ -34,6 +34,7 @@ jobs:
       with:
         image: ${{ matrix.image }}
         config: .github/syft.yaml
+        output-file: /tmp/sbom.json
         upload-artifact: false
     - name: sbom/upload
       shell: bash
@@ -98,6 +99,7 @@ jobs:
       with:
         image: 'blog:${{ matrix.docker_image }}'
         config: .github/syft.yaml
+        output-file: /tmp/blog-${{ matrix.docker_image }}.sbom.json
         upload-artifact: false
     - name: image/sbom/upload
       shell: bash
