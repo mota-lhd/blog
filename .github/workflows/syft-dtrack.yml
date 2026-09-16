@@ -102,7 +102,7 @@ jobs:
               "bom-ref": $rootRef
             } |
             .components = (.components // []) + [.metadata.component] |
-            # Link the root to direct dependencies while preserving Syft's existing graph.
+            # Link the root to direct dependencies while preserving the existing Syft graph.
             .dependencies = [{ "ref": $rootRef, "dependsOn": $topLevelRefs }] + (.dependencies // [])' \
             "$SBOM_FILE" > "$SBOM_GRAPH_FILE"
           # Replace the original only after jq successfully writes the transformed SBOM.
