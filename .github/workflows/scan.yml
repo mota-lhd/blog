@@ -10,85 +10,29 @@ permissions:
   contents: read
 
 jobs:
-  tools:
-    name: tools/scan/${{ matrix.project }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { image: ghcr.io/umami-software/umami:latest, project: umami }
-          - { image: outlinewiki/outline:latest, project: outline }
-          - { image: databasus/databasus:latest, project: databasus }
-          - { image: ghcr.io/immich-app/immich-server:release, project: immich }
-          - { image: coollabsio/coolify:latest, project: coolify }
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
-    steps:
-    - name: image/sbom
-      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
-      with:
-        image: ${{ matrix.image }}
-        output-file: /tmp/sbom.json
-        format: cyclonedx-json@1.7
-        upload-artifact: false
-    - name: sbom/upload
-      shell: bash
-      env:
-        DTRACK_URL: https://dtrack.louhaidia.info
-        DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-        SBOM_FILE: 
-      run: |
-        payload="$(mktemp)"
-        trap 'rm -f "$payload"' EXIT
-
-        jq \
-          --arg name "${{ matrix.project }}" \
-          --arg version "latest" \
-            '($name + "@" + $version) as $rootRef |
-
-            # Use bracket notation for "bom-ref"
-            ([.components[]["bom-ref"]] - [.dependencies[]?.dependsOn[]?]) as $topLevelRefs |
-
-            .metadata.component = {
-              "type": "container",
-              "name": $name,
-              "version": $version,
-              "bom-ref": $rootRef
-            } |
-
-            .components += [.metadata.component] |
-
-            .dependencies = [{ "ref": $rootRef, "dependsOn": $topLevelRefs }] + (.dependencies // [])' \
-          /tmp/sbom.json > /tmp/sbom-with-root.json
-
-        base64 -w 0 /tmp/sbom-with-root.json \
-          | jq -Rs --arg pn "${{ matrix.project }}" --arg pv "latest" \
-              '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
-          > "$payload"
-        curl -sS -f -X PUT "${DTRACK_URL}/api/v1/bom" \
-             -H "X-Api-Key: ${DTRACK_API_KEY}" \
-             -H "Content-Type: application/json" \
-             --data-binary "@${payload}"
-
   docker:
-    name: docker/scan/${{ matrix.docker_image }}
+    name: docker/build/${{ matrix.docker_image }}
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      packages: write
       security-events: write
     strategy:
       fail-fast: false
       matrix:
         docker_image: [frontend, backend]
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
     - name: checkout
       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
     - name: docker/setup
       uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+    - name: docker/login
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: dockerfile/scan
       uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7
       with:
@@ -106,36 +50,29 @@ jobs:
       uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
       with:
         context: './${{ matrix.docker_image }}/'
-        push: false
-        tags: blog:${{ matrix.docker_image }}
+        push: true
+        tags: ghcr.io/${{ github.repository }}/blog-${{ matrix.docker_image }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        outputs: type=docker
-    - name: image/sbom
-      id: "sbom"
-      uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
-      with:
-        image: 'blog:${{ matrix.docker_image }}'
-        output-file: /tmp/sbom.json
-        format: cyclonedx-json@1.7
-        upload-artifact: false
-    - name: image/sbom/upload
-      shell: bash
-      env:
-        DTRACK_URL: https://dtrack.louhaidia.info
-        DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-        SBOM_FILE: /tmp/sbom.json
-      run: |
-        payload="$(mktemp)"
-        trap 'rm -f "$payload"' EXIT
-        base64 -w 0 "$SBOM_FILE" \
-          | jq -Rs --arg pn "elmouatassim-blog-${{ matrix.docker_image }}" --arg pv "latest" \
-              '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
-          > "$payload"
-        curl -sS -f -X PUT "${DTRACK_URL}/api/v1/bom" \
-             -H "X-Api-Key: ${DTRACK_API_KEY}" \
-             -H "Content-Type: application/json" \
-             --data-binary "@${payload}"
+
+  syft-dtrack:
+    name: syft-dtrack
+    needs: docker
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/syft-dtrack.yml
+    with:
+      dtrack_url: https://dtrack.louhaidia.info
+      images: >-
+        [{"image":"ghcr.io/umami-software/umami","version":"latest","dtrack_project_name":"umami"},
+         {"image":"outlinewiki/outline","version":"latest","dtrack_project_name":"outline"},
+         {"image":"databasus/databasus","version":"latest","dtrack_project_name":"databasus"},
+         {"image":"ghcr.io/immich-app/immich-server","version":"release","dtrack_project_name":"immich"},
+         {"image":"coollabsio/coolify","version":"latest","dtrack_project_name":"coolify"},
+         {"image":"ghcr.io/${{ github.repository }}/blog-frontend","version":"latest","dtrack_project_name":"elmouatassim-blog-frontend"},
+         {"image":"ghcr.io/${{ github.repository }}/blog-backend","version":"latest","dtrack_project_name":"elmouatassim-blog-backend"}]
+    secrets: inherit
 
   analyze:
     name: codeql/scan/${{ matrix.language }}

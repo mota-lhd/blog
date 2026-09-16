@@ -1,0 +1,134 @@
+name: Syft + dTrack
+
+on:
+  workflow_call:
+    inputs:
+      # workflow_call supports only boolean, number, and string inputs.
+      # Pass objects as JSON and expand them into matrix entries with fromJSON below.
+      # Each object creates one matrix job with these required fields:
+      # image: container image reference scanned by Syft.
+      # version: image/project version used in the generated SBOM root component.
+      # dtrack_project_name: Dependency-Track project name for later publishing steps.
+      images:
+        description: JSON array of objects containing image, version, and dtrack_project_name
+        required: true
+        type: string
+      dtrack_url:
+        description: Base URL of the Dependency-Track server
+        required: true
+        type: string
+    secrets:
+      DTRACK_API_KEY:
+        description: API key used to publish BOMs to Dependency-Track
+        required: true
+
+jobs:
+  syft-install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: syft/install
+        run: |
+          # Download Syft once; matrix jobs reuse this artifact instead of fetching it again.
+          mkdir -p "$RUNNER_TEMP/syft"
+          curl -sSfL https://get.anchore.io/syft \
+            | sh -s -- -b "$RUNNER_TEMP/syft"
+
+      - name: syft/upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: syft-binary
+          path: ${{ runner.temp }}/syft/syft
+          if-no-files-found: error
+
+  syft-dtrack:
+    needs: syft-install
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJSON(inputs.images) }}
+    steps:
+      - name: syft/download
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: syft-binary
+          path: ${{ runner.temp }}/syft
+
+      - name: syft/activate
+        run: |
+          chmod +x "$RUNNER_TEMP/syft/syft"
+          echo "$RUNNER_TEMP/syft" >> "$GITHUB_PATH"
+
+      - name: image/identity
+        id: image_identity
+        env:
+          IMAGE: ${{ matrix.image }}
+          VERSION: ${{ matrix.version }}
+        run: |
+          # Hash the exact reference used by Syft; SHA-256 avoids MD5/SHA-1 collisions.
+          IMAGE_REFERENCE="$IMAGE:$VERSION"
+          IMAGE_SHA256="$(printf '%s' "$IMAGE_REFERENCE" | sha256sum | cut -d ' ' -f 1)"
+          echo "image_sha256=$IMAGE_SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: image/sbom
+        env:
+          IMAGE: ${{ matrix.image }}
+          VERSION: ${{ matrix.version }}
+          IMAGE_SHA256: ${{ steps.image_identity.outputs.image_sha256 }}
+        run: |
+          SBOM_FILE="sbom-${IMAGE_SHA256}.json"
+          syft "$IMAGE:$VERSION" -o "cyclonedx-json=$SBOM_FILE"
+
+      - name: sbom/deps-graph
+        env:
+          IMAGE: ${{ matrix.image }}
+          VERSION: ${{ matrix.version }}
+          IMAGE_SHA256: ${{ steps.image_identity.outputs.image_sha256 }}
+        run: |
+          SBOM_FILE="sbom-${IMAGE_SHA256}.json"
+          SBOM_GRAPH_FILE="sbom-with-graph-${IMAGE_SHA256}.json"
+          # Add a synthetic container root to the CycloneDX dependency graph.
+          jq \
+            --arg name "$IMAGE" \
+            --arg version "$VERSION" \
+            '# Build a stable reference for the scanned container.
+            ($name + "@" + $version) as $rootRef |
+            # Components not referenced by another dependency are direct dependencies of the root.
+            ([.components[]?["bom-ref"]] - [.dependencies[]?.dependsOn[]?] | unique) as $topLevelRefs |
+            # Add the root component to metadata and the component inventory.
+            .metadata.component = {
+              "type": "container",
+              "name": $name,
+              "version": $version,
+              "bom-ref": $rootRef
+            } |
+            .components = (.components // []) + [.metadata.component] |
+            # Link the root to direct dependencies while preserving Syft's existing graph.
+            .dependencies = [{ "ref": $rootRef, "dependsOn": $topLevelRefs }] + (.dependencies // [])' \
+            "$SBOM_FILE" > "$SBOM_GRAPH_FILE"
+          # Replace the original only after jq successfully writes the transformed SBOM.
+          mv "$SBOM_GRAPH_FILE" "$SBOM_FILE"
+
+      - name: dtrack/publish
+        env:
+          DTRACK_URL: ${{ inputs.dtrack_url }}
+          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+          IMAGE_SHA256: ${{ steps.image_identity.outputs.image_sha256 }}
+          PROJECT_NAME: ${{ matrix.dtrack_project_name }}
+          PROJECT_VERSION: ${{ matrix.version }}
+        run: |
+          SBOM_FILE="sbom-${IMAGE_SHA256}.json"
+          payload="$RUNNER_TEMP/dtrack-payload-${IMAGE_SHA256}.json"
+          # Normalize the base URL before appending the Dependency-Track API path.
+          DTRACK_URL="${DTRACK_URL%/}"
+
+          base64 -w 0 "$SBOM_FILE" \
+            | jq -Rs \
+                --arg pn "$PROJECT_NAME" \
+                --arg pv "$PROJECT_VERSION" \
+                '{projectName:$pn, projectVersion:$pv, autoCreate:false, bom:.}' \
+            > "$payload"
+
+          curl -sS -f -X PUT "$DTRACK_URL/api/v1/bom" \
+            -H "X-Api-Key: $DTRACK_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary "@$payload"
