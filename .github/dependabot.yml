@@ -1,21 +1,40 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directories:
-      - "/frontend"
-      - "/backend"
+    directory: "/frontend"
     schedule:
       interval: "daily"
+    groups:
+      front:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "daily"
+    groups:
+      back:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
     directory: "/frontend/src"
     schedule:
       interval: "daily"
+    groups:
+      front:
+        patterns:
+          - "*"
 
   - package-ecosystem: "uv"
     directory: "/backend"
     schedule:
       interval: "daily"
+    groups:
+      back:
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directories:
@@ -23,11 +42,6 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      codeql:
-        patterns:
-          - "github/codeql-action"
-      misc:
+      actions:
         patterns:
           - "*"
-        exclude-patterns:
-          - "github/codeql-action"
