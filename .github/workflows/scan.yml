@@ -75,26 +75,52 @@ jobs:
     secrets: inherit
 
   analyze:
-    name: codeql/scan/${{ matrix.language }}
+    name: opengrep/scan/${{ matrix.language }}
     runs-on: ubuntu-slim
     permissions:
       security-events: write
     strategy:
       fail-fast: false
       matrix:
-        language: [actions, javascript-typescript, python]
+        include:
+          - language: yaml
+            scan_path: .github/workflows .github/dependabot.yml
+            scan_args: "--include '*.yml' --include '*.yaml'"
+            sarif_file: opengrep-actions.sarif
+          - language: javascript
+            scan_path: frontend
+            scan_args: "--include '*.js' --include '*.mjs' --include '*.html'"
+            sarif_file: opengrep-frontend.sarif
+          - language: python
+            scan_path: backend
+            scan_args: "--include '*.py'"
+            sarif_file: opengrep-backend.sarif
 
     steps:
     - name: checkout
       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a
+    - name: opengrep/install
+      env:
+        OPENGREP_VERSION: v1.30.0
+      run: |
+        mkdir -p "$RUNNER_TEMP/opengrep"
+        curl -fsSL \
+          -o "$RUNNER_TEMP/opengrep/opengrep" \
+          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_manylinux_x86"
+        chmod +x "$RUNNER_TEMP/opengrep/opengrep"
+        echo "$RUNNER_TEMP/opengrep" >> "$GITHUB_PATH"
+    - name: opengrep/scan
+      continue-on-error: true
+      run: |
+        opengrep scan \
+          --config auto \
+          --taint-intrafile \
+          ${{ matrix.scan_args }} \
+          --sarif-output="${{ matrix.sarif_file }}" \
+          ${{ matrix.scan_path }}
+    - name: opengrep/upload
+      if: always()
+      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
       with:
-        languages: ${{ matrix.language }}
-        tools: linked
-        build-mode: none
-        config-file: ./.github/codeql/${{ matrix.language }}-config.yml
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a
-      with:
-        category: "/language:${{matrix.language}}"
+        sarif_file: ${{ matrix.sarif_file }}
+        category: "/opengrep:${{ matrix.language }}"

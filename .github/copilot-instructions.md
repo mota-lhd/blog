@@ -121,7 +121,21 @@ Backend requires:
 
 **Continuous Integration** (GitHub Actions):
 - Secret scanning on every PR (Trufflehog)
-- Dockerfile vulnerability scan (Trivy) on backend changes
+- Dockerfile checks with Checkov and image vulnerability scans with Anchore Grype on backend/frontend changes
 - Docker image build & caching for optimized builds
+- `scan.yml` uses OpenGrep v1.30.0 with `--config auto` and `--taint-intrafile` for full scans.
+- `scan.yml` uploads OpenGrep SARIF results for full scans; `pr.yml` does not upload results.
+- `pr.yml` uses one blocking OpenGrep job with `opengrep ci`; it scans only changed files for backend Python, frontend JavaScript/HTML, and GitHub Actions/Dependabot YAML. It passes `GH_TOKEN: ${{ github.token }}`.
+- Keep OpenGrep installation and conditional category scans in the shared PR OpenGrep step. Path-filter outputs determine which category scans run.
+
+### Syft and Dependency-Track
+- `.github/workflows/syft-dtrack.yml` is a reusable workflow. Its `images` input is a JSON string containing objects with `image`, `version`, and `dtrack_project_name` fields because `workflow_call` has no native array input type.
+- The reusable workflow accepts `dtrack_url` and the required `DTRACK_API_KEY` secret.
+- Syft is installed from `https://get.anchore.io/syft`, and each matrix entry generates a CycloneDX SBOM, adds a dependency root with `jq`, and publishes it to Dependency-Track.
+- Derive the SHA-256 identity from the exact `image:version` reference before scanning. Use it in all generated filenames, such as `sbom-<sha256>.json` and `dtrack-payload-<sha256>.json`; do not add the identity as extra SBOM or payload fields.
+- Docker images scanned by the reusable workflow must be pushed to GHCR first because reusable workflow jobs run on separate runners. Use the `latest` tag consistently when the caller specifies `version: latest`.
+
+### Dependabot
+- `.github/dependabot.yml` groups frontend Docker/npm updates as `front`, backend Docker/uv updates as `back`, and GitHub Actions updates as `actions`. Dependabot cannot combine different package ecosystems into one physical PR.
 
 **Current Gap**: No unit tests yet—consider adding when modifying critical paths (captcha validation, sanitization, DB queries).
