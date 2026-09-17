@@ -153,23 +153,21 @@ jobs:
         if [[ "$BACKEND_CHANGED" == "true" ]]; then
           "$RUNNER_TEMP/opengrep/opengrep" ci \
             --taint-intrafile \
-            --include '*.py' \
-            backend
+            --include 'backend/**/*.py'
         fi
         if [[ "$FRONTEND_CHANGED" == "true" ]]; then
           "$RUNNER_TEMP/opengrep/opengrep" ci \
             --taint-intrafile \
-            --include '*.js' \
-            --include '*.mjs' \
-            --include '*.html' \
-            frontend
+            --include 'frontend/**/*.js' \
+            --include 'frontend/**/*.mjs' \
+            --include 'frontend/**/*.html'
         fi
         if [[ "$ACTIONS_CHANGED" == "true" ]]; then
           "$RUNNER_TEMP/opengrep/opengrep" ci \
             --taint-intrafile \
-            --include '*.yml' \
-            --include '*.yaml' \
-            .github/workflows .github/dependabot.yml
+            --include '.github/workflows/**/*.yml' \
+            --include '.github/workflows/**/*.yaml' \
+            --include '.github/dependabot.yml'
         fi
 
   success:
