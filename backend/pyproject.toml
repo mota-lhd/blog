@@ -12,12 +12,12 @@ dependencies = [
     "nh3>=0.3.7",
     "pydantic-settings>=2.15.0",
     "sqlmodel>=0.0.42",
-    "uvicorn[standard]>=0.52.4",
+    "uvicorn[standard]>=0.53.0",
 ]
 
 [dependency-groups]
 dev = [
-    "alembic>=1.19.2",
+    "alembic>=1.20.0",
     "ruff>=0.16.7",
 ]
 
