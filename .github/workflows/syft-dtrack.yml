@@ -76,7 +76,7 @@ jobs:
           IMAGE_SHA256: ${{ steps.image_identity.outputs.image_sha256 }}
         run: |
           SBOM_FILE="sbom-${IMAGE_SHA256}.json"
-          syft "$IMAGE:$VERSION" -o "cyclonedx-json=$SBOM_FILE"
+          syft "$IMAGE:$VERSION" --select-catalogers -file -o "cyclonedx-json=$SBOM_FILE"
 
       - name: sbom/deps-graph
         env:
