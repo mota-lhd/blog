@@ -1,0 +1,126 @@
+name: "Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: '13 13 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: docker/build/${{ matrix.docker_image }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        docker_image: [frontend, backend]
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+    - name: docker/setup
+      uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+    - name: docker/login
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: dockerfile/scan
+      uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7
+      with:
+        output_format: cli,sarif
+        output_file_path: console,results-${{ matrix.docker_image }}.sarif
+        file: './${{ matrix.docker_image }}/Dockerfile'
+        framework: "dockerfile"
+        quiet: true
+        soft_fail: true
+    - name: dockerfile/codeql/upload
+      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
+      with:
+        sarif_file: results-${{ matrix.docker_image }}.sarif
+    - name: dockerfile/build
+      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
+      with:
+        context: './${{ matrix.docker_image }}/'
+        push: true
+        tags: ghcr.io/${{ github.repository }}/blog-${{ matrix.docker_image }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  syft-dtrack:
+    name: syft-dtrack
+    needs: docker
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/syft-dtrack.yml
+    with:
+      dtrack_url: https://dtrack.louhaidia.info
+      images: >-
+        [{"image":"ghcr.io/umami-software/umami","version":"latest","dtrack_project_name":"umami"},
+         {"image":"outlinewiki/outline","version":"latest","dtrack_project_name":"outline"},
+         {"image":"databasus/databasus","version":"latest","dtrack_project_name":"databasus"},
+         {"image":"ghcr.io/immich-app/immich-server","version":"release","dtrack_project_name":"immich"},
+         {"image":"coollabsio/coolify","version":"latest","dtrack_project_name":"coolify"},
+         {"image":"ghcr.io/${{ github.repository }}/blog-frontend","version":"latest","dtrack_project_name":"elmouatassim-blog-frontend"},
+         {"image":"ghcr.io/${{ github.repository }}/blog-backend","version":"latest","dtrack_project_name":"elmouatassim-blog-backend"}]
+    secrets: inherit
+
+  analyze:
+    name: opengrep/scan/${{ matrix.language }}
+    runs-on: ubuntu-slim
+    permissions:
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: yaml
+            scan_path: .github/workflows .github/dependabot.yml
+            scan_args: "--include '*.yml' --include '*.yaml'"
+            sarif_file: opengrep-actions.sarif
+          - language: javascript
+            scan_path: frontend
+            scan_args: "--include '*.js' --include '*.mjs' --include '*.html'"
+            sarif_file: opengrep-frontend.sarif
+          - language: python
+            scan_path: backend
+            scan_args: "--include '*.py'"
+            sarif_file: opengrep-backend.sarif
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+    - name: opengrep/install
+      env:
+        OPENGREP_VERSION: v1.30.0
+      run: |
+        mkdir -p "$RUNNER_TEMP/opengrep"
+        curl -fsSL \
+          -o "$RUNNER_TEMP/opengrep/opengrep" \
+          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_manylinux_x86"
+        chmod +x "$RUNNER_TEMP/opengrep/opengrep"
+        echo "$RUNNER_TEMP/opengrep" >> "$GITHUB_PATH"
+    - name: opengrep/scan
+      continue-on-error: true
+      run: |
+        opengrep scan \
+          --config auto \
+          --taint-intrafile \
+          ${{ matrix.scan_args }} \
+          --sarif-output="${{ matrix.sarif_file }}" \
+          ${{ matrix.scan_path }}
+    - name: opengrep/upload
+      if: always()
+      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
+      with:
+        sarif_file: ${{ matrix.sarif_file }}
+        category: "/opengrep:${{ matrix.language }}"
