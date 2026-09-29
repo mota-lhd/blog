@@ -1,5 +1,5 @@
 <!-- mermaid.html -->
-{{- if .Params.mermaid -}}
+{{- if or .Params.mermaid site.Params.mermaid -}}
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });

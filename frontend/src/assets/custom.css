@@ -8,3 +8,63 @@
     flex-shrink: 0;
     font-size: 1rem;
 }
+
+.mermaid svg {
+    background-color: #f4f4f4;
+    border-radius: 0.5%;
+}
+
+/*
+    Warning callout style for blockquotes
+    Overrides the typography plugin defaults (italic + curly quote marks)
+    and always shows a ⚠ icon injected via CSS.
+*/
+
+.prose blockquote {
+    font-style: normal !important;
+    font-weight: 400;
+    quotes: none !important;
+    margin: 1.5em 0;
+    padding: 0.75rem 1rem;
+    padding-left: 2.25rem !important;
+    border-left-width: 4px;
+    border-left-color: #e0a800;
+    border-radius: 0.5rem;
+    background-color: #fff3c4;
+    color: #5c4a00;
+    position: relative;
+}
+
+/* icon in the left gutter, aligned with the first text line */
+.prose blockquote::before {
+    content: "⚠";
+    position: absolute;
+    left: 0.5rem;
+    top: 0.75rem;
+    width: 1.5rem;
+    line-height: 1.5rem;
+    text-align: left;
+    font-size: 1.1rem;
+    font-style: normal;
+    font-weight: 700;
+    color: #b8860b;
+    transform: translateY(-0.5rem);
+}
+
+/* remove the curly “ ” quote marks added by the typography plugin */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after,
+.prose blockquote p::before,
+.prose blockquote p::after {
+    content: none !important;
+}
+
+.dark .prose blockquote {
+    background-color: #3a2f10;
+    border-left-color: #d9a400;
+    color: #f5e6a8;
+}
+
+.dark .prose blockquote::before {
+    color: #f0c419;
+}
