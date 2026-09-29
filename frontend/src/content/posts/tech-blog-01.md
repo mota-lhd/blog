@@ -17,7 +17,7 @@ id: "tech-blog-01"
 series: ["tech", "github hardening"]
 ---
 
-in this serie, the goal is to share my experience about hardening github while creating a very simple blog. this one, yes! the one you are reading :)
+in this serie, the goal is to share my experience about hardening github while creating a very simple blog. this one, yes! the one you are reading :grinning:.
 
 i decided to move my blog from wordpress to learn how to build one by myself for less than 1€ a month! also, having ads on the free plan of wordpress was a bit annoying. so this is it, i will cover during this serie of posts how to host static and dynamic content and also how to deploy it on your own server, **securely**.
 
@@ -35,7 +35,7 @@ here the hacker will be able to push commits to repositories where the hacked de
 this can lead to introducing backdoors within a code base if the changes get approved and merged.
 
 this can be prevented using signed commits.
-in the following sections, i'll walk you through configuring signed commits using an ssh key that you already use for authentication. eliminating the need to manage yet another key pair on your machine.
+in the following sections, i'll walk you through configuring signed commits using a ssh key that you already use for authentication. eliminating the need to manage yet another key pair on your machine.
 
 ## generate ssh key pair on macOS
 
