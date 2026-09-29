@@ -17,7 +17,7 @@ categories: [
 ]
 mermaid: true
 weight: 1
-id: "tech-blog-02"
+id: "tech-blog-01"
 series: ["tech", "coolify hardening"]
 ---
 
@@ -185,10 +185,10 @@ then you also need to define in access controls → policies the rules you want 
 
 ```json
 {
-	"src":    ["mota-lhd@github"], # the user authorized to run ssh
-	"dst":    ["autogroup:self"], # the destination of the ssh command
-	"users":  ["linux-user"], # to which users on the dst linux server the src has access
-	"action": "check", # forces checking the authentication each 12 hours
+	"src":    ["mota-lhd@github"], // the user authorized to run ssh
+	"dst":    ["autogroup:self"], // the destination of the ssh command
+	"users":  ["linux-user"], // which users on dst linux server the src has access to
+	"action": "check", // forces checking the authentication each 12 hours
 }
 ```
 
