@@ -15,6 +15,7 @@ categories: [
     "tech",
     "hardening"
 ]
+mermaid: true
 id: "tech-blog-02"
 series: ["tech", "coolify hardening"]
 ---
@@ -92,7 +93,6 @@ flowchart TB
     class Admin admin
 ```
 
-> [!IMPORTANT]
 > no inbound ports are exposed on the host's public interface. public https apps are served through cloudflare tunnel ; the coolify admin ui is exposed via tailscale funnel ; ssh is tailnet-only.
 
 ## public flows
@@ -234,14 +234,10 @@ networks:
     external: true
 ```
 
-
-> [!IMPORTANT]
 > do not set `network_mode: host`. the container must be on the `coolify` network so docker's embedded dns can resolve backend service names.
 
-> [!IMPORTANT]
 > do not publish any ports. the tunnel is outbound-only.
 
-> [!IMPORTANT]
 > the token is stored in .env.
 
 ## routes in cloudflare tunnel
@@ -253,10 +249,8 @@ after creating a free account in cloudflare, you will need to configure in cloud
 | `restricted` | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
 | `*`       | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
 
-replace `<backend>` with the container name of the service that terminates tls for your apps (e.g. the coolify proxy container on the `coolify` network). you can publish everything on the wildcard subdomain if you intend to have no controls on the published apps. i keep the restricted sub domain to showcase how we can put an identity aware proxy in front to not open publicly some apps on coolify. this can be useful for n8n for example and will be the topic of the next blog post :grinning:.
+replace `<backend>` with the container name of the service that terminates tls for your apps (e.g. the coolify proxy container on the `coolify` network). you can publish everything on the wildcard subdomain if you intend to have no controls on the published apps. i keep the restricted sub domain to showcase how we can put an identity aware proxy in front to not open publicly some apps on coolify. this can be useful for n8n for example and will be the topic of the next blog post 😀.
 
-
-> [!IMPORTANT]
 > match sni to host is required so `cloudflared` forwards the original hostname (e.g. `photos.louhaidia.info`) as the tls sni to the backend, allowing wildcard certificate matching.
 
 ## **origin certificate**
@@ -269,8 +263,6 @@ in cloudflare dashboard → **SSL/TLS → Origin Server → Create Certificate**
 * Hostnames: `louhaidia.info`, `*.louhaidia.info`
 * Validity: **15 years**
 
-
-> [!IMPORTANT]
 > **free-plan limitation:** \*.louhaidia.info covers exactly one level of subdomain. [deep.sub.louhaidia.info](http://deep.sub.louhaidia.info) requires Advanced Certificate Manager.
 
 ### **certificate installation**
@@ -316,11 +308,8 @@ docker exec coolify-proxy \
 | Always Use HTTPS | SSL/TLS → Edge Certificates | Enabled |
 | Wildcard CNAME | DNS      | `*.louhaidia.info` → `<TUNNEL_UUID>.cfargotunnel.com` (proxied) |
 
-
-> [!IMPORTANT]
 > full (strict) is mandatory now that the origin presents a real, cloudflare-trusted certificate.
 
-> [!IMPORTANT]
 > the wildcard cname is created automatically when the route is created within the tunnel.
 
 # coolify admin ui
@@ -355,7 +344,7 @@ funnel only accepts loopback targets (`127.0.0.1` / `localhost`). this is a deli
 
 coolify container proxies web-socket traffic internally to the realtime service, so the browser only needs to reach the funnel https url on port 443. no additional public ports are exposed.
 
-## ports’ bindings
+## ports' bindings
 
 first create a customization file for coolify docker-compose in `/data/coolify/source/docker-compose.custom.yml`
 
@@ -395,7 +384,6 @@ ListenAddress <TAILNET_IPv4>
 ListenAddress <TAILNET_IPv6>
 ```
 
-> [!IMPORTANT]
 > this file permissions must be 644 and owned by root:root. sshd silently ignores files that are group or world writable.
 
 The main `/etc/ssh/sshd_config` needs the directory include.
@@ -405,5 +393,10 @@ Include /etc/ssh/sshd_config.d/*.conf
 ...
 ```
 
-> [!IMPORTANT]
 > the Include must appear before any ListenAddress in the main config. sshd uses first-match-wins.
+
+# conclusion
+
+we hardened the server from the public edge to the operating system. we managed to have no inbound ports on its public interface. public apps are served through cloudflare tunnel (outbound-only), the coolify admin ui through tailscale funnel and ssh is tailnet-only. all coolify services are bound to 127.0.0.1. the result: no 0.0.0.0 listeners, two outbound-initiated public entry points and a verifiable security posture.
+
+next we will cover the east-west boundary inside docker. in the next article in this series, we'll discuss network segmentation between services on coolify network using docker networking, splitting the flat shared bridge into isolated segments so containers only reach the peers they need. that completes the hardening story.
