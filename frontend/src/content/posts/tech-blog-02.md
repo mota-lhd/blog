@@ -16,6 +16,7 @@ categories: [
     "hardening"
 ]
 mermaid: true
+weight: 1
 id: "tech-blog-02"
 series: ["tech", "coolify hardening"]
 ---
