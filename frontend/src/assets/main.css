@@ -139,7 +139,7 @@
 
   --default-mono-font-family: var(--font-mono);
 
-  --w: calc(680px + 32px * 2);
+  --w: 55%;
 }
 
 @supports (color: color(display-p3 0 0 0%)) {
