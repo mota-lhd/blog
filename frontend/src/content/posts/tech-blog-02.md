@@ -21,94 +21,110 @@ id: "tech-blog-01"
 series: ["tech", "coolify hardening"]
 ---
 
-# architecture
+## architecture
+
+the general architecture we are aiming for is illustrated in the diagram below. this architecture uses zero trust principles and reduces the attack surface to a minimum by keeping on the server no listening services on its public interface. we will be having a default firewall rule on the server that drops any incoming connection on any protocol. an attacker scanning the public ip would find every port filtered or closed. the only public entry points are the two tunnel endpoints (cloudflare tunnel for apps, tailscale for ssh and for the https-serve that handles the coolify admin ui). both are outbound-initiated from the server. ssh is reachable only from authenticated tailnet devices and through authentication and short lived provisioned credentials. no ssh keys are needed to be managed by end users.
 
 ```mermaid
 flowchart TB
     subgraph PUBLIC["Public Internet"]
         Browser["Browser / User"]
-        AdminWeb["Admin Browser<br/>(on tailnet)"]
     end
 
     subgraph CF["Cloudflare Edge"]
-        CFEdge["Cloudflare Proxy<br/>(Universal SSL - louhaidia.info cert)<br/>Full (Strict)"]
+        CFEdge["Cloudflare Proxy<br/>(Universal SSL - louhaidia.info cert)<br/>Full (Strict)<br/><b>Identity-Aware Proxy</b>"]
     end
 
-    subgraph TSEDGE["Tailscale Edge"]
-        TSFunnel["Tailscale Funnel<br/>server-name.tailscale-network-id.ts.net:443<br/>(*.ts.net cert)"]
+    subgraph IDP["Identity Providers"]
+        Auth0["Auth0<br/>IdP for Cloudflare"]
+        GitHub["GitHub<br/>IdP for Tailscale"]
     end
 
-    subgraph HOST["server-name"]
-        subgraph TUNNEL["Docker: coolify network"]
-            CFD["cloudflared<br/>(cloudflare-tunnel)<br/>outbound-only"]
-            APPS["Application Containers<br/>(backups, umami, immich, ...)"]
-        end
-
-        subgraph LOOPBACK["Localhost Bindings"]
-            COOLIFY["Coolify Admin<br/>127.0.0.1:8000 -> container:8080"]
-            SOKETI["Coolify Realtime<br/>127.0.0.1:6001 / :6002"]
-        end
-
-        subgraph TAIL["Tailnet (Tailscale)"]
-            TS["tailscaled<br/>&lt;TAILNET_IPv4&gt;:443"]
-            SSHD["sshd<br/>&lt;TAILNET_IPv4&gt;:22"]
-        end
-
-        subgraph LOCAL["Localhost Only"]
-            RCLONE["rclone<br/>127.0.0.1:5572"]
-            RESOLV["systemd-resolved<br/>127.0.0.53/54:53"]
-        end
-    end
-
-    subgraph ADMIN["Administrator"]
+    subgraph TAILNET["Tailnet (Tailscale) — highlighted"]
+        AdminWeb["Admin Browser<br/>(on tailnet)"]
         Admin["Admin Device<br/>(on tailnet)"]
+
+        subgraph HOST["server-name (on tailnet)"]
+            subgraph TUNNEL["Docker: coolify network"]
+                CFD["cloudflared<br/>(cloudflare-tunnel)<br/>outbound-only"]
+                APPS["Application Containers<br/>(backups, umami, immich, ...)"]
+            end
+
+            subgraph LOOPBACK["Localhost Bindings"]
+                COOLIFY["Coolify Admin<br/>127.0.0.1:8000 -> container:8080"]
+                SOKETI["Coolify Realtime<br/>127.0.0.1:6001 / :6002"]
+            end
+
+            subgraph TAILBIND["Tailnet Bindings"]
+                TSServe["Tailscale Serve<br/>coolify.tailscale-network-id.ts.net:443<br/>(*.ts.net cert)<br/>tailnet-only<br/><i>Coolify Admin UI published here —<br/>NOT exposed to Internet</i>"]
+                TS["tailscaled<br/>&lt;TAILNET_IPv4&gt;:443"]
+                SSHD["sshd<br/>&lt;TAILNET_IPv4&gt;:22"]
+            end
+        end
     end
 
     Browser -->|"HTTPS :443"| CFEdge
+    CFEdge -->|"OIDC/SAML"| Auth0
     CFEdge -->|"HTTPS (origin cert)<br/>SNI: *.louhaidia.info"| CFD
     CFD -->|"HTTPS over Docker network"| APPS
 
-    AdminWeb -->|"HTTPS :443"| TSFunnel
-    TSFunnel -->|"HTTP to loopback"| COOLIFY
+    AdminWeb -->|"HTTPS :443<br/>tailnet-only"| TSServe
+    TSServe -->|"HTTP to loopback"| COOLIFY
     COOLIFY -.->|"internal proxy<br/>for WebSocket"| SOKETI
 
     Admin -.->|"WireGuard"| TS
     Admin -->|"SSH"| SSHD
 
+    GitHub -->|"IdP for Tailscale SSO"| TS
+
     classDef public fill:#f9d5d5,stroke:#c33,stroke-width:2px,color:#000
     classDef cf fill:#fde0a8,stroke:#e08a00,stroke-width:2px,color:#000
-    classDef tsedge fill:#f9d5e0,stroke:#b21f66,stroke-width:2px,color:#000
+    classDef idp fill:#e0d5f9,stroke:#6a3fbf,stroke-width:3px,color:#000
+    classDef tailnet fill:#c8f7c8,stroke:#1f7a1f,stroke-width:4px,color:#000
     classDef tunnel fill:#d5e8f9,stroke:#1f6fb2,stroke-width:2px,color:#000
-    classDef tail fill:#d5f9d5,stroke:#2a9d2a,stroke-width:2px,color:#000
     classDef loop fill:#fff3c4,stroke:#b8860b,stroke-width:2px,color:#000
-    classDef local fill:#e8e8e8,stroke:#666,stroke-width:1px,color:#000
-    classDef admin fill:#e0d5f9,stroke:#6a3fbf,stroke-width:2px,color:#000
 
-    class Browser,AdminWeb public
+    class Browser public
     class CFEdge cf
-    class TSFunnel tsedge
+    class Auth0,GitHub idp
+    class AdminWeb,Admin,TSServe,TS,SSHD tailnet
     class CFD,APPS tunnel
-    class TS,SSHD tail
     class COOLIFY,SOKETI loop
-    class RCLONE,RESOLV local
-    class Admin admin
+
+    style TAILNET fill:#e6ffe6,stroke:#1f7a1f,stroke-width:4px
+    style IDP fill:#f3e5f5,stroke:#6a3fbf,stroke-width:3px
 ```
 
-> no inbound ports are exposed on the host's public interface. public https apps are served through cloudflare tunnel ; the coolify admin ui is exposed via tailscale funnel ; ssh is tailnet-only.
+> no inbound ports are exposed on the host's public interface. public https apps are served through cloudflare tunnel ; the coolify admin ui is exposed via tailscale serve command and only within the tailscale network. ssh is also available only on tailscale network.
 
-## public flows
+### sequence diagrams
+
+a user who is using publicly available apps hosted on coolify will go through the following sequence. some apps will be available after passing the identity aware proxy in cloudflare. some others will be available directly. this is usefull for some apps that are used by administrators (backups, automations, etc.).
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as User
-    participant CF as Cloudflare Edge
+    participant CF as Cloudflare Edge<br/>(Identity-Aware Proxy)
+    participant Auth0 as Auth0<br/>(IdP)
     participant CFD as cloudflared
     participant App as App Container
 
-    U->>CF: HTTPS request<br/>Host: photos.louhaidia.info
+    U->>CF: HTTPS request<br/>Host: n8n.louhaidia.info
     Note over CF: Terminate TLS<br/>Universal SSL cert
-    CF->>CFD: Forward over tunnel<br/>SNI: photos.louhaidia.info
+    CF->>CF: IAP checks session / access policy
+
+    alt No valid session
+        CF-->>U: 302 redirect to Auth0
+        U->>Auth0: Authenticate
+        Auth0-->>U: Redirect back with auth code
+        U->>CF: Callback with auth code
+        CF->>Auth0: Exchange code / validate
+        Auth0-->>CF: Tokens + claims
+    end
+
+    Note over CF: IAP enforces access<br/>Auth0 is IdP only
+    CF->>CFD: Forward over tunnel<br/>SNI: n8n.louhaidia.info
     Note over CFD: Match SNI to host
     CFD->>App: HTTPS over Docker network
     App-->>CFD: Response
@@ -116,19 +132,21 @@ sequenceDiagram
     CF-->>U: HTTPS response
 ```
 
-## coolify admin ui
+this following diagram illustrates the steps an admin will go through in order to access the coolify admin dashboard. as this interface is highly sensitive, it is published only on tailscale network and not exposed on the internet.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant A as Admin Browser<br/>(on tailnet)
-    participant TF as Tailscale Funnel
+    participant TF as Tailscale Serve<br/>coolify.tailscale-network-id.ts.net:443
     participant LP as 127.0.0.1:8000
     participant C as Coolify Container :8080
     participant S as Coolify Realtime<br/>127.0.0.1:6001/6002
 
-    A->>TF: HTTPS request<br/>server-name.tailscale-network-id.ts.net
-    Note over TF: Terminate TLS<br/>*.ts.net cert
+    Note over A: Admin already on tailnet<br/>authenticated via GitHub IdP for Tailscale
+
+    A->>TF: HTTPS request<br/>coolify.tailscale-network-id.ts.net
+    Note over TF: Terminate TLS<br/>*.ts.net cert<br/>Tailscale Serve — tailnet-only<br/>❌ NOT exposed via Funnel on the internet
     TF->>LP: HTTP to loopback
     Note over LP: docker-proxy NAT
     LP->>C: Forward to container port 8080
@@ -145,30 +163,32 @@ sequenceDiagram
     C-->>A: WebSocket established
 ```
 
-## ssh flow
+the last sequence diagram is to visualize the steps in place to authenticate using ssh protocol from a trusted device on the tailnet network.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant A as Admin (on tailnet)
-    participant TS as tailscaled
-    participant SSH as sshd
+    participant A as Admin Device<br/>(on tailnet)
+    participant GH as GitHub<br/>(IdP for Tailscale)
+    participant TS as tailscaled<br/>(server-name, on tailnet)
+    participant SSH as sshd<br/>(server-name, on tailnet)
 
-    A->>TS: WireGuard handshake
+    Note over A,GH: Admin authenticates to Tailscale<br/>via GitHub IdP (SSO)
+    A->>GH: OIDC login
+    GH-->>A: Identity asserted
+
+    A->>TS: WireGuard handshake<br/>(tailnet join)
     TS-->>A: Tailnet established
+    Note over TS: server-name reachable at<br/><TAILNET_IPv4>;
+
     A->>SSH: SSH to <TAILNET_IPv4>:22
+    Note over SSH: Bound to tailnet interface only<br/>publickey authentication using short lived creds
     SSH-->>A: Shell (publickey only)
 ```
 
-## attack surface
-
-we want to keep on the server no listening services on its public interface. we will be having a default firewall rule on the server that drops any incoming connection on any protocol. an attacker scanning the public ip would find every port filtered or closed. the only public entry points are the two tunnel endpoints (cloudflare tunnel for apps, tailscale for ssh and for the funnel that handles the coolify admin ui). both are outbound-initiated from the server. ssh is reachable only from authenticated tailnet devices and through authentication and short lived provisioned credentials. no ssh keys are needed.
-
-# prerequisites
-
 ## tailscale
 
-go to tailscale website and signup for a free account [here](https://tailscale.com/). when prompted to select an identity provider, choose what you are used to. i chose [github](https://github.com/). once you authorized tailscale to fetch some information from your identity provider, your tailnet is created.
+[go to tailscale](https://tailscale.com/) website and signup for a free account. when prompted to select an identity provider, choose what you are used to. i chose [github](https://github.com/). once you authorized tailscale to fetch some information from your identity provider, your tailnet is created.
 
 the next step is to enroll your server in tailnet. you will need to run on your linux server:
 
@@ -181,16 +201,44 @@ this command generates a node key pair and prompts you to authenticate via your 
 
 when you run `ssh your-server`, the tailscale client on your machine intercepts the connection. instead of using standard ssh keys, it establishes a connection over the wire-guard mesh network. tailscale's own ssh server on the destination device then authenticates you based on the rules in your tailscale config. the result is a secure, encrypted connection that is authorized centrally, without you ever managing a ssh key.
 
-then you also need to define in access controls → policies the rules you want to apply to control access to ssh in the tunnel:
+you also need to define in access controls → policies the rules you want to apply to control access to ssh in the tunnel. first you need to define the general acl:
+
+```json
+    {
+        "src": ["mota-lhd@github"],
+        "dst": ["tag:vps"],
+        "ip":  ["tcp:22"],
+    }
+```
+
+then the specific rule for ssh:
 
 ```json
 {
-	"src":    ["mota-lhd@github"], // the user authorized to run ssh
-	"dst":    ["autogroup:self"], // the destination of the ssh command
-	"users":  ["linux-user"], // which users on dst linux server the src has access to
-	"action": "check", // forces checking the authentication each 12 hours
+ "src":    ["mota-lhd@github"], // the user authorized to run ssh
+ "dst":    ["tag:vps"],         // the destination of the ssh command
+ "users":  ["linux-user"],      // which users on dst linux server the src has access to
+ "action": "check",             // forces checking the authentication each 12 hours
 }
 ```
+
+you also need to make sure that ssh listens on to the tailnet ip address. to perform this, you can create a new customization config on your server by adding the following file at `/etc/ssh/sshd_config.d/hardening.conf` with these contents.
+
+```none
+ListenAddress <TAILNET_IPv4>
+ListenAddress <TAILNET_IPv6>
+```
+
+> this file permissions must be 644 and owned by root:root. sshd silently ignores files that are group or world writable.
+
+The main `/etc/ssh/sshd_config` needs the directory include.
+
+```none
+Include /etc/ssh/sshd_config.d/*.conf
+...
+```
+
+> the Include must appear before any ListenAddress in the main config. sshd uses first-match-wins.
 
 then running the following command will run browser authentication and connect you to your server without managing any ssh keys.
 
@@ -198,17 +246,15 @@ then running the following command will run browser authentication and connect y
 ssh linux-user@server-name
 ```
 
-# public flows
+## cloudflare
 
-## why?
+### why?
 
-tailscale funnel could have been used as an ingress for custom-domain apps, but it terminates tls with a `*.ts.net` certificate only. it cannot present a certificate for `louhaidia.info`, which causes ssl handshake errors when a custom domain points at the funnel endpoint.
+tailscale funnel feature could have been used as an ingress for custom-domain apps to publish them on the internet. the problem is that it terminates tls with a `*.ts.net` certificate only. it cannot present a certificate for `louhaidia.info`, which causes ssl handshake errors when a custom domain points at the funnel endpoint.
 
 cloudflare tunnels solve this because cloudflare's edge serves the `louhaidia.info` certificate to clients and connects to the origin over a separate trusted path.
 
-tailscale funnel will be used only for the coolify admin app, which is accessed through its native `*.ts.net` hostname. no custom domain is involved there, so there is no certificate mismatch.
-
-## cloudflare in coolify
+### cloudflare daemon
 
 to implement cloudflare on coolify server, we create a new coolify service (using the template) with the following docker-compose file.
 
@@ -241,24 +287,21 @@ networks:
 
 > the token is stored in .env.
 
-## routes in cloudflare tunnel
+### cloudflare tunnel
 
-after creating a free account in cloudflare, you will need to configure in cloudflare dashboard → **networks → tunnels** a new tunnel and then afterwards go into the newly created tunnel settings to create a new route.
+after creating a free account in cloudflare, you will need to configure in cloudflare dashboard → networks → tunnels a new tunnel and then afterwards go into the newly created tunnel settings to create a new route.
 
 | **subdomain** | **domain** | **service url** | **sni setting** |
-|-----------|--------|-------------|-------------|
-| `restricted` | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
-| `*`       | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
+| ----------- | -------- | ------------- | ------------- |
+| `*` | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
 
-replace `<backend>` with the container name of the service that terminates tls for your apps (e.g. the coolify proxy container on the `coolify` network). you can publish everything on the wildcard subdomain if you intend to have no controls on the published apps. i keep the restricted sub domain to showcase how we can put an identity aware proxy in front to not open publicly some apps on coolify. this can be useful for n8n for example and will be the topic of the next blog post 😀.
+replace `<backend>` with the container name of the service that terminates tls for your apps (e.g. the coolify proxy container on the `coolify` network). you can publish everything on the wildcard subdomain.
 
 > match sni to host is required so `cloudflared` forwards the original hostname (e.g. `photos.louhaidia.info`) as the tls sni to the backend, allowing wildcard certificate matching.
 
-## **origin certificate**
+### origin certificate
 
-### **certificate creation**
-
-in cloudflare dashboard → **SSL/TLS → Origin Server → Create Certificate**:
+we need to generate the ssl certificate we will use to serve apps from the coolify containers. in cloudflare dashboard → ssl/tls → origin server → create certificate:
 
 * Key type: **RSA (2048)**
 * Hostnames: `louhaidia.info`, `*.louhaidia.info`
@@ -266,16 +309,14 @@ in cloudflare dashboard → **SSL/TLS → Origin Server → Create Certificate**
 
 > **free-plan limitation:** \*.louhaidia.info covers exactly one level of subdomain. [deep.sub.louhaidia.info](http://deep.sub.louhaidia.info) requires Advanced Certificate Manager.
 
-### **certificate installation**
-
-files placed on the host **inside the data volume of the TLS-terminating container**, which is mapped into that container at `/data/`:
+we then need to make our caddy reverse proxy use these files to terminate ssl/tls connections. files placed on the host **inside the data volume of the tls-terminating container**, which is mapped into that container at `/data/`:
 
 ```bash
 chmod 644 /path/to/caddy/configs/data/certs/louhaidia.info.cert
 chmod 600 /path/to/caddy/configs/data/certs/louhaidia.info.key
 ```
 
-### **dynamic tls config**
+loading these files is done using a dynamic config in caddy that can be created using the coolify admin dashboard or using the terminal.
 
 ```bash
 # file in /path/to/caddy/configs/dynamic/louhaidia-origin.caddy
@@ -301,51 +342,54 @@ docker exec coolify-proxy \
                     --config /config/caddy/Caddyfile.autosave
 ```
 
-## cloudflare settings
+make sure you have also configured as follows these settings.
 
 | **Setting** | **Location** | **Value** |
-|---------|----------|-------|
+| --------- | ---------- | ------- |
 | SSL/TLS encryption mode | SSL/TLS → Overview | Full (Strict) |
 | Always Use HTTPS | SSL/TLS → Edge Certificates | Enabled |
-| Wildcard CNAME | DNS      | `*.louhaidia.info` → `<TUNNEL_UUID>.cfargotunnel.com` (proxied) |
+| Wildcard CNAME | DNS | `*.louhaidia.info` → `<TUNNEL_UUID>.cfargotunnel.com` (proxied) |
 
 > full (strict) is mandatory now that the origin presents a real, cloudflare-trusted certificate.
 
 > the wildcard cname is created automatically when the route is created within the tunnel.
 
-# coolify admin ui
+## coolify admin ui
 
-the coolify admin ui is exposed publicly through tailscale funnel at the server's native tailnet hostname. this is separate from the cloudflare tunnel path, which handles the `louhaidia.info` apps.
+the coolify admin ui is exposed on the tailscale local network through `tailscale serve`. this is separate from the cloudflare tunnel path, which handles the `louhaidia.info` apps.
 
-## how?
+### how?
+
+the following sequence explains how this is performed in the background.
 
 ```mermaid
 flowchart LR
-    A["Admin Browser<br/>(on tailnet)"]
-    TF["Tailscale Funnel<br/>server-name.tailscale-network-id.ts.net:443<br/>(*.ts.net cert)"]
+    A["Admin Browser<br/>(on tailnet)<br/>auth via GitHub IdP"]
+    TS["Tailscale Serve<br/>coolify.tailscale-network-id.ts.net:443<br/>(*.ts.net cert)<br/><b>tailnet-only</b><br/>❌ NOT exposed to Internet"]
     LP["127.0.0.1:8000<br/>(docker-proxy)"]
     C["Coolify Container<br/>:8080"]
     S["Coolify Realtime<br/>127.0.0.1:6001/6002"]
 
-    A -->|"HTTPS :443"| TF
-    TF -->|"HTTP to loopback"| LP
+    A -->|"HTTPS :443<br/>tailnet-only"| TS
+    TS -->|"HTTP to loopback"| LP
     LP -->|"NAT to container port"| C
     C -.->|"internal proxy"| S
 
-    classDef edge fill:#f9d5e0,stroke:#b21f66,stroke-width:2px,color:#000
+    classDef tailnet fill:#c8f7c8,stroke:#1f7a1f,stroke-width:4px,color:#000
     classDef loop fill:#fff3c4,stroke:#b8860b,stroke-width:2px,color:#000
     classDef cont fill:#d5e8f9,stroke:#1f6fb2,stroke-width:2px,color:#000
 
-    class TF edge
+    class A,TS tailnet
     class LP loop
     class C,S cont
+
+    style A fill:#e6ffe6,stroke:#1f7a1f,stroke-width:4px
+    style TS fill:#e6ffe6,stroke:#1f7a1f,stroke-width:4px
 ```
 
-funnel only accepts loopback targets (`127.0.0.1` / `localhost`). this is a deliberate tailscale security measure as it prevents funnel from being used to expose arbitrary services on local network. all coolify services are therefore bound to `127.0.0.1` on the host.
+coolify container proxies web-socket traffic internally to the realtime service, so the browser only needs to reach the `serve` https url on port 443. no additional ports are exposed.
 
-coolify container proxies web-socket traffic internally to the realtime service, so the browser only needs to reach the funnel https url on port 443. no additional public ports are exposed.
-
-## ports' bindings
+### coolify ports
 
 first create a customization file for coolify docker-compose in `/data/coolify/source/docker-compose.custom.yml`
 
@@ -366,38 +410,30 @@ to apply this change, run the upgrade script.
 /data/coolify/source/upgrade.sh
 ```
 
-## **funnel command**
+### serve command
 
-run as `root`:
+first you would need to go to network -> services in tailscale admin ui and create a new service. let's call it coolify and this service will listen on tcp port 443.
+then ssh into your server and run the following as `root`:
 
 ```bash
-tailscale funnel reset
-tailscale funnel --bg 8000
-tailscale funnel status
+tailscale serve reset
+# here svc:coolify will advertise the service using the previously created entity
+tailscale serve --https 443 --service svc:coolify --bg http://127.0.0.1:8000
+tailscale serve status
 ```
 
-# ssh flow
+then to allow access to the newly created service available at `coolify.<tailnet-id>.ts.net` you would need to add the following in access controls -> policies.
 
-first you need to bind the port ssh listens on to the tailnet ip address. to perform this, you can create a new customization config file at `/etc/ssh/sshd_config.d/hardening.conf` with the following contents.
-
-```none
-ListenAddress <TAILNET_IPv4>
-ListenAddress <TAILNET_IPv6>
+```json
+{
+ "src": ["mota-lhd@github"],
+ "dst": ["svc:coolify"],
+ "ip":  ["tcp:443"],
+}
 ```
 
-> this file permissions must be 644 and owned by root:root. sshd silently ignores files that are group or world writable.
+## conclusion
 
-The main `/etc/ssh/sshd_config` needs the directory include.
+we hardened the server from the public edge to the server. we managed to have no inbound ports on its public interface. public apps are served through cloudflare tunnel (outbound-only), the coolify admin ui and ssh are published only on tailnet. all coolify services are bound to 127.0.0.1. the result: no 0.0.0.0 listeners, two outbound-initiated public entry points and a verifiable security posture.
 
-```none
-Include /etc/ssh/sshd_config.d/*.conf
-...
-```
-
-> the Include must appear before any ListenAddress in the main config. sshd uses first-match-wins.
-
-# conclusion
-
-we hardened the server from the public edge to the operating system. we managed to have no inbound ports on its public interface. public apps are served through cloudflare tunnel (outbound-only), the coolify admin ui through tailscale funnel and ssh is tailnet-only. all coolify services are bound to 127.0.0.1. the result: no 0.0.0.0 listeners, two outbound-initiated public entry points and a verifiable security posture.
-
-next we will cover the east-west boundary inside docker. in the next article in this series, we'll discuss network segmentation between services on coolify network using docker networking, splitting the flat shared bridge into isolated segments so containers only reach the peers they need. that completes the hardening story.
+in the next article in this series, we'll discuss network segmentation between services on coolify network using docker networking, splitting the flat shared bridge into isolated segments so containers only reach the peers they need. that and along with some docker security best practices will complete the hardening story.
