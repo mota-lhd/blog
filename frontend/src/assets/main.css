@@ -1426,6 +1426,11 @@ button:not(#\#):not(#\#), input:where([type="button"], [type="reset"], [type="su
   margin-bottom: calc(var(--spacing) * 4);
 }
 
+.mb-6:not(#\#):not(#\#):not(#\#):not(#\#) {
+
+  margin-bottom: calc(var(--spacing) * 6);
+}
+
 .mb-12:not(#\#):not(#\#):not(#\#):not(#\#) {
 
   margin-bottom: calc(var(--spacing) * 12);

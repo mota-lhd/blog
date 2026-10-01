@@ -29,10 +29,12 @@ the general architecture we are aiming for is illustrated in the diagram below. 
 flowchart TB
     subgraph PUBLIC["Public Internet"]
         Browser["Browser / User"]
+        GHWebhook["GitHub Webhook Sender<br/>(IPs from api.github.com/meta → .hooks)"]
     end
 
     subgraph CF["Cloudflare Edge"]
         CFEdge["Cloudflare Proxy<br/>(Universal SSL - louhaidia.info cert)<br/>Full (Strict)<br/><b>Identity-Aware Proxy</b>"]
+        CFAccess["Cloudflare Access — App: coolify.example.com<br/><b>Policy 1: Bypass</b> — GitHub IP ranges (no login)<br/><b>Policy 2: Block</b> — Everyone"]
     end
 
     subgraph IDP["Identity Providers"]
@@ -65,8 +67,15 @@ flowchart TB
 
     Browser -->|"HTTPS :443"| CFEdge
     CFEdge -->|"OIDC/SAML"| Auth0
+
+    GHWebhook -->|"HTTPS :443<br/>Source IP in GitHub range"| CFEdge
+    CFEdge -.->|"evaluates Access policy"| CFAccess
+    CFAccess -->|"Bypass — IP matches<br/>no identity check"| CFD
+    CFAccess -->|"Block — IP not matched"| GHBlock["403 Blocked"]
+
     CFEdge -->|"HTTPS (origin cert)<br/>SNI: *.louhaidia.info"| CFD
     CFD -->|"HTTPS over Docker network"| APPS
+    CFD -->|"HTTPS to Coolify<br/>(webhook route)"| COOLIFY
 
     AdminWeb -->|"HTTPS :443<br/>tailnet-only"| TSServe
     TSServe -->|"HTTP to loopback"| COOLIFY
@@ -79,17 +88,21 @@ flowchart TB
 
     classDef public fill:#f9d5d5,stroke:#c33,stroke-width:2px,color:#000
     classDef cf fill:#fde0a8,stroke:#e08a00,stroke-width:2px,color:#000
+    classDef cfaccess fill:#ffe0b2,stroke:#e08a00,stroke-width:3px,color:#000
     classDef idp fill:#e0d5f9,stroke:#6a3fbf,stroke-width:3px,color:#000
     classDef tailnet fill:#c8f7c8,stroke:#1f7a1f,stroke-width:4px,color:#000
     classDef tunnel fill:#d5e8f9,stroke:#1f6fb2,stroke-width:2px,color:#000
     classDef loop fill:#fff3c4,stroke:#b8860b,stroke-width:2px,color:#000
+    classDef blocked fill:#ffcccc,stroke:#c33,stroke-width:2px,color:#000
 
-    class Browser public
+    class Browser,GHWebhook public
     class CFEdge cf
+    class CFAccess cfaccess
     class Auth0,GitHub idp
     class AdminWeb,Admin,TSServe,TS,SSHD tailnet
     class CFD,APPS tunnel
     class COOLIFY,SOKETI loop
+    class GHBlock blocked
 
     style TAILNET fill:#e6ffe6,stroke:#1f7a1f,stroke-width:4px
     style IDP fill:#f3e5f5,stroke:#6a3fbf,stroke-width:3px
@@ -99,37 +112,50 @@ flowchart TB
 
 ### sequence diagrams
 
-a user who is using publicly available apps hosted on coolify will go through the following sequence. some apps will be available after passing the identity aware proxy in cloudflare. some others will be available directly. this is usefull for some apps that are used by administrators (backups, automations, etc.).
+a user who is using publicly available apps hosted on coolify will go through the following sequence. some apps will be available after passing the identity aware proxy in cloudflare (like backups, automations, etc.). some others will be available directly. we will have also a path dedicated to github webhooks where access policies are bypassed after checking the source ip address of the sender.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant U as User
-    participant CF as Cloudflare Edge<br/>(Identity-Aware Proxy)
-    participant Auth0 as Auth0<br/>(IdP)
+    participant GH as GitHub Webhook
+    participant U as Browser User
+    participant P as Public Visitor
+    participant CF as Cloudflare Edge<br/>(Access)
+    participant Auth0 as Auth0
     participant CFD as cloudflared
-    participant App as App Container
+    participant App as App Containers
 
-    U->>CF: HTTPS request<br/>Host: n8n.louhaidia.info
-    Note over CF: Terminate TLS<br/>Universal SSL cert
-    CF->>CF: IAP checks session / access policy
+    Note over CF: vps.louhaidia.info → Policy 1: Bypass (GitHub IPs)<br/>backups.louhaidia.info → IAP + Auth0<br/>elmouatassim.louhaidia.info → Public (no Access)
 
-    alt No valid session
-        CF-->>U: 302 redirect to Auth0
-        U->>Auth0: Authenticate
-        Auth0-->>U: Redirect back with auth code
-        U->>CF: Callback with auth code
-        CF->>Auth0: Exchange code / validate
-        Auth0-->>CF: Tokens + claims
+    rect rgb(230,245,255)
+    Note over GH,App: A — Webhook (vps.louhaidia.info)
+    GH->>CF: POST /webhooks/* (GitHub IP)
+    CF->>CF: Bypass — IP match, no login
+    CF->>CFD: Forward (SNI: vps.louhaidia.info)
+    CFD->>App: Docker network
+    Note over App: Validate URL token
+    App-->>GH: 200 OK — deployment triggered
     end
 
-    Note over CF: IAP enforces access<br/>Auth0 is IdP only
-    CF->>CFD: Forward over tunnel<br/>SNI: n8n.louhaidia.info
-    Note over CFD: Match SNI to host
-    CFD->>App: HTTPS over Docker network
-    App-->>CFD: Response
-    CFD-->>CF: Response
-    CF-->>U: HTTPS response
+    rect rgb(245,235,255)
+    Note over U,App: B — Protected app (backups.louhaidia.info)
+    U->>CF: GET /
+    CF-->>U: 302 redirect to Auth0
+    U->>Auth0: Authenticate
+    Auth0-->>CF: Tokens + claims
+    CF->>CFD: Forward (SNI: backups.louhaidia.info)
+    CFD->>App: Docker network
+    App-->>U: HTTPS response
+    end
+
+    rect rgb(230,255,230)
+    Note over P,App: C — Public app (elmouatassim.louhaidia.info)
+    P->>CF: GET /
+    Note over CF: No Access app attached
+    CF->>CFD: Forward (SNI: elmouatassim.louhaidia.info)
+    CFD->>App: Docker network
+    App-->>P: HTTPS response
+    end
 ```
 
 this following diagram illustrates the steps an admin will go through in order to access the coolify admin dashboard. as this interface is highly sensitive, it is published only on tailscale network and not exposed on the internet.
@@ -289,13 +315,12 @@ networks:
 
 ### cloudflare tunnel
 
-after creating a free account in cloudflare, you will need to configure in cloudflare dashboard → networks → tunnels a new tunnel and then afterwards go into the newly created tunnel settings to create a new route.
+after creating a free account in cloudflare, you will need to configure in cloudflare dashboard → networks → tunnels a new tunnel and then afterwards go into the newly created tunnel settings to create two new routes. one to serve all apps hosted on your coolify from the internet and one to receive webhooks to deploy github sources. the order is important. start with the webhooks one as it goes to a different container.
 
-| **subdomain** | **domain** | **service url** | **sni setting** |
-| ----------- | -------- | ------------- | ------------- |
-| `*` | `louhaidia.info` | `https://<backend>:443` | `Match SNI to host = Enabled` |
-
-replace `<backend>` with the container name of the service that terminates tls for your apps (e.g. the coolify proxy container on the `coolify` network). you can publish everything on the wildcard subdomain.
+| **subdomain** | **domain** | **path** | **service url** | **sni setting** |
+| ----------- | -------- | -------- | ------------- | ------------- |
+| `vps` | `louhaidia.info` | `^/webhooks/source/github/` | `http://coolify:8080` | `none as we are in clear-text world here` |
+| `*` | `louhaidia.info` | `*` | `https://coolify-proxy:443` | `Match SNI to host = Enabled` |
 
 > match sni to host is required so `cloudflared` forwards the original hostname (e.g. `photos.louhaidia.info`) as the tls sni to the backend, allowing wildcard certificate matching.
 
@@ -431,6 +456,35 @@ then to allow access to the newly created service available at `coolify.<tailnet
  "ip":  ["tcp:443"],
 }
 ```
+
+### github webhooks
+
+in order to protect your coolify admin ui, exposed via a cloudflare tunnel, so that only gitHub's webhook delivery ip ranges can reach it, we will use a `bypass` policy in cloudflare access, **not an `allow` policy**, so non-interactive webhook requests are never redirected to a login page.
+
+```mermaid
+flowchart LR
+    A[GitHub Push Event] -->|Webhook POST<br/>Source: GitHub IP| B[Cloudflare Edge]
+    B --> C{Cloudflare Access<br/>Application}
+    C -->|Policy 1: Bypass<br/>IP in GitHub range| D[Cloudflare Tunnel]
+    C -->|Policy 2: Block<br/>Everyone else| E[403 Blocked]
+    D --> F[Coolify Admin UI<br/>Webhook Endpoint]
+    F -->|Validate URL token| G[Trigger Deployment]
+```
+
+> the webhook url already contains a secret token for authentication
+
+you can actually get the ip ranges used by github to deliver webhooks using the following command line:
+
+```bash
+curl -s https://api.github.com/meta | jq '.hooks'
+```
+
+then create in zero-trust configs on cloudflare a self-hosted application with 2 policies:
+
+1. bypass policy that is based only on source ip addresses
+2. block policy that blocks everything else.
+
+make sure to test it from github and from your local device (using burp or curl).
 
 ## conclusion
 
