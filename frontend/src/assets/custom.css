@@ -68,3 +68,109 @@
 .dark .prose blockquote::before {
     color: #f0c419;
 }
+
+/*
+    Table of Contents box
+    Rendered by layouts/partials/toc.html at the top of each post.
+    Hugo outputs <nav id="TableOfContents"><ul>…</ul></nav>.
+
+    NOTE: Tailwind v4 preflight resets box-model properties with a
+    `:not(#\#):not(#\#)` specificity hack (0,2,0), which beats plain
+    class selectors. Spacing/border rules below therefore need
+    !important to win — same approach as the blockquote styles above.
+*/
+
+.toc {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.75rem 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* summary row: label + chevron side by side */
+.toc summary {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    justify-content: flex-start !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    list-style: none;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* hide the default disclosure triangle */
+.toc summary::-webkit-details-marker {
+    display: none;
+}
+
+.toc summary::marker {
+    content: "";
+}
+
+/* custom chevron: points right when closed, down when open */
+.toc summary::after {
+    content: "" !important;
+    width: 0.45rem !important;
+    height: 0.45rem !important;
+    border-right: 1.5px solid currentColor !important;
+    border-bottom: 1.5px solid currentColor !important;
+    transform: rotate(-45deg) !important;
+    transition: transform 0.2s ease;
+    opacity: 0.55;
+    flex-shrink: 0;
+}
+
+.toc details[open] > summary::after {
+    transform: rotate(45deg) !important;
+}
+
+/* divider under the label; gap matches the box padding rhythm (0.75rem) */
+.toc details[open] > summary {
+    margin-bottom: 0 !important;
+    padding-bottom: 0.75rem !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* list entries start flush with the "Contents" label */
+.toc nav#TableOfContents ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.toc nav#TableOfContents ul ul {
+    padding-left: 1.25rem !important;
+    margin-top: 0.25rem !important;
+}
+
+.toc nav#TableOfContents li {
+    margin: 0 !important;
+    padding: 0.3rem 0 !important;
+    line-height: 1.5;
+}
+
+.toc nav#TableOfContents a {
+    text-decoration: none !important;
+    color: inherit;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
+}
+
+.toc nav#TableOfContents a:hover {
+    text-decoration: underline !important;
+    opacity: 1;
+}
+
+.dark .toc {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .toc details[open] > summary {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}

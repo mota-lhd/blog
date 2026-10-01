@@ -1,0 +1,8 @@
+{{- if and (ne .Params.toc false) (gt (len .Fragments.Identifiers) 0) -}}
+<aside class="toc not-prose">
+  <details open>
+    <summary>Contents</summary>
+    {{- .TableOfContents -}}
+  </details>
+</aside>
+{{- end -}}
