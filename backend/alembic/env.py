@@ -14,7 +14,7 @@ modules_path: str = str(Path(__file__).parent.parent)
 
 logger.info(f"using {modules_path} for python packages ...")
 
-if modules_path.endswith("blog"):
+if modules_path.endswith("blog/backend"):
   sys.path.insert(0, f"{modules_path}/src")
 else:
   sys.path.insert(0, f"{modules_path}")

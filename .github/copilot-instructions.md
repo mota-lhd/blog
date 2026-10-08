@@ -13,20 +13,21 @@ This is a **full-stack personal blog** with:
 **Purpose**: Multi-site comment system with HTML sanitization and captcha protection.
 
 **Key Files & Patterns**:
-- `backend/src/main.py`: FastAPI app setup with SQLModel ORM, CORS middleware, and three endpoints
+- `backend/src/main.py`: FastAPI app setup with SQLModel ORM, CORS middleware, and two endpoints
   - `POST /comments`: Create new comments with Turnstile captcha validation
   - `GET /comments?site_id=X&post_slug=Y`: Fetch approved comments for a post
-  - `GET /comments-to-approve`: Moderation endpoint for unapproved comments
 - `backend/src/models.py`: SQLModel definitions with self-referential relationships for nested replies
-  - `CommentBase`: Shared fields (site_id, post_slug, author, email, content, parent_id)
+  - `CommentBase`: Shared public fields (site_id, post_slug, author, content, parent_id)
   - `Comment`: ORM table model with recursive reply relationships
+  - `CommentCreate`: Request model containing email and the Turnstile token
   - `CommentResponse`: API response model with nested replies
-- `backend/src/settings.py`: Pydantic settings from `.env` (database_url, turnstile_secret, turnstile_api_url)
+- `backend/src/settings.py`: Required Pydantic settings from `.env` (database_url, turnstile_secret, turnstile_api_url, service_name)
 
 **Critical Patterns**:
 - Comments are sanitized with `nh3` library before returning (removes XSS vectors)
 - Self-referential relationships stored in DB with `parent_id` foreign key
-- All data queries must filter by `approved=True` and `parent_id=None` to get top-level comments
+- New comments are approved by default. The public `GET /comments` query selects approved top-level rows and includes their nested replies.
+- Keep email in the database model and `CommentCreate` only; never add it to `CommentResponse` or public comment payloads
 - Turnstile captcha token validation is **required** on comment creation
 
 ### Frontend (Hugo + Tailwind)
@@ -42,20 +43,27 @@ This is a **full-stack personal blog** with:
 - Hugo Paper theme (trimmed version)
 - All content in Markdown with YAML frontmatter
 - Post slugs defined in `content/posts/` filenames (used by backend for comment queries)
-- Tailwind CSS post-processed via `npm run css` command
+- Tailwind CSS post-processed from `frontend/src/` via `bun run build:css`
 
 ## Development Workflows
 
 ### Backend Workflows
 
 **Code Quality**:
-- Linting: `ruff check --unsafe-fixes --fix` (checks E, F, UP, W, I, B rules)
-- Formatting: `ruff format` (80 char line length, double quotes, 2-space indent)
+- From `backend/`, lint with `uv run ruff check --unsafe-fixes --fix` (checks E, F, UP, W, I, B rules)
+- From `backend/`, format with `uv run ruff format` (80 char line length, double quotes, 2-space indent)
 - Applied automatically on migration file generation via alembic post-write hooks
 
 **Database Migrations**:
 - Tool: Alembic
 - Location: `backend/alembic/versions/`
+- Run migration commands from `backend/`. Configure `.env` with the required settings:
+  - `DATABASE_URL`
+  - `TURNSTILE_SECRET`
+  - `TURNSTILE_API_URL`
+  - `SERVICE_NAME`
+- For the local SQLite database, set `DATABASE_URL=sqlite:///comments.db` in `.env` and create the file first with `touch comments.db`. Then run `uv run alembic upgrade head` before generating revisions, so the database is at the current migration head.
+- After changing models, generate a revision with `uv run alembic revision --autogenerate -m "describe the change"`, review it, then run `uv run alembic upgrade head` to apply it.
 - Auto-format migrations with ruff (enforced in alembic.ini post_write_hooks)
 - Run migrations on app startup via `entrypoint.sh`: `alembic upgrade head`
 
@@ -68,11 +76,11 @@ This is a **full-stack personal blog** with:
 ### Frontend Workflows
 
 **CSS Building**:
-- Run `npm run css` to regenerate `assets/main.css` from `assets/app.css`
+- From `frontend/src/`, run `bun run build:css` to regenerate `assets/main.css` from `assets/app.css`
 - Uses Tailwind with typography plugin
 
 **Dependency Management**:
-- Tools: prettier, stylelint, tailwindcss
+- Tools: Bun, Prettier, PostCSS, and Tailwind CSS
 - No complex build pipeline—Hugo handles static generation
 
 ## Project Conventions
@@ -84,16 +92,17 @@ This is a **full-stack personal blog** with:
 - **Naming**: snake_case for functions/variables, PascalCase for classes
 
 ### Commit & PR Process
-- PR requires linting and dockerfile security scan (Trivy) to pass
+- The PR workflow builds and scans backend/frontend images when those paths change; it runs Checkov on changed Dockerfiles and Grype image scans. It does not currently run Ruff linting or Trivy.
 - All PRs trigger secret scanning (Trufflehog)
 - Path-based job filtering: backend changes only run backend checks
 
 ### Environment Variables
 Backend requires:
-- `DATABASE_URL`: SQLite or PostgreSQL connection string
+- `DATABASE_URL`: SQLAlchemy database URL (SQLite works with current dependencies; other database engines require their driver)
 - `TURNSTILE_SECRET`: Cloudflare Turnstile secret key
 - `TURNSTILE_API_URL`: Turnstile verification endpoint URL
 - `SERVICE_NAME`: App title for FastAPI docs
+- `ALLOWED_ORIGINS` (optional): JSON array of allowed CORS origins, for example `["https://example.com","https://admin.example.com"]`; defaults to `["*"]`
 - `DEBUG` (optional): Enable debug mode (default False)
 
 ## Integration Points
@@ -104,14 +113,14 @@ Backend requires:
   - Post body (create): `site_id`, `post_slug`, `author`, `email`, `content`, `turnstile_token`
 
 **Security**:
-- CORS configured to allow all origins (frontend deployed separately)
+- Backend CORS uses `settings.allowed_origins`; configure `ALLOWED_ORIGINS` as a JSON array in `.env` when restricting access, for example `ALLOWED_ORIGINS='["https://example.com"]'`
 - All comment text sanitized before storage and retrieval
 - Captcha validation required on creation
-- CSP headers restrict script execution
+- Hugo's `security.csp` configuration defines `default-src`, `script-src`, `frame-src`, and `connect-src` policies
 
 ## When Making Changes
 
-1. **Backend models**: Update `models.py`, then run `alembic revision --autogenerate` to create migration
+1. **Backend models**: Update `backend/src/models.py`, then from `backend/` create/upgrade `comments.db` as described above, generate a revision with `uv run alembic revision --autogenerate -m "describe the change"`, review it, and apply it with `uv run alembic upgrade head`
 2. **New endpoints**: Follow GET/POST pattern, validate input, sanitize output, depend on session
 3. **Frontend config**: Update `frontend/src/config.yml` if changing blog parameters or comment backend URL
 4. **Content changes**: Edit Markdown in `frontend/src/content/posts/` — Hugo handles static generation
