@@ -6,6 +6,7 @@ class Settings(BaseSettings):
   turnstile_secret: str
   turnstile_api_url: str
   service_name: str
+  allowed_origins: list[str] = ["*"]
 
   debug: bool = False
   request_timeout: int = 30

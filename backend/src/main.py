@@ -31,7 +31,7 @@ def get_app() -> FastAPI:
     CORSMiddleware,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
-    allow_origins=["*"],
+    allow_origins=settings.allowed_origins,
     expose_headers=[],
     allow_headers=[],
   )
@@ -60,7 +60,8 @@ def get_session() -> Any:
 def sanitize_text(text: str) -> str:
   if not text:
     return ""
-  return nh3.clean(text)
+  else:
+    return nh3.clean(text)
 
 
 def sanitize_comment(comment: Comment) -> None:
@@ -89,7 +90,7 @@ async def check_captcha(token: str) -> bool:
     return res.json().get("success", False)
 
 
-# methods
+# endpoints
 
 
 @app.post("/comments", response_model=CommentResponse)
@@ -102,25 +103,11 @@ async def create_comment_bis(
 
   db_comment: Comment = Comment.model_validate(comment)
 
+  sanitize_comment(db_comment)
   session.add(db_comment)
   session.commit()
   session.refresh(db_comment)
-  sanitize_comment(db_comment)
   return db_comment
-
-
-@app.get("/comments-to-approve", response_model=list[CommentResponse])
-def get_non_approved_comments(
-  session: Session = Depends(get_session),  # noqa: B008
-):
-  statement = select(Comment).where(
-    Comment.approved == False,  # noqa: E712
-    Comment.parent_id == None,  # noqa: E711
-  )
-  comments: list[Comment] = session.exec(statement).all()
-
-  sanitize_comments(comments)
-  return comments
 
 
 @app.get("/comments", response_model=list[CommentResponse])
@@ -129,11 +116,14 @@ def get_post_comments(
   post_slug: str,
   session: Session = Depends(get_session),  # noqa: B008
 ):
-  statement = select(Comment).where(
-    Comment.site_id == site_id,
-    Comment.post_slug == post_slug,
-    Comment.approved == True,  # noqa: E712
-    Comment.parent_id == None,  # noqa: E711
+  statement = (
+    select(Comment)
+    .where(
+      Comment.site_id == site_id,
+      Comment.post_slug == post_slug,
+      Comment.approved == True,  # noqa: E712
+      Comment.parent_id == None,  # noqa: E711
+    )
   )
   comments: list[Comment] = session.exec(statement).all()
 

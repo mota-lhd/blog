@@ -2,13 +2,14 @@ from datetime import UTC
 from datetime import datetime
 from typing import Optional
 
+from pydantic import ConfigDict
 from pydantic import EmailStr
 from sqlmodel import Field
 from sqlmodel import Relationship
 from sqlmodel import SQLModel
 
 
-class CommentPublicBase(SQLModel):
+class CommentBase(SQLModel):
   site_id: str = Field(index=True)
   post_slug: str = Field(index=True)
   author: str = Field(max_length=100)
@@ -16,11 +17,8 @@ class CommentPublicBase(SQLModel):
   parent_id: int | None = Field(default=None, foreign_key="comment.id")
 
 
-class CommentBase(CommentPublicBase):
-  email: EmailStr
-
-
 class Comment(CommentBase, table=True):
+  email: EmailStr
   id: int | None = Field(default=None, primary_key=True, index=True)
   approved: bool = Field(default=True)
   created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -41,13 +39,13 @@ class Comment(CommentBase, table=True):
 
 
 class CommentCreate(CommentBase):
+  email: EmailStr
   turnstile_token: str
 
 
-class CommentResponse(CommentPublicBase):
+class CommentResponse(CommentBase):
   id: int
   created_at: datetime
-  replies: list["CommentResponse"] = []
+  replies: list["CommentResponse"] = Field(default_factory=list)
 
-  class Config:
-    from_attributes = True
+  model_config = ConfigDict(from_attributes=True)
