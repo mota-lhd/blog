@@ -1,5 +1,4 @@
 node_modules/
-alembic
 comments.db
 .env
 .idea
