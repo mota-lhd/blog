@@ -8,6 +8,8 @@ updates:
       front:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "docker"
     directory: "/backend"
@@ -17,6 +19,8 @@ updates:
       back:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/frontend/src"
@@ -26,6 +30,8 @@ updates:
       front:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "uv"
     directory: "/backend"
@@ -35,6 +41,8 @@ updates:
       back:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "github-actions"
     directories:
@@ -45,3 +53,5 @@ updates:
       actions:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
