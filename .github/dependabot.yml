@@ -4,6 +4,8 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       front:
         patterns:
@@ -13,6 +15,8 @@ updates:
     directory: "/backend"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       back:
         patterns:
@@ -22,6 +26,8 @@ updates:
     directory: "/frontend/src"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       front:
         patterns:
@@ -31,6 +37,8 @@ updates:
     directory: "/backend"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       back:
         patterns:
@@ -41,6 +49,8 @@ updates:
       - "/.github/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:
