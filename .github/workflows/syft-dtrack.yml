@@ -34,7 +34,7 @@ jobs:
           # Verify the installer was downloaded and is executable
           test -s "$RUNNER_TEMP/syft/install.sh"
           # Execute the downloaded installer
-          sh "$RUNNER_TEMP/syft/install.sh" -s -- -b "$RUNNER_TEMP/syft"
+          sh "$RUNNER_TEMP/syft/install.sh" -b "$RUNNER_TEMP/syft"
 
       - name: syft/upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
