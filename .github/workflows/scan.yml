@@ -72,7 +72,8 @@ jobs:
          {"image":"coollabsio/coolify","version":"latest","dtrack_project_name":"coolify"},
          {"image":"ghcr.io/${{ github.repository }}/blog-frontend","version":"latest","dtrack_project_name":"elmouatassim-blog-frontend"},
          {"image":"ghcr.io/${{ github.repository }}/blog-backend","version":"latest","dtrack_project_name":"elmouatassim-blog-backend"}]
-    secrets: inherit
+    secrets:
+      DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
 
   analyze:
     name: opengrep/scan/${{ matrix.language }}
