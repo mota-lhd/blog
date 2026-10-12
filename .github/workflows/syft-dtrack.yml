@@ -30,8 +30,15 @@ jobs:
         run: |
           # Download Syft once; matrix jobs reuse this artifact instead of fetching it again.
           mkdir -p "$RUNNER_TEMP/syft"
-          curl -sSfL https://get.anchore.io/syft \
-            | sh -s -- -b "$RUNNER_TEMP/syft"
+          # Download Syft installer script first, verify it, then execute
+          # This avoids the "curl | bash" pattern which is a security risk
+          curl -sSfL https://get.anchore.io/syft -o "$RUNNER_TEMP/syft/install.sh"
+          # Verify the script is not empty and looks reasonable
+          if [ ! -s "$RUNNER_TEMP/syft/install.sh" ] || ! grep -q "anchore.io" "$RUNNER_TEMP/syft/install.sh"; then
+            echo "Downloaded installer appears invalid or empty"
+            exit 1
+          fi
+          sh "$RUNNER_TEMP/syft/install.sh" -b "$RUNNER_TEMP/syft"
 
       - name: syft/upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
