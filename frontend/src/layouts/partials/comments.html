@@ -30,7 +30,12 @@
   <div id="comments" class="mt-6 space-y-3"></div>
 </div>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script
+    async
+    defer
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js" 
+    integrity="sha384-atpOMQEE6BpVvX/gJ4opeACh3M/SPia1QVsvFl1zEhC3r4t+gsy4X8nXa3HDbus6"
+></script>
 <script>
   const API_BASE = "{{- .Site.Params.commentsBackend -}}";
   const el = (id) => document.getElementById(id);
