@@ -12,17 +12,17 @@
     "build:generate": "hugo --config ./config.yml --gc --minify --source . --destination public"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.3.3",
-    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/cli": "^4.3.5",
+    "@tailwindcss/postcss": "^4.3.5",
     "@tailwindcss/typography": "^0.5.20",
-    "autoprefixer": "^10.6.1",
-    "postcss": "^8.5.28",
+    "autoprefixer": "^10.6.2",
+    "postcss": "^8.5.32",
     "postcss-cli": "^12.0.0",
-    "postcss-preset-env": "^11.5.4",
-    "prettier": "^3.9.9",
+    "postcss-preset-env": "^11.6.2",
+    "prettier": "^3.10.1",
     "prettier-plugin-css-order": "^2.2.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.5"
   }
 }
