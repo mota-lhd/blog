@@ -55,26 +55,6 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  syft-dtrack:
-    name: syft-dtrack
-    needs: docker
-    permissions:
-      contents: read
-      packages: read
-    uses: ./.github/workflows/syft-dtrack.yml
-    with:
-      dtrack_url: https://dtrack.louhaidia.info
-      images: >-
-        [{"image":"ghcr.io/umami-software/umami","version":"latest","dtrack_project_name":"umami"},
-         {"image":"outlinewiki/outline","version":"latest","dtrack_project_name":"outline"},
-         {"image":"databasus/databasus","version":"latest","dtrack_project_name":"databasus"},
-         {"image":"ghcr.io/immich-app/immich-server","version":"release","dtrack_project_name":"immich"},
-         {"image":"coollabsio/coolify","version":"latest","dtrack_project_name":"coolify"},
-         {"image":"ghcr.io/${{ github.repository }}/blog-frontend","version":"latest","dtrack_project_name":"elmouatassim-blog-frontend"},
-         {"image":"ghcr.io/${{ github.repository }}/blog-backend","version":"latest","dtrack_project_name":"elmouatassim-blog-backend"}]
-    secrets:
-      DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-
   analyze:
     name: opengrep/scan/${{ matrix.language }}
     runs-on: ubuntu-slim
