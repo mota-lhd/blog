@@ -1,0 +1,27 @@
+---
+applyTo: "backend/**/*.py"
+---
+
+- The backend is a FastAPI comments service using SQLModel, CORS middleware, and a database session dependency.
+- The comments API supports multiple sites and nested reply threads.
+- CORS middleware uses `settings.allowed_origins`; `SERVICE_NAME` supplies the FastAPI title.
+- `backend/src/main.py` defines `POST /comments` for comment creation and `GET /comments?site_id=X&post_slug=Y` for approved comment threads.
+- `CommentBase` contains `site_id`, `post_slug`, `author`, `content`, and `parent_id`; `Comment` stores email and recursive parent/reply relationships.
+- `CommentCreate` adds email and the Turnstile token; `CommentResponse` contains nested replies but no email.
+- Keep email in the database model and `CommentCreate` only; never expose it through `CommentResponse` or public payloads.
+- Require Turnstile validation for every comment creation; do not add a bypass path.
+- Sanitize comment text with `nh3` before storage and retrieval.
+- New comments are approved by default; public queries return approved top-level comments with nested replies.
+- Validate endpoint input, sanitize output, and use the existing database session pattern.
+- The frontend sends `site_id`, `post_slug`, `author`, `email`, `content`, and `turnstile_token` when creating a comment; `parent_id` is used for replies.
+- The frontend fetches comments with `site_id` and `post_slug` query parameters.
+- Required settings are `DATABASE_URL`, `TURNSTILE_SECRET`, `TURNSTILE_API_URL`, and `SERVICE_NAME`.
+- `ALLOWED_ORIGINS` is an optional JSON array and defaults to `["*"]`; `DEBUG` defaults to `false`.
+- To restrict CORS, set `ALLOWED_ORIGINS` to a JSON array such as `["https://example.com","https://admin.example.com"]`.
+- SQLite works with current dependencies; other database engines require their driver.
+- No `.env.example` is present; configure backend settings in `.env`.
+- Manage Python dependencies with `uv`.
+- Run Ruff from `backend/` with `uv run ruff check --unsafe-fixes --fix` and `uv run ruff format`.
+- Use Python 3.13 or newer, full type annotations, double-quoted strings, snake_case names, and PascalCase class names.
+- Keep imports single-line and grouped standard library, third-party, then local; Ruff uses an 80-character line length and two-space indentation.
+- Put Alembic schema changes and migration procedures under the migration-specific instructions and skill.
