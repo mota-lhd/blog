@@ -99,6 +99,23 @@ jobs:
           ${{ matrix.scan_args }} \
           --sarif-output="${{ matrix.sarif_file }}" \
           ${{ matrix.scan_path }}
+    - name: opengrep/filter-suppressed-sarif
+      if: always()
+      env:
+        SARIF_FILE: ${{ matrix.sarif_file }}
+      run: |
+        jq '
+          .runs |= map(
+            if (.results | type) == "array" then
+              .results |= map(select(
+                (any(.suppressions[]?; .kind == "inSource")) | not
+              ))
+            else
+              .
+            end
+          )
+        ' "$SARIF_FILE" > "$SARIF_FILE.tmp"
+        mv "$SARIF_FILE.tmp" "$SARIF_FILE"
     - name: opengrep/upload
       if: always()
       uses: github/codeql-action/upload-sarif@38112626f97ac1fd7acf3df7ebca51f4677c1b38 # v2.27.6
