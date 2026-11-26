@@ -24,17 +24,17 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: docker/setup
-      uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
     - name: docker/login
-      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+      uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7
+      uses: bridgecrewio/checkov-action@b782b35c8411ff565b881fba67ceebdb426d7dc4 # v3.4.11
       with:
         output_format: cli,sarif
         output_file_path: console,results-${{ matrix.docker_image }}.sarif
@@ -43,11 +43,11 @@ jobs:
         quiet: true
         soft_fail: true
     - name: dockerfile/codeql/upload
-      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
+      uses: github/codeql-action/upload-sarif@38112626f97ac1fd7acf3df7ebca51f4677c1b38 # v2.27.6
       with:
         sarif_file: results-${{ matrix.docker_image }}.sarif
     - name: dockerfile/build
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: './${{ matrix.docker_image }}/'
         push: true
@@ -79,15 +79,15 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: opengrep/install
       env:
-        OPENGREP_VERSION: v1.30.0
+        OPENGREP_VERSION: v2.1.0
       run: |
         mkdir -p "$RUNNER_TEMP/opengrep"
         curl -fsSL \
           -o "$RUNNER_TEMP/opengrep/opengrep" \
-          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_manylinux_x86"
+          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_linux_x86"
         chmod +x "$RUNNER_TEMP/opengrep/opengrep"
         echo "$RUNNER_TEMP/opengrep" >> "$GITHUB_PATH"
     - name: opengrep/scan
@@ -101,7 +101,7 @@ jobs:
           ${{ matrix.scan_path }}
     - name: opengrep/upload
       if: always()
-      uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a
+      uses: github/codeql-action/upload-sarif@38112626f97ac1fd7acf3df7ebca51f4677c1b38 # v2.27.6
       with:
         sarif_file: ${{ matrix.sarif_file }}
         category: "/opengrep:${{ matrix.language }}"

@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: trufflehog
-      uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55
+      uses: trufflesecurity/trufflehog@4ef51f69ca6347aaa76a5e64a87eac9c0c909f71 # v3.100.1
       with:
         extra_args: --results=verified,unknown
 
@@ -35,11 +35,11 @@ jobs:
       actions: ${{ steps.changes.outputs.actions }}
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: changes
-      uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706
+      uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
       id: changes
       with:
         filters: .github/file_and_dir_filters.yml
@@ -51,11 +51,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7
+      uses: bridgecrewio/checkov-action@b782b35c8411ff565b881fba67ceebdb426d7dc4 # v3.4.11
       if: ${{ needs.changes.outputs.backend_dockerfile == 'true' }}
       with:
         output_format: cli
@@ -64,9 +64,9 @@ jobs:
         framework: "dockerfile"
         quiet: true
     - name: docker/setup
-      uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
     - name: docker/build
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: './backend/'
         push: false
@@ -76,7 +76,7 @@ jobs:
         outputs: type=docker
     - name: image/scan
       id: backend_scan
-      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
+      uses: anchore/scan-action@11983a512817154c80a9db660c1a184be7513ed6 # v7.4.3
       with:
         image: 'local/web:back'
         fail-build: true
@@ -92,11 +92,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: dockerfile/scan
-      uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7
+      uses: bridgecrewio/checkov-action@b782b35c8411ff565b881fba67ceebdb426d7dc4 # v3.4.11
       if: ${{ needs.changes.outputs.frontend_dockerfile == 'true' }}
       with:
         output_format: cli
@@ -105,9 +105,9 @@ jobs:
         framework: "dockerfile"
         quiet: true
     - name: docker/setup
-      uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
     - name: docker/build
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: './frontend/'
         push: false
@@ -117,7 +117,7 @@ jobs:
         outputs: type=docker
     - name: image/scan
       id: frontend_scan
-      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2
+      uses: anchore/scan-action@11983a512817154c80a9db660c1a184be7513ed6 # v7.4.3
       with:
         image: 'local/web:front'
         fail-build: true
@@ -133,12 +133,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: opengrep
       env:
-        OPENGREP_VERSION: v1.30.0
+        OPENGREP_VERSION: v2.1.0
         GH_TOKEN: ${{ github.token }}
         BACKEND_CHANGED: ${{ needs.changes.outputs.backend_python }}
         FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend_js }}
@@ -147,7 +147,7 @@ jobs:
         mkdir -p "$RUNNER_TEMP/opengrep"
         curl -fsSL \
           -o "$RUNNER_TEMP/opengrep/opengrep" \
-          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_manylinux_x86"
+          "https://github.com/opengrep/opengrep/releases/download/${OPENGREP_VERSION}/opengrep_linux_x86"
         chmod +x "$RUNNER_TEMP/opengrep/opengrep"
 
         if [[ "$BACKEND_CHANGED" == "true" ]]; then
