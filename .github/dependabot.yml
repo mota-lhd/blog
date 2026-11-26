@@ -46,7 +46,7 @@ updates:
 
   - package-ecosystem: "github-actions"
     directories:
-      - "/.github/"
+      - "/.github"
     schedule:
       interval: "daily"
     cooldown:
